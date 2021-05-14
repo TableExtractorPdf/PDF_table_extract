@@ -3,7 +3,7 @@
 	<head>
         <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
         <title>PDF Table Select Areas</title>
-        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/extract.css')}}">
+        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/workspace.css')}}">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 
 		<!--[if lte IE 8]><link href="../resources/jquery.selectareas.ie8.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
@@ -381,7 +381,10 @@
                     var imageWidth = $('#pageImg').width();
                     var imageHeight = $('#pageImg').height();
 
-                    $('.image-decorator div, .image-decorator img').css({'height':'70vh', 'width':(imageWidth/imageHeight*100)*0.7+'vh'});
+                    var fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
+
+                    $('.image-decorator div, .image-decorator img').css({'height':'70vh', 'width':fit_width});
+                    // $('#top_tools').css({'width':fit_height});
                     
                     if( detected_areas.hasOwnProperty(String(this_page)) ){
                         page = String(this_page);
@@ -471,18 +474,23 @@
 
 	<body>
         <div class="loader loader-default" data-text="Processing..."></div>
-        <header>
-            <ul>
-                <li onclick='location.href="/"'>HOME</li>
-                <li>BLAH BLAH</li>
-                <li>BLAH BLAH</li>
-                <!-- <li style='font-size: 24px;'><b>{{fileName}}.pdf</b>&nbsp;&nbsp;&nbsp; p{{page}}</li> -->
-            </ul>
-        </header>
+
+        {% include "menu_template.html" %}
+
         <div id='page_list_box'>
             {% for idx in range(1, totalPage+1) %}
-                <div class='thumb_page'>
+                <div class='thumb_page thumb_page_{{idx}}'>
                     <center>
+                        {% set tables_len = detected_areas[idx]|length %}
+                        <img src='/static/icon/check.png' class='check_page' style='display:none'>
+                        <img src='/static/icon/table.png' class='exist_class' style='
+                        {% if tables_len > 0 %}
+                        display: inline;
+                        {% else %}
+                        display: none;
+                        {% endif %}
+                        '>
+                        <br>
                         {% if idx == 1 %}
                         <img
                             class='thumb_img thumb_img_select'
@@ -493,6 +501,7 @@
                             id="thumb_page_{{idx}}">
 
                         {% else %}
+                        
                         <img
                             class='thumb_img'
                             src="{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-{{idx}}-thumb.png"
@@ -503,7 +512,7 @@
                         {% endif %}
                         <br>
                         <span>{{idx}}</span>
-                        <br><br>
+                        <br>
                     </center>
                 </div>
             {% endfor %}
@@ -513,17 +522,36 @@
            <tr>
                 <td>
                     <div id="wrapper">
-
-                        <input id='auto_detect' type='button' value='Auto Detected'>
-                        <div style='float:right'>
-                            <label title='Line Scale is the smallest length to detect PDF tables border lines'>
-                                ⯑ Line Scale&nbsp;<input style="width: 40px" type='text' id="line_scale" value="40">
-                            </label>
-                            
-                            <label>
-                                <input type='button' id="get_line_size" value="get Line Size">
-                            </label>
-                        </div>
+                        <table id="top_tools">
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <label title='Line Scale is the smallest length to detect PDF tables border lines'>
+                                        ⯑ Line Scale&nbsp;<input style="width: 40px" type='text' id="line_scale" value="40">
+                                    </label>
+                                </td>
+                                <td>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="optradio" value="areas">&nbsp;&nbsp;&nbsp;table_areas
+                                    </label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input id='auto_detect' type='button' class='btn btn-success' value='Auto Detected'>
+                                </td>
+                                <td>
+                                    <label>
+                                        <input type='button' id="get_line_size" class="btn btn-warning" value="Get Line Size">
+                                    </label>
+                                </td>
+                                <td>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="optradio" value="regions" checked>&nbsp;&nbsp;&nbsp;table_regions
+                                    </label>
+                                </td>
+                            </tr>
+                        </table>
                         <br>
 
                         <div class="image-decorator">
@@ -532,23 +560,13 @@
                         
                     <center>
                         <span class="arrow">◀</span>
-                        <input type="text">
+                        <!-- <input type="text"> -->
                         <span class="arrow">▶</span>
                     </center>
                     </div>
                 </td>
                 
                 <td style="width: 120px;">
-                    <div style='position: absolute; top: 10%'>
-                        <label class="radio-inline">
-                            <input type="radio" name="optradio" value="areas">table_areas
-                        </label>
-                        <br>
-                        <label class="radio-inline">
-                            <input type="radio" name="optradio" value="regions" checked>table_regions
-                        </label>
-                    </div>
-
                     <input type="button" value="검출?" style="font-size: 18px; cursor:pointer;"/>
                     <br>
                     <input type="button" id="extract" value="추출▶" style="font-size: 18px; cursor:pointer;"/>

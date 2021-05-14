@@ -196,7 +196,7 @@ def extract_page():
         inputstream.close()
 
         return render_template(
-            'extract.html',
+            'workspace.html',
             fileName=fileName,
             totalPage=total_page,
             detected_areas=detected_areas[fileName],

@@ -12,26 +12,6 @@ body {
 	font-size : 12px;
 	height: 100vh;
 }
-header {
-	position: relative;
-    width: auto;
-    height: 8%;
-    background: #F52C05;
-}
-header ul{
-	position: absolute;
-	height: 50%;
-	bottom: 0;
-}
-header li{
-	list-style-type: none;
-	float: left;
-	height: 100%;
-	margin-left: 100px;
-	font-size: 28px;
-	color: white;
-	cursor: pointer;
-}
 
 #page_list_box{
 	position: absolute;
@@ -51,6 +31,16 @@ header li{
 .thumb_img_select{
 	border: 2px solid #F52C05;
 }
+.check_page{
+	float:left;
+	width: 20px;
+	margin-left: 10px;
+}
+.exist_class{
+	float:right;
+	width: 16px;
+	margin-right: 10px;
+}
 
 
 #article_table{
@@ -65,6 +55,24 @@ input :not([type=radio]){
 	display: block;
 	/* width: 120px; */
 	margin: 10px;
+}
+
+#top_tools{
+	width: 580px;
+}
+#top_tools input[type=button]{
+	font-size: 18px;
+	font-weight: bold;
+}
+.btn{
+	width: 160px;
+}
+.radio-inline input[type="radio"]{
+	width: 25px;
+	height: 25px;
+	margin-right: 10px;
+	margin-top: -1px;
+	vertical-align: middle;
 }
 
 #output {
