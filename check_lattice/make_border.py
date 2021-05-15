@@ -33,7 +33,6 @@ def addOutline(direction, mask, contours, line_size = 2):
     return mask
 
 if __name__ ==  "__main__":
-    print("I AM MAKE_BORDER MAIN")
     '''
     # How to use?
     
@@ -46,4 +45,5 @@ if __name__ ==  "__main__":
     horizontal_mask = addOutline("h", horizontal_mask, contours)
     
     '''
+    pass
 
