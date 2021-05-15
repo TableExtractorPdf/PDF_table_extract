@@ -1,0 +1,591 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+        <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+        <title>PDF Table Select Areas</title>
+        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/workspace.css')}}">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+		<!--[if lte IE 8]><link href="../resources/jquery.selectareas.ie8.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
+        <script type="text/javascript" src = "{{url_for('static',filename='js/jquery-1.11.3.min.js')}}"></script>
+
+        
+        <!-- JQUERY Select Areas plug-in -->
+        <script type="text/javascript" src = "{{url_for('static',filename='js/jquery.selectareas.js')}}"></script>
+        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='resources/jquery.selectareas.css')}}">
+        <!--  -->
+
+        <!-- JQUERY Tool tips plug-in -->
+        <!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+        <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script> -->
+
+        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/jquery-ui.min.css')}}">
+        <script type="text/javascript" src = "{{url_for('static',filename='js/jquery-ui.min.js')}}"></script>
+        <!--  -->
+
+
+        <!-- JSpreadSheet -->
+        <script src="https://bossanova.uk/jspreadsheet/v4/jexcel.js"></script>
+        <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jexcel.css" type="text/css" />
+        
+        <script src="https://jsuites.net/v4/jsuites.js"></script>
+        <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jexcel/2.1.0/css/jquery.jexcel.min.css" type="text/css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jexcel/2.1.0/css/jquery.jdropdown.min.css" type="text/css" />
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.css" type="text/css" />
+
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Material+Icons" />
+        <!--  -->
+
+
+
+        <!-- JExcel -->
+        <!-- <link rel="stylesheet" href="{{url_for('static',filename='ce-master/dist/jexcel.css')}}" />
+        <script src="{{url_for('static',filename='ce-master/dist/index.js')}}"></script>
+        <script src="{{url_for('static',filename='ce-master/src/js/jexcel.core.js')}}"></script>
+        <script src="{{url_for('static',filename='ce-master/src/js/jexcel.extensions.js')}}"></script>
+        <script src="{{url_for('static',filename='ce-master/src/js/jexcel.formulars.js')}}"></script> -->
+        <!--  -->
+
+
+        <!-- X-SpreadSheet -->
+        <link rel="stylesheet" href="https://unpkg.com/x-data-spreadsheet@1.1.5/dist/xspreadsheet.css">
+        <script src="https://unpkg.com/x-data-spreadsheet@1.1.5/dist/xspreadsheet.js"></script>
+        <!--  -->
+
+
+        <!-- CSS Loader -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='dist/css-loader.css') }}">
+        <!---------------->
+        
+	<!-- <link rel="icon" href="{{ url_for('static', filename='css/image/icon.png') }}"> -->
+        
+        
+		<script type="text/javascript">
+            var this_page = 1;
+            var detected_areas = JSON.parse( '{{detected_areas | tojson | safe}}' );
+            var table_data;
+
+            $( document ).tooltip();
+            
+                
+
+            // 테이블 선택 영역 표시 함수
+            function set_select_areas(bboxs){
+                if(bboxs != 0){
+                    bboxs = bboxs.split(";");
+                    
+                    $("#pageImg").selectAreas('reset');
+                    
+                    arrs = [];
+                    for(i=0 ; i<bboxs.length ; i++){
+                        var arr = bboxs[i].split(',');
+
+                        fileDimsX = Number(arr[4])
+                        fileDimsY = Number(arr[5])
+                        const imageWidth = $("img#pageImg").width();
+                        const imageHeight = $("img#pageImg").height();
+
+                        scalingFactorX = fileDimsX / imageWidth;
+                        scalingFactorY = fileDimsY / imageHeight;
+
+                        arrs.push({
+                            x: Number(arr[0] / scalingFactorX),
+                            y: Number(arr[1]/ scalingFactorY),
+                            width: Number(arr[2]/ scalingFactorX),
+                            height: Number(arr[3]/ scalingFactorY),
+                        });
+                    }
+                    
+                    $("#pageImg").selectAreas('add', arrs);
+                }
+            }
+
+
+            // 페이지 이동 함수 (pre_page는 현재 페이지, page는 이동할 페이지)
+            function move_page(pre_page, page){
+                this_page = page;
+
+                // 스크롤바를 현재 선택된 썸네일로 이동시키고 중간에 위치하게함
+                document.getElementById('thumb_page_'+page).scrollIntoView({
+                    behavior: 'auto',
+                    block: 'center',
+                    inline: 'center'
+                });
+
+                // thumb_img_select 클래스가 적용된 썸네일은 빨간 테두리가 표시됨 (현재 선택된 페이지라는 뜻)
+                $('#thumb_page_'+pre_page).removeClass('thumb_img_select');
+                $('#thumb_page_'+page).addClass('thumb_img_select');
+
+                $('img#pageImg').attr('src', "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+page+".png");
+                
+                    
+                if( detected_areas.hasOwnProperty(String(page)) ){
+                    $("#pageImg").selectAreas('reset');
+                    page = String(this_page);
+                    set_select_areas( detected_areas[page] );
+                }
+
+                $("#table_printer").html('');
+            }
+            function sum(total, num) {
+               return total + num;
+            }
+
+            function show_gs(data){
+                $("#table_printer").html('');
+
+                gs_url = data.gs_url;
+                for(i=0 ; i<gs_url.length ; i++){
+                    url = gs_url[i];
+
+                    iframe = document.createElement('iframe');
+                    $(iframe).attr('src', url);
+                    $(iframe).css('width', data.table_width[i]+50);
+                    document.getElementById('table_printer').appendChild(iframe);
+                }
+            }
+
+            function show_jss(data){
+                $("#table_printer").html('');
+
+                csvs = data.csvs;
+                col_width = data.col_width;
+
+                for(i=0 ; i<csvs.length ; i++){
+                    var div = document.createElement('div');
+                    document.getElementById('table_printer').appendChild(div);
+
+                    table = jspreadsheet(div, {
+                        csv: "/static/job_pdf/{{fileName}}/page-"+this_page+"-table-"+(i+1)+".csv",
+                        // columns:csvs[i],
+                        colWidths: col_width[i],
+                        rowResize: true,
+                        columnResize: true,
+                        toolbar:[
+                            {
+                                type: 'i',
+                                content: 'undo',
+                                onclick: function() {
+                                    table.undo();
+                                }
+                            },
+                            {
+                                type: 'i',
+                                content: 'redo',
+                                onclick: function() {
+                                    table.redo();
+                                }
+                            },
+                            {
+                                type: 'i',
+                                content: 'save',
+                                onclick: function () {
+                                    table.download();
+                                }
+                            },
+                            {
+                                type: 'select',
+                                k: 'font-family',
+                                v: ['Arial','Verdana']
+                            },
+                            {
+                                type: 'select',
+                                k: 'font-size',
+                                v: ['9px','10px','11px','12px','13px','14px','15px','16px','17px','18px','19px','20px']
+                            },
+                            {
+                                type: 'i',
+                                content: 'format_align_left',
+                                k: 'text-align',
+                                v: 'left'
+                            },
+                            {
+                                type:'i',
+                                content:'format_align_center',
+                                k:'text-align',
+                                v:'center'
+                            },
+                            {
+                                type: 'i',
+                                content: 'format_align_right', 
+                                k: 'text-align',
+                                v: 'right'
+                            },
+                            {
+                                type: 'i',
+                                content: 'format_bold',
+                                k: 'font-weight',
+                                v: 'bold'
+                            },
+                            {
+                                type: 'color',
+                                content: 'format_color_text',
+                                k: 'color'
+                            },
+                            {
+                                type: 'color',
+                                content: 'format_color_fill',
+                                k: 'background-color'
+                            },
+                        ],
+                    });
+                }
+            }
+
+			$(document).ready(function () {
+
+                // 추출할 메인 이미지 교체
+                $('img#pageImg').attr("src", "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+this_page+".png");
+
+                $('.arrow').click(function () {
+					direction = $(this).text();
+                    pre_page = this_page;
+
+                    if (direction == "◀"){
+                        this_page = Number(this_page)-1;
+                        if(this_page < 1){
+                            this_page = 1;
+                        }
+                    }
+                    else{
+                        this_page = Number(this_page)+1;
+                    }
+                    move_page(pre_page, this_page);
+				});
+            
+                $('#get_line_size').click(function () {
+                    $('.loader').addClass("is-active");
+					var selectedAreas = $('img#pageImg').selectAreas('areas');
+                    
+                    if (selectedAreas.length > 0) {
+                        const imageWidth = $('#pageImg').width();
+                        const imageHeight = $('#pageImg').height();
+                    
+                        var table_option = $("input[name='optradio']:checked").val();
+                        var jsons = {};
+                        
+                        for(i=0 ; i<selectedAreas.length ; i++){
+                            selectedAreas[i]['imageWidth'] = imageWidth;
+                            selectedAreas[i]['imageHeight'] = imageHeight;
+                            jsons[i] = JSON.stringify(selectedAreas[i]);
+                        }
+                        jsons = JSON.stringify(jsons);
+
+                        $.ajax({
+                            url: '/getLineScale',
+                            data: {"jsons":jsons, "fileName":"{{fileName}}", "page":this_page},
+                            dataType:'json',
+                            type: 'POST',
+                            success: function (data) {
+                                $("#line_scale").val(data.line_scale);
+                                $('.loader').removeClass('is-active');
+                            },
+                            error: function (error) {
+                                console.error(error);
+                                $('.loader').removeClass('is-active');
+                            }
+                        });
+                    }
+                    else{
+                        alert("먼저 영역을 지정해주세요.");
+                        $('.loader').removeClass('is-active');
+                    }
+				});
+                
+                $('#extract').click(function () {
+                    $('.loader').addClass('is-active');
+
+					var selectedAreas = $('img#pageImg').selectAreas('areas');
+                    
+                    if (selectedAreas.length > 0) {
+                        const imageWidth = $('#pageImg').width();
+                        const imageHeight = $('#pageImg').height();
+                    
+                        var table_option = $("input[name='optradio']:checked").val();
+                        var jsons = {};
+                        
+                        for(i=0 ; i<selectedAreas.length ; i++){
+                            selectedAreas[i]['imageWidth'] = imageWidth;
+                            selectedAreas[i]['imageHeight'] = imageHeight;
+                            jsons[i] = JSON.stringify(selectedAreas[i]);
+                        }
+                        jsons = JSON.stringify(jsons);
+                        
+                        $.ajax({
+                            url: '/doExtract',
+                            data: {"jsons":jsons, "fileName":"{{fileName}}", "page":this_page, "table_option":table_option, "line_scale":$("#line_scale").val()},
+                            dataType:'json',
+                            type: 'POST',
+                            success: function (data) {
+                                table_data = data;
+
+                                var bboxs = data.bboxs;
+                                var jsons = data.jsons;
+                                var csvs = data.csvs;
+                                
+                                var gs_url = data.gs_url;
+                                var iframe = null;
+
+                                show_gs(data);
+                                // show_jss(data);
+
+                                if(bboxs != 0){
+                                    bboxs = bboxs.split(";");
+                                    
+                                    $("#pageImg").selectAreas('reset');
+                                    
+                                    arrs = [];
+                                    for(i=0 ; i<bboxs.length ; i++){
+                                        var arr = bboxs[i].split(',');
+                                        
+                                        arrs.push({
+                                            x: Number(arr[0]),
+                                            y: Number(arr[1]),
+                                            width: Number(arr[2]),
+                                            height: Number(arr[3]),
+                                        });
+                                    }
+                                    
+                                    $("#pageImg").selectAreas('add', arrs);
+
+                                    $("#table_show_type").css("display", "block");
+                                    $('.loader').removeClass('is-active');
+                                }
+                            },
+                            error: function (error) {
+                                console.error(error);
+                                $('.loader').removeClass('is-active');
+                            }
+                        });
+                    }
+				});
+
+
+                $('#auto_detect').click(function(){
+                    if( detected_areas.hasOwnProperty(String(page)) ){
+                        $("#pageImg").selectAreas('reset');
+                        page = String(this_page);
+                        set_select_areas( detected_areas[page] );
+                    }
+                });
+
+
+				$('img#pageImg').selectAreas({
+                    width: window.innerWidth / 3.84
+				}).load(function(){
+                    var imageWidth = $('#pageImg').width();
+                    var imageHeight = $('#pageImg').height();
+
+                    var fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
+
+                    $('.image-decorator div, .image-decorator img').css({'height':'70vh', 'width':fit_width});
+                    // $('#top_tools').css({'width':fit_height});
+                    
+                    if( detected_areas.hasOwnProperty(String(this_page)) ){
+                        page = String(this_page);
+                        set_select_areas( detected_areas[page] );
+                    }
+                });
+
+
+				$('#btnView').click(function () {
+					var selectedAreas = $('img#pageImg').selectAreas('areas');
+					displayAreas(selectedAreas);
+				});
+				$('#btnViewRel').click(function () {
+					var areas = $('img#pageImg').selectAreas('relativeAreas');
+					displayAreas(areas);
+				});
+				$('#btnReset').click(function () {
+					output("reset")
+					$('img#pageImg').selectAreas('reset');
+				});
+				$('#btnDestroy').click(function () {
+					$('img#pageImg').selectAreas('destroy');
+
+					output("destroyed")
+					$('.actionOn').attr("disabled", "disabled");
+					$('.actionOff').removeAttr("disabled")
+				});
+				$('#btnCreate').attr("disabled", "disabled").click(function () {
+					$('img#pageImg').selectAreas({
+						minSize: [10, 10],
+						onChanged : debugQtyAreas,
+						width: 500,
+					});
+
+					output("created")
+					$('.actionOff').attr("disabled", "disabled");
+					$('.actionOn').removeAttr("disabled")
+				});
+				$('#btnNew').click(function () {
+					var areaOptions = {
+						x: Math.floor((Math.random() * 200)),
+						y: Math.floor((Math.random() * 200)),
+						width: Math.floor((Math.random() * 100)) + 50,
+						height: Math.floor((Math.random() * 100)) + 20,
+					};
+					output("Add a new area: " + areaToString(areaOptions))
+					$('img#pageImg').selectAreas('add', areaOptions);
+				});
+				$('#btnNews').click(function () {
+					var areaOption1 = {
+						x: Math.floor((Math.random() * 200)),
+						y: Math.floor((Math.random() * 200)),
+						width: Math.floor((Math.random() * 100)) + 50,
+						height: Math.floor((Math.random() * 100)) + 20,
+					}, areaOption2 = {
+						x: areaOption1.x + areaOption1.width + 10,
+						y: areaOption1.y + areaOption1.height - 20,
+						width: 50,
+						height: 20,
+					};
+					output("Add a new area: " + areaToString(areaOption1) + " and " + areaToString(areaOption2))
+					$('img#pageImg').selectAreas('add', [areaOption1, areaOption2]);
+				});
+			});
+
+			var selectionExists;
+
+			function areaToString (area) {
+				return (typeof area.id === "undefined" ? "" : (area.id + ": ")) + area.x + ':' + area.y  + ' ' + area.width + 'x' + area.height + '<br />'
+			}
+
+			function output (text) {
+				$('#output').html(text);
+			}
+
+			// Display areas coordinates in a div
+			function displayAreas (areas) {
+				var text = "";
+				$.each(areas, function (id, area) {
+					text += areaToString(area);
+				});
+				output(text);
+			};
+
+		</script>
+	</head>
+
+	<body>
+        <div class="loader loader-default" data-text="Processing..."></div>
+
+        {% include "menu_template.html" %}
+
+        <div id='page_list_box'>
+            {% for idx in range(1, totalPage+1) %}
+                <div class='thumb_page thumb_page_{{idx}}'>
+                    <center>
+                        {% set tables_len = detected_areas[idx]|length %}
+                        <img src='/static/icon/check.png' class='check_page' style='display:none'>
+                        <img src='/static/icon/table.png' class='exist_class' style='
+                        {% if tables_len > 0 %}
+                        display: inline;
+                        {% else %}
+                        display: none;
+                        {% endif %}
+                        '>
+                        <br>
+                        {% if idx == 1 %}
+                        <img
+                            class='thumb_img thumb_img_select'
+                            src="{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-{{idx}}-thumb.png"
+                            onclick="
+                                    move_page(this_page, '{{idx}}');
+                                "
+                            id="thumb_page_{{idx}}">
+
+                        {% else %}
+                        
+                        <img
+                            class='thumb_img'
+                            src="{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-{{idx}}-thumb.png"
+                            onclick="
+                                    move_page(this_page, '{{idx}}');
+                                "
+                            id="thumb_page_{{idx}}">
+                        {% endif %}
+                        <br>
+                        <span>{{idx}}</span>
+                        <br>
+                    </center>
+                </div>
+            {% endfor %}
+        </div>
+
+       <table id='article_table'>
+           <tr>
+                <td>
+                    <div id="wrapper">
+                        <table id="top_tools">
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <label title='Line Scale is the smallest length to detect PDF tables border lines'>
+                                        ⯑ Line Scale&nbsp;<input style="width: 40px" type='text' id="line_scale" value="40">
+                                    </label>
+                                </td>
+                                <td>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="optradio" value="areas">&nbsp;&nbsp;&nbsp;table_areas
+                                    </label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input id='auto_detect' type='button' class='btn btn-success' value='Auto Detected'>
+                                </td>
+                                <td>
+                                    <label>
+                                        <input type='button' id="get_line_size" class="btn btn-warning" value="Get Line Size">
+                                    </label>
+                                </td>
+                                <td>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="optradio" value="regions" checked>&nbsp;&nbsp;&nbsp;table_regions
+                                    </label>
+                                </td>
+                            </tr>
+                        </table>
+                        <br>
+
+                        <div class="image-decorator">
+                            <img alt="Image principale" id="pageImg"/>
+                        </div>
+                        
+                    <center>
+                        <span class="arrow">◀</span>
+                        <!-- <input type="text"> -->
+                        <span class="arrow">▶</span>
+                    </center>
+                    </div>
+                </td>
+                
+                <td style="width: 120px;">
+                    <input type="button" value="검출?" style="font-size: 18px; cursor:pointer;"/>
+                    <br>
+                    <input type="button" id="extract" value="추출▶" style="font-size: 18px; cursor:pointer;"/>
+                </td>
+                
+                <td style="vertical-align: top">
+                    <div id='table_show_type' style='float:right; display:none'>
+                        <label class="radio-inline">
+                            <input type="radio" name="showradio" value="gs" onclick='show_gs(table_data)' checked>Google Sheet
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="showradio" value="jss" onclick='show_jss(table_data)'>JSpreadSheet
+                        </label>
+                    </div>
+                    <br>
+
+                    <div id='table_printer'></div>
+                </td>
+            </tr>
+       </table>
+	</body>
+</html>

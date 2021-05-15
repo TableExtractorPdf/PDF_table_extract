@@ -1,0 +1,22 @@
+header {
+	position: relative;
+    width: auto;
+    height: 8%;
+    background: #F52C05;
+}
+header ul{
+	position: absolute;
+	height: 50%;
+	bottom: 10%;
+}
+header li{
+	list-style-type: none;
+	float: left;
+	height: 100%;
+	margin-left: 10px;
+	margin-right: 50px;
+	font-size: 32px;
+    font-weight: bold;
+	color: white;
+	cursor: pointer;
+}
