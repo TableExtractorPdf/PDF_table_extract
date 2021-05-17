@@ -16,15 +16,21 @@ body {
 #page_list_box{
 	position: absolute;
 	float: left;
-	width: 12%;
+	width: 135px;
 	height: 92%;
 	top: 8%;
 	overflow-y: scroll;
 	padding: 10px;
 	background: #d8d8d8;
+	z-index: 9999;
+}
+.thumb_page{
+	display: inline-block;
+	margin-left: 10px;
 }
 .thumb_img{
-	width: 80%;
+	/* width: 80%; */
+	width: 80px;
 	cursor: pointer;
 	border: 1px solid black;
 }
@@ -35,25 +41,27 @@ body {
 .check_page{
 	float: left;
 	width: 20px;
-	margin-left: 10px;
+	/* margin-left: 10px; */
 }
 .exist_class{
 	float: right;
 	width: 16px;
-	margin-right: 10px;
+	/* margin-right: 10px; */
 }
+
 #page_list_size_btn{
 	position: absolute;
 	width: 22px;
 	height: 54px;
 	margin: auto;
-	left: 12%;
+	left: 135px;
 	top: 50%;
 	transform: translateY(-50%);
 	line-height: 54px;
 	font-size: 22px;
 	color: red;
 	background: gray;
+	cursor: pointer;
 }
 
 
@@ -61,8 +69,9 @@ body {
 	position: absolute;
 	/* width: 75%; */
 	height: 92%;
-	left: 15%;
+	left: 180px;
 	top: 8%;
+	z-index: 1;
 }
 
 input :not([type=radio]){

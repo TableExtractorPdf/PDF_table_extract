@@ -238,6 +238,7 @@
             }
 
 			$(document).ready(function () {
+                var is_page_list_expand = false;
 
                 // 추출할 메인 이미지 교체
                 $('img#pageImg').attr("src", "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+this_page+".png");
@@ -448,6 +449,22 @@
 					output("Add a new area: " + areaToString(areaOption1) + " and " + areaToString(areaOption2))
 					$('img#pageImg').selectAreas('add', [areaOption1, areaOption2]);
 				});
+                
+
+                $("#page_list_size_btn").click(function(){
+                    if(is_page_list_expand){
+                        is_page_list_expand = false;
+                        $("#page_list_box").css("width", "135px");
+                        $("#page_list_size_btn").css("left", "135px");
+                        $("#page_list_size_btn").text("▶");
+                    }
+                    else{
+                        is_page_list_expand = true;
+                        $("#page_list_box").css("width", "980px");
+                        $("#page_list_size_btn").css("left", "980px");
+                        $("#page_list_size_btn").text("◀");
+                    }
+                });
 			});
 
 			var selectionExists;
@@ -478,6 +495,15 @@
         {% include "menu_template.html" %}
 
         <div id='page_list_box'>
+            <select class="select" multiple>
+                <option value="1">One</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+                <option value="4">Four</option>
+                <option value="5">Five</option>
+              </select>
+              <label class="form-label select-label">Example label</label>
+              
             {% for idx in range(1, totalPage+1) %}
                 <div class='thumb_page thumb_page_{{idx}}'>
                     <center>
