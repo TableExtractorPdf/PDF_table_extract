@@ -21,6 +21,7 @@ body {
 	top: 8%;
 	overflow-y: scroll;
 	padding: 10px;
+	background: #d8d8d8;
 }
 .thumb_img{
 	width: 80%;
@@ -32,14 +33,27 @@ body {
 	border: 2px solid #F52C05;
 }
 .check_page{
-	float:left;
+	float: left;
 	width: 20px;
 	margin-left: 10px;
 }
 .exist_class{
-	float:right;
+	float: right;
 	width: 16px;
 	margin-right: 10px;
+}
+#page_list_size_btn{
+	position: absolute;
+	width: 22px;
+	height: 54px;
+	margin: auto;
+	left: 12%;
+	top: 50%;
+	transform: translateY(-50%);
+	line-height: 54px;
+	font-size: 22px;
+	color: red;
+	background: gray;
 }
 
 

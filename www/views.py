@@ -175,8 +175,8 @@ def getProgress():
 
 
 # 추출할 pdf파일이 정해졌을때 추출을 진행하는 라우트 (Get 요청으로 pdf파일 명시)
-@views.route("/extract_page", methods=['GET'])
-def extract_page():
+@views.route("/workspace", methods=['GET'])
+def workspace():
     global detected_areas
 
     fileName = request.args.get("fileName")
