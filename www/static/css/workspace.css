@@ -129,11 +129,41 @@ table {
 	margin: auto;
 }
 
+.previewImg{
+	position: absolute;
+	display: inline-block;
+	width: 350px;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+	border: 1px solid black;
+	cursor: pointer;
+}
+#prvImg{
+	/* left: 0; */
+}
+.previewImg#centerImg{
+	left: 350px;
+}
+.previewImg#nxtImg{
+	left: 650px;
+}
+.preview_canvas{
+	position: absolute;
+	display: inline-block;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+	border: 1px solid black;
+	cursor: pointer;
+}
 
 div#wrapper {
 	position: relative;
+	display: inline-block;
 	margin: 0 auto;
-	width: 520px;
+	width: 1000px;
+	/* width: 520px; */
 	/* height: 90%; */
 	/* max-width: 55vh; */
 	/* width: fit-content; */
@@ -141,6 +171,11 @@ div#wrapper {
 }
 
 div.image-decorator {
+	position: relative;
+	display : inline-block;
+	padding : 5px 5px 5px 5px;
+	margin-left: 250px;
+	
 	-moz-border-radius : 5px 5px 5px 5px;
 	-moz-box-shadow : 0 0 6px #c8c8c8;
 	-webkit-border-radius : 5px 5px 5px 5px;
@@ -149,10 +184,7 @@ div.image-decorator {
 	border : 1px solid #c8c8c8;
 	border-radius : 5px 5px 5px 5px;
 	box-shadow : 0 0 6px #c8c8c8;
-	display : inline-block;
-	padding : 5px 5px 5px 5px;
-	position: relative;
-	/* margin-bottom: 10px; */
+	z-index: 9999;
 }
 
 .arrow{

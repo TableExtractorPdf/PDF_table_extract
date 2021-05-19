@@ -14,13 +14,12 @@
 
         <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/bootstrap-multiselect.css') }}" type="text/css">
         <script type="text/javascript" src="{{ url_for('static', filename='dist/js/bootstrap-multiselect.js') }}"></script>
-
         <!--------------->
         
         <!-- JQUERY Select Areas plug-in -->
         <script type="text/javascript" src = "{{url_for('static',filename='js/jquery.selectareas.js')}}"></script>
         <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='resources/jquery.selectareas.css')}}">
-        <!--  -->
+        <!--------------------------------->
 
         <!-- JQUERY Tool tips plug-in -->
         <!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
@@ -29,6 +28,10 @@
         <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/jquery-ui.min.css')}}">
         <script type="text/javascript" src = "{{url_for('static',filename='js/jquery-ui.min.js')}}"></script>
         <!------------------------------->
+
+        <!-- JCanvas -->
+        <script type="text/javascript" src = "{{url_for('static',filename='docs/js/jcanvas.min.js')}}"></script>
+        <!------------->
 
 
         <!-- JSpreadSheet -->
@@ -46,7 +49,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.css" type="text/css" />
 
         <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Material+Icons" />
-        <!--  -->
+        <!------------------->
 
 
 
@@ -56,7 +59,7 @@
         <script src="{{url_for('static',filename='ce-master/src/js/jexcel.core.js')}}"></script>
         <script src="{{url_for('static',filename='ce-master/src/js/jexcel.extensions.js')}}"></script>
         <script src="{{url_for('static',filename='ce-master/src/js/jexcel.formulars.js')}}"></script> -->
-        <!--  -->
+        <!------------>
 
 
         <!-- X-SpreadSheet -->
@@ -75,8 +78,15 @@
         
         
 		<script type="text/javascript">
+            var detected_areas_origin = JSON.parse( '{{detected_areas | tojson | safe}}' );
+            localStorage.setItem("{{fileName}}_origin", JSON.stringify(detected_areas_origin));
+
+
+            if( localStorage.getItem("{{fileName}}") === null){
+                localStorage.setItem("{{fileName}}", JSON.stringify(detected_areas_origin));
+            }
+
             var this_page = 1;
-            var detected_areas = JSON.parse( '{{detected_areas | tojson | safe}}' );
             var table_data;
 
             $( document ).tooltip();
@@ -87,7 +97,7 @@
                 if(bboxs != 0){
                     bboxs = bboxs.split(";");
                     
-                    $("#pageImg").selectAreas('reset');
+                    // $(".nowImg").selectAreas('reset');
                     
                     arrs = [];
                     for(i=0 ; i<bboxs.length ; i++){
@@ -95,8 +105,8 @@
 
                         fileDimsX = Number(arr[4])
                         fileDimsY = Number(arr[5])
-                        const imageWidth = $("img#pageImg").width();
-                        const imageHeight = $("img#pageImg").height();
+                        const imageWidth = $("img.nowImg").width();
+                        const imageHeight = $("img.nowImg").height();
 
                         scalingFactorX = fileDimsX / imageWidth;
                         scalingFactorY = fileDimsY / imageHeight;
@@ -108,11 +118,51 @@
                             height: Number(arr[3]/ scalingFactorY),
                         });
                     }
-                    
-                    $("#pageImg").selectAreas('add', arrs);
+                    $(".nowImg").selectAreas('add', arrs);
                 }
             }
+            
+            // 테이블 선택 영역 표시 함수
+            function areas_to_bbox(areas, realWidth, realHeight){
+                bboxs = [];
+                for(i=0 ; i<areas.length ; i++){
+                    arrs = [];
 
+                    const imageWidth = $("img#centerImg").width();
+                    const imageHeight = $("img#centerImg").height();
+
+                    scalingFactorX = realWidth / imageWidth;
+                    scalingFactorY = realHeight / imageHeight;
+
+                    // arrs.push( Number(areas[i]['x'] / scalingFactorX ));
+                    // arrs.push( Number(areas[i]['y'] / scalingFactorY ));
+                    // arrs.push( Number(areas[i]['width'] / scalingFactorX ));
+                    // arrs.push( Number(areas[i]['height'] / scalingFactorY ));
+                    arrs.push( Number(areas[i]['x'] * scalingFactorX));
+                    arrs.push( Number(areas[i]['y'] * scalingFactorY));
+                    arrs.push( Number(areas[i]['width'] * scalingFactorX));
+                    arrs.push( Number(areas[i]['height'] * scalingFactorY));
+                    // arrs.push( Number(areas[i]['x'] ));
+                    // arrs.push( Number(areas[i]['y'] ));
+                    // arrs.push( Number(areas[i]['width'] ));
+                    // arrs.push( Number(areas[i]['height'] ));
+                    arrs.push(realWidth);
+                    arrs.push(realHeight);
+
+                    bboxs.push(arrs.join(','));
+                }
+                bboxs = bboxs.join(";");
+                return bboxs;
+            }
+
+
+            function destroy_select_areas(){
+                $('.nowImg').selectAreas('destroy');
+                $('.nowImg').removeAttr('alt');
+                $('.nowImg').removeAttr('style');
+                $('.nowImg').unwrap();
+                $('.nowImg').attr("class", "previewImg");
+            }
 
             // 페이지 이동 함수 (pre_page는 현재 페이지, page는 이동할 페이지)
             function move_page(pre_page, page){
@@ -129,17 +179,54 @@
                 $('#thumb_page_'+pre_page).removeClass('thumb_img_select');
                 $('#thumb_page_'+page).addClass('thumb_img_select');
 
-                $('img#pageImg').attr('src', "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+page+".png");
+                $('img#centerImg').attr('src', "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+page+".png");
                 
+                $('img#prvImg').attr('src', "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+(Number(page)-1)+".png").load(function(){
+                    // 정상 이미지 로딩, do nothing
+                })
+                .error(function(){
+                    $(this).attr("src", "{{url_for('static', filename='job_pdf')}}/page_out_of_range.png");
+                });
+                $('img#nxtImg').attr('src', "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+(Number(page)+1)+".png").load(function(){
+                    // 정상 이미지 로딩, do nothing
+                })
+                .error(function(){
+                    $(this).attr("src", "{{url_for('static', filename='job_pdf')}}/page_out_of_range.png");
+                });
+
+
+                destroy_select_areas();
+                $('#centerImg').wrap('<div class="image-decorator"></div>')
+                $('#centerImg').addClass('nowImg');
+                $('#centerImg').removeClass('previewImg');
+
+                $("div.image-decorator:has(#centerImg)").css("margin-left", "250px");
+
+
+                $("<img>").attr("src", $("img.nowImg").attr("src")).load(function(){
+                    var imageWidth = this.width;
+                    var imageHeight = this.height;
+
+                    var fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
+
+                    $('.image-decorator div, .image-decorator img').css({'height':'70vh', 'width':fit_width});
                     
-                if( detected_areas.hasOwnProperty(String(page)) ){
-                    $("#pageImg").selectAreas('reset');
-                    page = String(this_page);
-                    set_select_areas( detected_areas[page] );
-                }
+                    var dtd_pg = JSON.parse(localStorage.getItem("{{fileName}}"));
+
+                    page = Number(this_page);
+                    if($('.nowImg').attr('id') === 'prvImg') page-=1;
+                    if($('.nowImg').attr('id') === 'nxtImg') page+=1;
+
+                    page = String(page);
+                    if( dtd_pg.hasOwnProperty(String(this_page)) ){
+                        set_select_areas( dtd_pg[page] );
+                    }
+                });
 
                 $("#table_printer").html('');
+                showAreaPreviewImg();
             }
+
             function sum(total, num) {
                return total + num;
             }
@@ -245,13 +332,98 @@
                 }
             }
 
+            function debugQtyAreas (event, id, areas) {
+                    // console.log(areas.length + " areas", arguments);
+                    // alert(areas.length + " areas", arguments);
+
+                    var this_page_thumb = $(".thumb_page_"+this_page);
+                    $("<img>").attr("src", $("img.nowImg").attr("src")).load(function(){
+                        var dtd_pg = JSON.parse( localStorage.getItem("{{fileName}}") );
+
+                        dtd_pg[this_page] = areas_to_bbox(areas, this.width, this.height);
+
+                        localStorage.setItem("{{fileName}}", JSON.stringify( dtd_pg ));
+                    });
+
+                    if(areas.length > 0) {
+                        if(this_page_thumb.hasClass("thumb_table_none")){
+                            this_page_thumb.addClass("thumb_table");
+                            this_page_thumb.removeClass("thumb_table_none");
+                            this_page_thumb.find(".exist_class").css("display", "inline");
+                        }
+                    }
+                    else {
+                        if(this_page_thumb.hasClass("thumb_table")){
+                            this_page_thumb.removeClass("thumb_table")
+                            this_page_thumb.addClass("thumb_table_none");
+                            this_page_thumb.find(".exist_class").css("display", "none");
+                        }
+                    }
+                };
+
+            function showAreaPreviewImg(){
+                $(".previewImg").each(function(i){
+                    if(this.naturalWidth == 0){
+                        $(this).load(function (){
+                            showAreaImg(this);
+                        });
+                    }
+                    else{
+                        showAreaImg(this);
+                    }
+                });
+            }
+            function showAreaImg(target){
+                if ($(target).parent().is("canvas") )
+                    $(target).unwrap();
+                    
+                var img_width = target.width;
+                var img_height = target.height;
+
+                var img_width_n = target.naturalWidth;
+                var img_height_n = target.naturalHeight;
+
+                $(target).wrap("<canvas class='preview_canvas' width='"+img_width+"' height='"+img_height+"'></canvas>")
+                // $(this).wrap("<canvas class='preview_canvas' width='350px' height='auto'></canvas>")
+                
+                $("canvas.preview_canvas:has(#prvImg)").css("left", "0px");
+                $("canvas.preview_canvas:has(#centerImg)").css("left", "250px");
+                $("canvas.preview_canvas:has(#nxtImg)").css("left", "600px");
+                
+                var canvas = $(target).parent();
+                var ctx = canvas[0].getContext("2d");
+                ctx.drawImage(target, 0, 0, img_width, img_height);
+                
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = "2";
+                ctx.setLineDash([5, 3]);
+
+                scalingFactorX = img_width_n / img_width;
+                scalingFactorY = img_height_n / img_height;
+                
+                var dtd_pg = JSON.parse(localStorage.getItem("{{fileName}}"));
+
+                page = Number(this_page);
+                if($(target).attr('id') === 'prvImg') page-=1;
+                if($(target).attr('id') === 'nxtImg') page+=1;
+
+                page = String(page);
+                if( dtd_pg.hasOwnProperty(String(page)) ){
+                    var arr = dtd_pg[page].split(";");
+                    for(j=0 ; j<arr.length ; j++){
+                        var arr2 = arr[j].split(",");
+                        if(arr2.length>=4){
+                            ctx.strokeRect(arr2[0]/scalingFactorX, arr2[1]/scalingFactorY, arr2[2]/scalingFactorX, arr2[3]/scalingFactorY);
+                        }
+                    }
+                }
+            }
             
 			$(document).ready(function () {
                 var select_items = new Set();
                 select_items.add(".thumb_page");
 
                 $('#page_multiple_selected').multiselect({
-                    enableFiltering: true,
                     onChange: function(option, checked, select) {
                         var opselected = $(option).val();
                         if(checked == true) {
@@ -277,11 +449,15 @@
                 
 
                 // 추출할 메인 이미지 교체
-                $('img#pageImg').attr("src", "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+this_page+".png");
+                $('img#centerImg').attr("src", "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+this_page+".png");
+                
+                $('img#prvImg').attr("src", "{{url_for('static', filename='job_pdf')}}/page_out_of_range.png");
+                $('img#nxtImg').attr("src", "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+(Number(this_page)+1)+".png");
+
 
                 $('.arrow').click(function () {
 					direction = $(this).text();
-                    pre_page = this_page;
+                    pre_page = Number(this_page);
 
                     if (direction == "◀"){
                         this_page = Number(this_page)-1;
@@ -294,14 +470,15 @@
                     }
                     move_page(pre_page, this_page);
 				});
-            
+        
+                
                 $('#get_line_size').click(function () {
                     $('.loader').addClass("is-active");
-					var selectedAreas = $('img#pageImg').selectAreas('areas');
+					var selectedAreas = $('img#centerImg').selectAreas('areas');
                     
                     if (selectedAreas.length > 0) {
-                        const imageWidth = $('#pageImg').width();
-                        const imageHeight = $('#pageImg').height();
+                        const imageWidth = $('#centerImg').width();
+                        const imageHeight = $('#centerImg').height();
                     
                         var table_option = $("input[name='optradio']:checked").val();
                         var jsons = {};
@@ -333,15 +510,16 @@
                         $('.loader').removeClass('is-active');
                     }
 				});
+     
                 
                 $('#extract').click(function () {
                     $('.loader').addClass('is-active');
 
-					var selectedAreas = $('img#pageImg').selectAreas('areas');
+					var selectedAreas = $('img#centerImg').selectAreas('areas');
                     
                     if (selectedAreas.length > 0) {
-                        const imageWidth = $('#pageImg').width();
-                        const imageHeight = $('#pageImg').height();
+                        const imageWidth = $('#centerImg').width();
+                        const imageHeight = $('#centerImg').height();
                     
                         var table_option = $("input[name='optradio']:checked").val();
                         var jsons = {};
@@ -374,7 +552,7 @@
                                 if(bboxs != 0){
                                     bboxs = bboxs.split(";");
                                     
-                                    $("#pageImg").selectAreas('reset');
+                                    $("#centerImg").selectAreas('reset');
                                     
                                     arrs = [];
                                     for(i=0 ; i<bboxs.length ; i++){
@@ -388,7 +566,7 @@
                                         });
                                     }
                                     
-                                    $("#pageImg").selectAreas('add', arrs);
+                                    $("#centerImg").selectAreas('add', arrs);
 
                                     $("#table_show_type").css("display", "block");
                                     $('.loader').removeClass('is-active');
@@ -404,110 +582,89 @@
 
 
                 $('#auto_detect').click(function(){
-                    if( detected_areas.hasOwnProperty(String(page)) ){
-                        $("#pageImg").selectAreas('reset');
-                        page = String(this_page);
-                        set_select_areas( detected_areas[page] );
+                    var dtd_pg_origin = JSON.parse( localStorage.getItem("{{fileName}}_origin") );
+                    var dtd_pg = JSON.parse( localStorage.getItem("{{fileName}}") );
+
+                    page = Number(this_page);
+                    if($('.nowImg').attr('id') === 'prvImg') page-=1;
+                    if($('.nowImg').attr('id') === 'nxtImg') page+=1;
+
+                    dtd_pg[page] = dtd_pg_origin[page];
+
+                    if( dtd_pg.hasOwnProperty(String(page)) ){
+                        $(".nowImg").selectAreas('reset');
+                        set_select_areas( dtd_pg[page] );
+                        localStorage.setItem("{{fileName}}", JSON.stringify( dtd_pg ));
                     }
                 });
 
 
-                function debugQtyAreas (event, id, areas) {
-                    // console.log(areas.length + " areas", arguments);
-                    // alert(areas.length + " areas", arguments);
-                    var this_page_thumb = $(".thumb_page_"+this_page);
+                // $(document).on('click', '.previewImg', function(){
+                $(document).on('click', '.preview_canvas', function(){
+                    if ($(this).find("img").attr('src') == "{{url_for('static', filename='job_pdf')}}/page_out_of_range.png") return;
+                    
+                    var target = $(this).find("img");
+                    $(this).find("img").unwrap();
+                    
+                    destroy_select_areas();
 
-                    if(areas.length > 0) {
-                        if(this_page_thumb.hasClass("thumb_table_none")){
-                            this_page_thumb.addClass("thumb_table");
-                            this_page_thumb.removeClass("thumb_table_none");
-                            this_page_thumb.find(".exist_class").css("display", "inline");
-                        }
-                    }
-                    else {
-                        if(this_page_thumb.hasClass("thumb_table")){
-                            this_page_thumb.removeClass("thumb_table")
-                            this_page_thumb.addClass("thumb_table_none");
-                            this_page_thumb.find(".exist_class").css("display", "none");
-                        }
-                    }
-                };
+                    $(target).wrap('<div class="image-decorator"></div>')
+                    $(target).addClass('nowImg');
+                    $(target).removeClass('previewImg');
 
-				$('img#pageImg').selectAreas({
+                    $(target).selectAreas({
+                        width: window.innerWidth / 3.84,
+                        onChanged: debugQtyAreas
+                    })
+
+                    $("div.image-decorator:has(#prvImg)").css("margin-left", "0px");
+                    $("div.image-decorator:has(#centerImg)").css("margin-left", "250px");
+                    $("div.image-decorator:has(#nxtImg)").css("margin-left", "600px");
+
+                    showAreaPreviewImg();
+
+                    $("<img>").attr("src", $("img.nowImg").attr("src")).load(function(){
+                        var imageWidth = this.width;
+                        var imageHeight = this.height;
+
+                        var fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
+
+                        $('.image-decorator div, .image-decorator img').css({'height':'70vh', 'width':fit_width});
+                        
+                        var dtd_pg = JSON.parse(localStorage.getItem("{{fileName}}"));
+
+                        page = Number(this_page);
+                        if($('.nowImg').attr('id') === 'prvImg') page-=1;
+                        if($('.nowImg').attr('id') === 'nxtImg') page+=1;
+
+                        if( dtd_pg.hasOwnProperty(String(this_page)) ){
+                            set_select_areas( dtd_pg[page] );
+                        }
+                    });
+                });
+
+
+				$('img#centerImg').selectAreas({
                     width: window.innerWidth / 3.84,
                     onChanged: debugQtyAreas
-				}).load(function(){
-                    var imageWidth = $('#pageImg').width();
-                    var imageHeight = $('#pageImg').height();
+				}).one("load", function(){
+                    var imageWidth = $('#centerImg').width();
+                    var imageHeight = $('#centerImg').height();
 
                     var fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
 
                     $('.image-decorator div, .image-decorator img').css({'height':'70vh', 'width':fit_width});
-                    // $('#top_tools').css({'width':fit_height});
                     
-                    if( detected_areas.hasOwnProperty(String(this_page)) ){
+                    var dtd_pg = JSON.parse(localStorage.getItem("{{fileName}}"));
+
+                    if( dtd_pg.hasOwnProperty(String(this_page)) ){
                         page = String(this_page);
-                        set_select_areas( detected_areas[page] );
+                        set_select_areas( dtd_pg[page] );
                     }
                 });
+                showAreaPreviewImg();
 
 
-				$('#btnView').click(function () {
-					var selectedAreas = $('img#pageImg').selectAreas('areas');
-					displayAreas(selectedAreas);
-				});
-				$('#btnViewRel').click(function () {
-					var areas = $('img#pageImg').selectAreas('relativeAreas');
-					displayAreas(areas);
-				});
-				$('#btnReset').click(function () {
-					output("reset")
-					$('img#pageImg').selectAreas('reset');
-				});
-				$('#btnDestroy').click(function () {
-					$('img#pageImg').selectAreas('destroy');
-
-					output("destroyed")
-					$('.actionOn').attr("disabled", "disabled");
-					$('.actionOff').removeAttr("disabled")
-				});
-				$('#btnCreate').attr("disabled", "disabled").click(function () {
-					$('img#pageImg').selectAreas({
-						minSize: [10, 10],
-						onChanged : debugQtyAreas,
-						width: 500,
-					});
-
-					output("created")
-					$('.actionOff').attr("disabled", "disabled");
-					$('.actionOn').removeAttr("disabled")
-				});
-				$('#btnNew').click(function () {
-					var areaOptions = {
-						x: Math.floor((Math.random() * 200)),
-						y: Math.floor((Math.random() * 200)),
-						width: Math.floor((Math.random() * 100)) + 50,
-						height: Math.floor((Math.random() * 100)) + 20,
-					};
-					output("Add a new area: " + areaToString(areaOptions))
-					$('img#pageImg').selectAreas('add', areaOptions);
-				});
-				$('#btnNews').click(function () {
-					var areaOption1 = {
-						x: Math.floor((Math.random() * 200)),
-						y: Math.floor((Math.random() * 200)),
-						width: Math.floor((Math.random() * 100)) + 50,
-						height: Math.floor((Math.random() * 100)) + 20,
-					}, areaOption2 = {
-						x: areaOption1.x + areaOption1.width + 10,
-						y: areaOption1.y + areaOption1.height - 20,
-						width: 50,
-						height: 20,
-					};
-					output("Add a new area: " + areaToString(areaOption1) + " and " + areaToString(areaOption2))
-					$('img#pageImg').selectAreas('add', [areaOption1, areaOption2]);
-				});
-                
 
                 $("#page_list_size_btn").click(function(){
                     if(is_page_list_expand){
@@ -680,17 +837,22 @@
                             </tr>
                         </table>
 
+                        
+                        <img class="previewImg" id="prvImg"/>
+
                         <div class="image-decorator">
-                            <img alt="Image principale" id="pageImg"/>
+                            <img alt="Image principale" id="centerImg" class="nowImg"/>
                         </div>
                         
-                    <center>
-                        <span class="arrow">◀</span>
-                        <!-- <input type="text"> -->
-                        <input id="check_page_btn" type="button" class="btn btn-lg btn-info" value="Check this page">
+                        <img class="previewImg" id="nxtImg"/>
+                        
+                        <center>
+                            <span class="arrow">◀</span>
+                            <!-- <input type="text"> -->
+                            <input id="check_page_btn" type="button" class="btn btn-lg btn-info" value="Check this page">
 
-                        <span class="arrow">▶</span>
-                    </center>
+                            <span class="arrow">▶</span>
+                        </center>
                     </div>
                 </td>
                 
