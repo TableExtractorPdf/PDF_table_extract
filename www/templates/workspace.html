@@ -333,18 +333,21 @@
             }
 
             function debugQtyAreas (event, id, areas) {
-                    // console.log(areas.length + " areas", arguments);
-                    // alert(areas.length + " areas", arguments);
+                // console.log(areas.length + " areas", arguments);
+                // alert(areas.length + " areas", arguments);
 
-                    var this_page_thumb = $(".thumb_page_"+this_page);
-                    $("<img>").attr("src", $("img.nowImg").attr("src")).load(function(){
-                        var dtd_pg = JSON.parse( localStorage.getItem("{{fileName}}") );
+                $("<img>").attr("src", $("img.nowImg").attr("src")).load(function(){
+                    page = Number(this_page);
+                    if($(".nowImg").attr('id') === 'prvImg') page-=1;
+                    if($(".nowImg").attr('id') === 'nxtImg') page+=1;
+                    var this_page_thumb = $(".thumb_page_"+page);
 
-                        dtd_pg[this_page] = areas_to_bbox(areas, this.width, this.height);
+                    var dtd_pg = JSON.parse( localStorage.getItem("{{fileName}}") );
 
-                        localStorage.setItem("{{fileName}}", JSON.stringify( dtd_pg ));
-                    });
+                    dtd_pg[page] = areas_to_bbox(areas, this.width, this.height);
 
+                    localStorage.setItem("{{fileName}}", JSON.stringify( dtd_pg ));
+                    
                     if(areas.length > 0) {
                         if(this_page_thumb.hasClass("thumb_table_none")){
                             this_page_thumb.addClass("thumb_table");
@@ -359,7 +362,9 @@
                             this_page_thumb.find(".exist_class").css("display", "none");
                         }
                     }
-                };
+                });
+
+            };
 
             function showAreaPreviewImg(){
                 $(".previewImg").each(function(i){
@@ -373,6 +378,7 @@
                     }
                 });
             }
+
             function showAreaImg(target){
                 if ($(target).parent().is("canvas") )
                     $(target).unwrap();
@@ -637,7 +643,7 @@
                         if($('.nowImg').attr('id') === 'prvImg') page-=1;
                         if($('.nowImg').attr('id') === 'nxtImg') page+=1;
 
-                        if( dtd_pg.hasOwnProperty(String(this_page)) ){
+                        if( dtd_pg.hasOwnProperty(String(page)) ){
                             set_select_areas( dtd_pg[page] );
                         }
                     });
