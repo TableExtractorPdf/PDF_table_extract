@@ -52,7 +52,8 @@ def extract():
         pdf_File.save(pdf_save_path)
         
         
-        tables = camelot.read_pdf(pdf_save_path, flavor="stream")
+        tables = camelot.read_pdf(pdf_save_path, flavor="lattice", line_scale=50)
+        print("Lattice go on")
         # parser = Lattice2( line_scale=45)
         # tables = parser.extract_tables(image_save_path)
         htmls = []
@@ -63,7 +64,7 @@ def extract():
             htmls.append( str(open(save_path+".html", "rt").read()) )
             camelot.plot(tb, kind='contour')
             # plt.save(save_path+".png")
-            plt.savefig(save_path+".png", dpi=300)
+            plt.savefig(save_path+".png", dpi=400)
             # plt.show()
         
         print("max_image",index+1)
