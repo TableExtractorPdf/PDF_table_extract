@@ -62,8 +62,8 @@
 		
 		<div class="dataResult">
 			{% for index in range(max_index) %}
-				<img class="contour" src="/static/extracted/{{ index }}.png">
-				
+				<img class="contour" src="/static/extracted/{{ index|string }}.png">
+				index: {{index}}
 			{% endfor %}
 			
 			{% for data in html_data %}
