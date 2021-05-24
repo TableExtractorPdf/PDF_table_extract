@@ -90,6 +90,7 @@ input :not([type=radio]){
 #top_tools{
 	width: 480px;
 	margin: 0;
+	margin-left: 250px;
 }
 #top_tools input[type=button]{
 	font-size: 18px;
@@ -146,7 +147,7 @@ table {
 	left: 350px;
 }
 .previewImg#nxtImg{
-	left: 650px;
+	left: 700px;
 }
 .preview_canvas{
 	position: absolute;
