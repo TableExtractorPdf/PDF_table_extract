@@ -39,6 +39,8 @@ def index():
 def extract():
     if request.method == 'POST': 
         pdf_File = request.files['pdf_input']
+        pdf_page = request.form['pdf_page']
+        print("pdf_page",pdf_page)
         
         print("PDF file name :", pdf_File.filename)
         is_pdf = pdf_File.filename.split(".")[-1].lower() == "pdf"
