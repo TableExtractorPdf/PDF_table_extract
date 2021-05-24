@@ -1,0 +1,120 @@
+﻿
+<html>
+	<head>
+		<title>
+		Lattice Test Program
+		</title>
+	</head>
+	
+	<body>
+		<h1>
+			<a href="/" style="text-decoration:none; color:black;">
+			Lattice Test Program
+			</a>
+		</h1>
+		
+		
+		<div style="display: inline-block;width:99%;">
+		<form class="dataInput" name="extract"  enctype="multipart/form-data"
+		action="extract"  method="post">
+		<span>PDF Input Here</span><br>
+		<input type="file" id="pdf_input" name="pdf_input" ><br>
+		
+		<div>
+			<div class="inputBoxs">
+			<ul class="parametersUl" style="line-height: 500px;">
+				<li class="parametersLi" >
+				<div>line scale</div>
+				<input type="text" class="parameters" id="line_scale" name="line_scale">
+				</li>
+				<li class="parametersLi">
+				<div>process background</div>
+				<input type="text" class="parameters" id="process_background" name="process_background">
+				</li>
+				<li class="parametersLi">
+				<div>copy text</div>
+				<input type="text" class="parameters" id="copy_text" name="copy_text">
+				</li>
+				<li class="parametersLi">
+				<div>shift text</div>
+				<input type="text" class="parameters" id="shift_text" name="shift_text">
+				</li>
+				<li class="parametersLi">
+				<div>line tol</div>
+				<input type="text" class="parameters" id="line_tol" name="line_tol">
+				</li>
+				<li class="parametersLi">
+				<div>joint tol</div>
+				<input type="text" class="parameters" id="joint_tol" name="joint_tol">
+				</li>
+				<li class="parametersLi">
+				<div>split text</div>
+				<input type="text" class="parameters" id="split_text" name="split_text">
+				</li>
+			</ul>
+			</div>
+			
+			<div class="inputBoxs" style="width: 20%;">
+				<button class="extractButton" name="extracts" style="vertical-align:middle">Extract</button>
+			</div>
+		</div>
+		</form>
+		
+		<div class="dataResult">
+			{% for index in range(max_index) %}
+				<img class="contour" src="/static/extracted/{{ index|string }}.png">
+				index: {{index}}
+			{% endfor %}
+			
+			{% for data in html_data %}
+				<div class="html_insert">
+					{{data|safe}}
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+	</div>
+	</body>
+
+<style>
+	#pdf_input{
+		width: 80%;
+		height: 60px;
+		border: 2px solid #819FF7;
+	}
+	.parametersLi{
+		line-height: 20px;
+		margin: 10px;
+	}
+	.parameters{
+		width: 50px;
+	}
+	.extractButton{
+		margin: 100px auto;
+	}
+	.inputBoxs{
+		display: inline-block;
+		vertical-align: top;
+		height: 400px;
+		width: 300px;
+	}
+	
+	.dataInput{
+		border-right: 2px solid black;
+		width: 35%;
+		display: inline-block;
+		vertical-align: top;
+	}
+	.dataResult{
+		width: 60%;
+		display: inline-block;
+	}
+	
+	.contour{
+		width: 50%;
+		border: 1px solid red;
+	}
+</style>
+<script>
+</script>
+</html>
