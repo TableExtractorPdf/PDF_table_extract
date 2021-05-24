@@ -120,6 +120,9 @@
                     }
                     $(".nowImg").selectAreas('add', arrs);
                 }
+                else{
+                    $(".nowImg").selectAreas();
+                }
             }
             
             // 테이블 선택 영역 표시 함수
@@ -128,24 +131,15 @@
                 for(i=0 ; i<areas.length ; i++){
                     arrs = [];
 
-                    const imageWidth = $("img#centerImg").width();
-                    const imageHeight = $("img#centerImg").height();
+                    const imageWidth = $("img.nowImg").width();
+                    const imageHeight = $("img.nowImg").height();
 
                     scalingFactorX = realWidth / imageWidth;
                     scalingFactorY = realHeight / imageHeight;
-
-                    // arrs.push( Number(areas[i]['x'] / scalingFactorX ));
-                    // arrs.push( Number(areas[i]['y'] / scalingFactorY ));
-                    // arrs.push( Number(areas[i]['width'] / scalingFactorX ));
-                    // arrs.push( Number(areas[i]['height'] / scalingFactorY ));
                     arrs.push( Number(areas[i]['x'] * scalingFactorX));
                     arrs.push( Number(areas[i]['y'] * scalingFactorY));
                     arrs.push( Number(areas[i]['width'] * scalingFactorX));
                     arrs.push( Number(areas[i]['height'] * scalingFactorY));
-                    // arrs.push( Number(areas[i]['x'] ));
-                    // arrs.push( Number(areas[i]['y'] ));
-                    // arrs.push( Number(areas[i]['width'] ));
-                    // arrs.push( Number(areas[i]['height'] ));
                     arrs.push(realWidth);
                     arrs.push(realHeight);
 
@@ -154,7 +148,6 @@
                 bboxs = bboxs.join(";");
                 return bboxs;
             }
-
 
             function destroy_select_areas(){
                 $('.nowImg').selectAreas('destroy');
@@ -166,6 +159,25 @@
 
             // 페이지 이동 함수 (pre_page는 현재 페이지, page는 이동할 페이지)
             function move_page(pre_page, page){
+                
+                if($('.nowImg').attr("id") == "centerImg"){
+                    destroy_select_areas();
+                }
+                else{
+                    $('.nowImg').selectAreas('destroy');
+                    $('.nowImg').unwrap().unwrap();
+                    $('.nowImg').removeAttr('alt');
+                    $('.nowImg').removeAttr('style');
+                    $('.nowImg').attr("class", "previewImg");
+
+                    var target = $('#centerImg');
+                    $(target).unwrap();
+
+                    $(target).selectAreas({
+                        width: window.innerWidth / 3.84,
+                        onChanged: debugQtyAreas
+                    })
+                }
                 this_page = page;
 
                 // 스크롤바를 현재 선택된 썸네일로 이동시키고 중간에 위치하게함
@@ -175,19 +187,33 @@
                     inline: 'center'
                 });
 
+                
+
                 // thumb_img_select 클래스가 적용된 썸네일은 빨간 테두리가 표시됨 (현재 선택된 페이지라는 뜻)
                 $('#thumb_page_'+pre_page).removeClass('thumb_img_select');
                 $('#thumb_page_'+page).addClass('thumb_img_select');
 
+
+                var target_thumb = $('.thumb_img_select').parent().parent();
+                var prv_page = -1;
+                var nxt_page = -1;
+
+                if($(target_thumb).prevAll('.thumb_page:visible:first').length > 0)
+                    prv_page = target_thumb.prevAll('.thumb_page:visible:first').find('.thumb_img').attr("id").replace("thumb_page_", "");
+                    
+                if($(target_thumb).nextAll('.thumb_page:visible:first').length > 0)
+                    nxt_page = target_thumb.nextAll('.thumb_page:visible:first').find('.thumb_img').attr("id").replace("thumb_page_", "");
+
+
                 $('img#centerImg').attr('src', "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+page+".png");
                 
-                $('img#prvImg').attr('src', "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+(Number(page)-1)+".png").load(function(){
+                $('img#prvImg').attr('src', "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+(Number(prv_page))+".png").load(function(){
                     // 정상 이미지 로딩, do nothing
                 })
                 .error(function(){
                     $(this).attr("src", "{{url_for('static', filename='job_pdf')}}/page_out_of_range.png");
                 });
-                $('img#nxtImg').attr('src', "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+(Number(page)+1)+".png").load(function(){
+                $('img#nxtImg').attr('src', "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+(Number(nxt_page))+".png").load(function(){
                     // 정상 이미지 로딩, do nothing
                 })
                 .error(function(){
@@ -195,12 +221,19 @@
                 });
 
 
-                destroy_select_areas();
-                $('#centerImg').wrap('<div class="image-decorator"></div>')
+                $('#centerImg').wrap('<div class="image-decorator"></div>');
                 $('#centerImg').addClass('nowImg');
                 $('#centerImg').removeClass('previewImg');
 
-                $("div.image-decorator:has(#centerImg)").css("margin-left", "250px");
+                // $("div.image-decorator:has(#centerImg)").css("margin-left", "250px");
+                $("div.image-decorator:has(#centerImg)").animate({
+                    marginLeft: '250px'
+                });
+
+                // $("#top_tools").css("margin-left", "250px");
+                $("#top_tools").animate({
+                    marginLeft:'250px'
+                });
 
 
                 $("<img>").attr("src", $("img.nowImg").attr("src")).load(function(){
@@ -214,11 +247,11 @@
                     var dtd_pg = JSON.parse(localStorage.getItem("{{fileName}}"));
 
                     page = Number(this_page);
-                    if($('.nowImg').attr('id') === 'prvImg') page-=1;
-                    if($('.nowImg').attr('id') === 'nxtImg') page+=1;
+                    if($('.nowImg').attr('id') === 'prvImg') page=prv_page;
+                    if($('.nowImg').attr('id') === 'nxtImg') page=nxt_page;
 
                     page = String(page);
-                    if( dtd_pg.hasOwnProperty(String(this_page)) ){
+                    if( dtd_pg.hasOwnProperty(String(page)) ){
                         set_select_areas( dtd_pg[page] );
                     }
                 });
@@ -335,33 +368,39 @@
             function debugQtyAreas (event, id, areas) {
                 // console.log(areas.length + " areas", arguments);
                 // alert(areas.length + " areas", arguments);
+                var target = this;
 
                 $("<img>").attr("src", $("img.nowImg").attr("src")).load(function(){
-                    page = Number(this_page);
-                    if($(".nowImg").attr('id') === 'prvImg') page-=1;
-                    if($(".nowImg").attr('id') === 'nxtImg') page+=1;
-                    var this_page_thumb = $(".thumb_page_"+page);
+                    if ($(target).attr("id") == $('.nowImg').attr('id')){
 
-                    var dtd_pg = JSON.parse( localStorage.getItem("{{fileName}}") );
+                        page = Number(this_page);
+                        if($(".nowImg").attr('id') === 'prvImg') page-=1;
+                        if($(".nowImg").attr('id') === 'nxtImg') page+=1;
+                        var this_page_thumb = $(".thumb_page_"+page);1
 
-                    dtd_pg[page] = areas_to_bbox(areas, this.width, this.height);
+                        var dtd_pg = JSON.parse( localStorage.getItem("{{fileName}}") );
 
-                    localStorage.setItem("{{fileName}}", JSON.stringify( dtd_pg ));
-                    
-                    if(areas.length > 0) {
-                        if(this_page_thumb.hasClass("thumb_table_none")){
-                            this_page_thumb.addClass("thumb_table");
-                            this_page_thumb.removeClass("thumb_table_none");
-                            this_page_thumb.find(".exist_class").css("display", "inline");
+                        dtd_pg[page] = areas_to_bbox(areas, this.width, this.height);
+
+                        localStorage.setItem("{{fileName}}", JSON.stringify( dtd_pg ));
+                        
+                        if(areas.length > 0) {
+                            if(this_page_thumb.hasClass("thumb_table_none")){
+                                this_page_thumb.addClass("thumb_table");
+                                this_page_thumb.removeClass("thumb_table_none");
+                                this_page_thumb.find(".exist_class").css("display", "inline");
+                            }
+                        }
+                        else {
+                            if(this_page_thumb.hasClass("thumb_table")){
+                                this_page_thumb.removeClass("thumb_table")
+                                this_page_thumb.addClass("thumb_table_none");
+                                this_page_thumb.find(".exist_class").css("display", "none");
+                            }
                         }
                     }
-                    else {
-                        if(this_page_thumb.hasClass("thumb_table")){
-                            this_page_thumb.removeClass("thumb_table")
-                            this_page_thumb.addClass("thumb_table_none");
-                            this_page_thumb.find(".exist_class").css("display", "none");
-                        }
-                    }
+
+
                 });
 
             };
@@ -447,8 +486,10 @@
                             if (opselected == 'non_checked') { select_items.delete(".thumb_check_none"); } 
                         }
 
-                        $( ".thumb_page:not("+Array.from(select_items).join('')+")" ).css("display", "none");
-                        $( Array.from(select_items).join('') ).css("display", "inline-block");
+                        // $( ".thumb_page:not("+Array.from(select_items).join('')+")" ).css("display", "none");
+                        // $( Array.from(select_items).join('') ).css("display", "inline-block");
+                        $( ".thumb_page:not("+Array.from(select_items).join('')+")" ).hide("slow");
+                        $( Array.from(select_items).join('') ).show("slow");
                     }
                 });
                 var is_page_list_expand = false;
@@ -605,14 +646,12 @@
                 });
 
 
-                // $(document).on('click', '.previewImg', function(){
                 $(document).on('click', '.preview_canvas', function(){
                     if ($(this).find("img").attr('src') == "{{url_for('static', filename='job_pdf')}}/page_out_of_range.png") return;
+                    destroy_select_areas();
                     
                     var target = $(this).find("img");
-                    $(this).find("img").unwrap();
-                    
-                    destroy_select_areas();
+                    $(target).unwrap();
 
                     $(target).wrap('<div class="image-decorator"></div>')
                     $(target).addClass('nowImg');
@@ -623,9 +662,35 @@
                         onChanged: debugQtyAreas
                     })
 
-                    $("div.image-decorator:has(#prvImg)").css("margin-left", "0px");
-                    $("div.image-decorator:has(#centerImg)").css("margin-left", "250px");
-                    $("div.image-decorator:has(#nxtImg)").css("margin-left", "600px");
+                    // $("div.image-decorator:has(#prvImg)").css("margin-left", "0px");
+                    // $("div.image-decorator:has(#centerImg)").css("margin-left", "250px");
+                    // $("div.image-decorator:has(#nxtImg)").css("margin-left", "600px");
+                    
+                    $("div.image-decorator:has(#prvImg)").animate({
+                        marginLeft:"0"
+                    });
+                    $("div.image-decorator:has(#centerImg)").animate({
+                        marginLeft:'250px'
+                    });
+                    $("div.image-decorator:has(#nxtImg)").animate({
+                        marginLeft:'600px'
+                    });
+                    
+                    if($(".nowImg").attr("id") == "nxtImg")
+                        // $("#top_tools").css("margin-left", "600px");
+                        $("#top_tools").animate({
+                            marginLeft:'600px'
+                        });
+
+
+                    else if($(".nowImg").attr("id") == "prvImg")
+                        $("#top_tools").animate({
+                            marginLeft:'0'
+                        });
+                    else
+                        $("#top_tools").animate({
+                            marginLeft:'250px'
+                        });
 
                     showAreaPreviewImg();
 
@@ -675,14 +740,26 @@
                 $("#page_list_size_btn").click(function(){
                     if(is_page_list_expand){
                         is_page_list_expand = false;
-                        $("#page_list_box").css("width", "177px");
-                        $("#page_list_size_btn").css("left", "177px");
+                        // $("#page_list_box").css("width", "177px");
+                        // $("#page_list_size_btn").css("left", "177px");
+                        $("#page_list_box").animate({
+                            width:"177px"
+                        });
+                        $("#page_list_size_btn").animate({
+                            left:"177px"
+                        });
                         $("#page_list_size_btn").text("▶");
                     }
                     else{
                         is_page_list_expand = true;
-                        $("#page_list_box").css("width", "1200px");
-                        $("#page_list_size_btn").css("left", "1200px");
+                        // $("#page_list_box").css("width", "1200px");
+                        // $("#page_list_size_btn").css("left", "1200px");
+                        $("#page_list_box").animate({
+                            width:"1200px"
+                        });
+                        $("#page_list_size_btn").animate({
+                            left:"1200px"
+                        });
                         $("#page_list_size_btn").text("◀");
                     }
                 });

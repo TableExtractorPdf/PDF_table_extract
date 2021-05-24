@@ -153,7 +153,7 @@ def uploadPDF():
         else:
             bboxs = 0
 
-        detected_areas[filename.replace('.pdf', '')] = result
+        detected_areas[filename.replace('.pdf', '').replace('.PDF', '')] = result
 
         resp = jsonify({'message' : 'Files successfully uploaded'})
         resp.status_code = 201
