@@ -39,7 +39,7 @@ def index():
 def extract():
     if request.method == 'POST': 
         pdf_File = request.files['pdf_input']
-        pdf_page = request.form['pdf_page']
+        pdf_page = int( request.form['pdf_page'] )
         print("pdf_page",pdf_page)
         
         print("PDF file name :", pdf_File.filename)
@@ -49,9 +49,37 @@ def extract():
             print("This is not pdf file")
             return render_template("index.html")
         
-        pdf_save_path = './static/extracted/'+"test.pdf"
+        save_path = './static/extracted/'
+        pdf_save_path = save_path +"test.pdf"
         #secure_filename(pdf_File.filename)
         pdf_File.save(pdf_save_path)
+        '''
+        import fitz
+
+        doc = fitz.open(pdf_save_path)
+        page = doc.loadPage( pdf_page )  # number of page
+        pix = page.getPixmap()
+        output = "outfile.png"
+        pix.writePNG(output)
+        
+        '''
+        from pdf2image import convert_from_path, convert_from_bytes
+        from pdf2image.exceptions import (
+                                        PDFInfoNotInstalledError,
+                                        PDFPageCountError,
+                                        PDFSyntaxError
+                                    )
+        # file_name = "pdf파일.pdf" 
+        pages = convert_from_path(pdf_save_path) 
+        
+        for i, page in enumerate(pages): 
+            if i == pdf_page:
+                page.save(pdf_save_path+str(i)+".jpg", "JPEG")
+            else:
+                print(i, "is not pdf page")
+
+        
+        # conda install -c conda-forge poppler
         
         
         tables = camelot.read_pdf(pdf_save_path, flavor="lattice", line_scale=50)
@@ -61,12 +89,12 @@ def extract():
         htmls = []
         for index, tb in enumerate(tables):
             print( tb.df )
-            save_path = './static/extracted/'+str(index)
-            tb.to_html(save_path+".html")
-            htmls.append( str(open(save_path+".html", "rt").read()) )
+            result_save_path = save_path+str(index)
+            tb.to_html(result_save_path+".html")
+            htmls.append( str(open(result_save_path+".html", "rt").read()) )
             camelot.plot(tb, kind='contour')
-            # plt.save(save_path+".png")
-            plt.savefig(save_path+".png", dpi=400)
+            # plt.save(result_save_path+".png")
+            plt.savefig(result_save_path+".png", dpi=400)
             # plt.show()
         
         print("max_image",index+1)
