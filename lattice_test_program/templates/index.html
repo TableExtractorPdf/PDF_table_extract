@@ -24,6 +24,10 @@
 			<div class="inputBoxs">
 			<ul class="parametersUl" style="line-height: 500px;">
 				<li class="parametersLi" >
+				<div>page</div>
+				<input type="text" class="parameters" id="pdf_page" name="pdf_page">
+				</li>
+				<li class="parametersLi" >
 				<div>line scale</div>
 				<input type="text" class="parameters" id="line_scale" name="line_scale">
 				</li>
@@ -61,9 +65,11 @@
 		</form>
 		
 		<div class="dataResult">
+			{% if max_index == 0 %}
+				<div class="contour" style="height:300px;">Extracted Contour Image</div>
+			{% endif %}
 			{% for index in range(max_index) %}
 				<img class="contour" src="/static/extracted/{{ index|string }}.png">
-				index: {{index}}
 			{% endfor %}
 			
 			{% for data in html_data %}
@@ -112,6 +118,7 @@
 	
 	.contour{
 		width: 50%;
+		margin: 5px 15px;
 		border: 1px solid red;
 	}
 </style>
