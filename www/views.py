@@ -309,14 +309,15 @@ def doExtract_page():
 
         result = extract(regions, page_file, table_option, line_scale)
         
+        html = []
+        jsons = []
+        csvs = []
+        col_width = []
+        table_width = []
+        bboxs = []
+        gs = []
+
         if len(result) > 0:
-            html = []
-            jsons = []
-            csvs = []
-            col_width = []
-            table_width = []
-            bboxs = []
-            gs = []
 
             for idx, table in enumerate(result, 1):
                 df = table.df
