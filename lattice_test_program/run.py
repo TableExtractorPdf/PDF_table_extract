@@ -53,16 +53,7 @@ def extract():
         pdf_save_path = save_path +"test.pdf"
         #secure_filename(pdf_File.filename)
         pdf_File.save(pdf_save_path)
-        '''
-        import fitz
-
-        doc = fitz.open(pdf_save_path)
-        page = doc.loadPage( pdf_page )  # number of page
-        pix = page.getPixmap()
-        output = "outfile.png"
-        pix.writePNG(output)
         
-        '''
         '''
         from pdf2image import convert_from_path, convert_from_bytes
         from pdf2image.exceptions import (
