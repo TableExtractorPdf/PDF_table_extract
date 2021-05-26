@@ -63,6 +63,7 @@ def extract():
         pix.writePNG(output)
         
         '''
+        '''
         from pdf2image import convert_from_path, convert_from_bytes
         from pdf2image.exceptions import (
                                         PDFInfoNotInstalledError,
@@ -80,7 +81,7 @@ def extract():
 
         
         # conda install -c conda-forge poppler
-        
+        '''
         
         tables = camelot.read_pdf(pdf_save_path, flavor="lattice", line_scale=50)
         print("Lattice go on")
