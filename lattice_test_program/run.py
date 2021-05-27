@@ -54,26 +54,6 @@ def extract():
         #secure_filename(pdf_File.filename)
         pdf_File.save(pdf_save_path)
         
-        '''
-        from pdf2image import convert_from_path, convert_from_bytes
-        from pdf2image.exceptions import (
-                                        PDFInfoNotInstalledError,
-                                        PDFPageCountError,
-                                        PDFSyntaxError
-                                    )
-        # file_name = "pdf파일.pdf" 
-        pages = convert_from_path(pdf_save_path) 
-        
-        for i, page in enumerate(pages): 
-            if i == pdf_page:
-                page.save(pdf_save_path+str(i)+".jpg", "JPEG")
-            else:
-                print(i, "is not pdf page")
-
-        
-        # conda install -c conda-forge poppler
-        '''
-        
         tables = camelot.read_pdf(pdf_save_path, flavor="lattice", line_scale=50)
         print("Lattice go on")
         # parser = Lattice2( line_scale=45)
