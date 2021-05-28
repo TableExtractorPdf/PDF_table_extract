@@ -69,7 +69,6 @@ def extract():
             plt.savefig(result_save_path+".png", dpi=400)
             # plt.show()
         
-        print("max_image",index+1)
         
         return render_template("index.html", html_data=htmls, max_index = index+1)#, data = data)
 
