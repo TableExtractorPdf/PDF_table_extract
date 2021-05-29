@@ -42,11 +42,17 @@ split_progress = {} # split 작업 진행도
 detected_areas = {}
 
 
-# 기본 인덱스 페이지, 이곳에서 pdf파일을 업로드할 수 있음
+# 인덱스 페이지
 @views.route("/", methods=['GET'])
 def index():
-    return render_template('index.html')
+    return redirect(url_for("views.workspace"))
     # return redirect(url_for('views.example')) # 예시 페이지로 리다이렉트시킴 (현재 사용 안함)
+    
+
+# 업로드 페이지, 이곳에서 pdf파일을 업로드할 수 있음
+@views.route("/upload", methods=['GET'])
+def upload():
+    return render_template('upload.html')
     
 
 # 각종 테스트 페이지. 현재 사용안함
@@ -68,6 +74,60 @@ def example():
 # jquery ajax로 파일 업로드 요청시 오게되는 라우트
 @views.route("/uploadPDF", methods = ['POST'])
 def uploadPDF():
+    global split_progress
+    global detected_areas
+
+    if 'file' not in request.files:
+        resp = jsonify({'message' : 'No file part in the request'})
+        resp.status_code = 400
+        return resp
+	
+    files = request.files.getlist('file')
+
+    errors = {}
+    success = False
+    filepath = None
+
+    for file in files:
+        if file:
+            # filename = secure_filename(file.filename) # secure_filename은 한글명을 지원하지 않음
+            filename = file.filename
+            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            file_page_path = os.path.splitext(filepath)[0]
+
+            # make filename folder
+            if not os.path.exists(file_page_path):
+                os.makedirs(file_page_path)
+
+            filepath = os.path.join(file_page_path, filename)
+            
+            # pdf file save (with uploaded)
+            file.save(filepath)
+            success = True
+
+        else:
+            errors[file.filename] = 'File type is not allowed'
+    
+    if success and errors:
+        errors['message'] = 'File(s) successfully uploaded'
+        resp = jsonify(errors)
+        resp.status_code = 206
+        return resp
+
+    # main 
+    if success:
+        resp = jsonify({'message' : 'Files successfully uploaded'})
+        resp.status_code = 201
+        return resp
+
+    else:
+        resp = jsonify(errors)
+        resp.status_code = 400
+        return resp
+
+# jquery ajax로 파일 업로드 요청시 오게되는 라우트
+@views.route("/uploadPDF2", methods = ['POST'])
+def uploadPDF2():
     global split_progress
     global detected_areas
 
@@ -195,16 +255,22 @@ def workspace():
         total_page = infile.getNumPages()
         inputstream.close()
 
-        return render_template(
-            'workspace.html',
-            fileName=fileName,
-            totalPage=total_page,
-            detected_areas=detected_areas[fileName],
-            # page=page
-        )
+        if detected_areas.get(fileName) is not None:
+            return render_template(
+                'workspace.html',
+                fileName=fileName,
+                totalPage=total_page,
+                detected_areas=detected_areas[fileName],
+                # page=page
+            )
 
-    else:
-        return render_template('error.html', error='해당 페이지를 찾을 수 없습니다.')
+    return render_template(
+        'workspace.html',
+        fileName=fileName,
+        detected_areas=-1
+    )
+    # else:
+    #     return render_template('error.html', error='해당 페이지를 찾을 수 없습니다.')
 
 
 
