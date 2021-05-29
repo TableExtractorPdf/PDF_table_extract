@@ -40,7 +40,14 @@ def extract():
     if request.method == 'POST': 
         pdf_File = request.files['pdf_input']
         pdf_page = int( request.form['pdf_page'] )
-        print("pdf_page",pdf_page)
+        line_scale = int( request.form['line_scale'] )
+        process_background = int( request.form['process_background'] )
+        copy_text = request.form['copy_text'] 
+        shift_text = int( request.form['shift_text'] )
+        joint_tol = int( request.form['joint_tol'] )
+        split_text = request.form['split_text'] 
+        line_tol = int( request.form['line_tol'] )
+        iterations = int( request.form['iterations'] )
         
         print("PDF file name :", pdf_File.filename)
         is_pdf = pdf_File.filename.split(".")[-1].lower() == "pdf"
@@ -53,26 +60,6 @@ def extract():
         pdf_save_path = save_path +"test.pdf"
         #secure_filename(pdf_File.filename)
         pdf_File.save(pdf_save_path)
-        
-        '''
-        from pdf2image import convert_from_path, convert_from_bytes
-        from pdf2image.exceptions import (
-                                        PDFInfoNotInstalledError,
-                                        PDFPageCountError,
-                                        PDFSyntaxError
-                                    )
-        # file_name = "pdf파일.pdf" 
-        pages = convert_from_path(pdf_save_path) 
-        
-        for i, page in enumerate(pages): 
-            if i == pdf_page:
-                page.save(pdf_save_path+str(i)+".jpg", "JPEG")
-            else:
-                print(i, "is not pdf page")
-
-        
-        # conda install -c conda-forge poppler
-        '''
         
         tables = camelot.read_pdf(pdf_save_path, flavor="lattice", line_scale=50)
         print("Lattice go on")
@@ -89,7 +76,6 @@ def extract():
             plt.savefig(result_save_path+".png", dpi=400)
             # plt.show()
         
-        print("max_image",index+1)
         
         return render_template("index.html", html_data=htmls, max_index = index+1)#, data = data)
 
