@@ -78,20 +78,6 @@
         
         
 		<script type="text/javascript">
-            var detected_areas_origin = JSON.parse( '{{detected_areas | tojson | safe}}' );
-            localStorage.setItem("{{fileName}}_origin", JSON.stringify(detected_areas_origin));
-
-
-            if( localStorage.getItem("{{fileName}}") === null){
-                localStorage.setItem("{{fileName}}", JSON.stringify(detected_areas_origin));
-            }
-
-            var this_page = 1;
-            var table_data;
-
-            $( document ).tooltip();
-                
-
             // 테이블 선택 영역 표시 함수
             function set_select_areas(bboxs){
                 if(bboxs != 0){
@@ -464,42 +450,214 @@
                 }
             }
             
-			$(document).ready(function () {
-                var select_items = new Set();
-                select_items.add(".thumb_page");
 
-                $('#page_multiple_selected').multiselect({
-                    onChange: function(option, checked, select) {
-                        var opselected = $(option).val();
-                        if(checked == true) {
-                            if (opselected == 'all') { select_items.add(".thumb_page"); } 
-                            if (opselected == 'table') { select_items.add(".thumb_table"); } 
-                            if (opselected == 'empty') { select_items.add(".thumb_table_none"); } 
-                            if (opselected == 'checked') { select_items.add(".thumb_check"); } 
-                            if (opselected == 'non_checked') { select_items.add(".thumb_check_none"); } 
-                        }
-                        else if(checked == false) {
-                            if (opselected == 'all') { select_items.delete(".thumb_page"); } 
-                            if (opselected == 'table') { select_items.delete(".thumb_table"); } 
-                            if (opselected == 'empty') { select_items.delete(".thumb_table_none"); } 
-                            if (opselected == 'checked') { select_items.delete(".thumb_check"); } 
-                            if (opselected == 'non_checked') { select_items.delete(".thumb_check_none"); } 
-                        }
+			function areaToString (area) {
+				return (typeof area.id === "undefined" ? "" : (area.id + ": ")) + area.x + ':' + area.y  + ' ' + area.width + 'x' + area.height + '<br />'
+			}
 
-                        // $( ".thumb_page:not("+Array.from(select_items).join('')+")" ).css("display", "none");
-                        // $( Array.from(select_items).join('') ).css("display", "inline-block");
-                        $( ".thumb_page:not("+Array.from(select_items).join('')+")" ).hide("slow");
-                        $( Array.from(select_items).join('') ).show("slow");
+			function output (text) {
+				$('#output').html(text);
+			}
+
+			// Display areas coordinates in a div
+			function displayAreas (areas) {
+				var text = "";
+				$.each(areas, function (id, area) {
+					text += areaToString(area);
+				});
+				output(text);
+			};
+
+            
+            
+            function extract_pdf(formData, files){
+                // progress();
+                console.log("files:", files);
+                $.ajax({
+                    type: 'POST',
+                    url: '/uploadPDF',
+                    processData: false,
+                    contentType: false,
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    data: formData,
+                    success: function (data) {
+                        if(data.message == 'Files successfully uploaded'){
+                            alert("파일 업로드 성공");
+                            // location.href = '{{url_for("views.workspace")}}'+'?fileName='+fileName.split('.')[0];
+                        }
+                        else{
+                            alert("파일 업로드 실패");
+                        }
+                    },
+                    error: function (error) {
+                        console.error(error);
                     }
                 });
-                var is_page_list_expand = false;
-                
+            }
 
-                // 추출할 메인 이미지 교체
-                $('img#centerImg').attr("src", "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+this_page+".png");
-                
-                $('img#prvImg').attr("src", "{{url_for('static', filename='job_pdf')}}/page_out_of_range.png");
-                $('img#nxtImg').attr("src", "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+(Number(this_page)+1)+".png");
+            
+            if('{{detected_areas}}' != "-1"){   
+                var detected_areas_origin = JSON.parse( '{{detected_areas | tojson | safe}}' );
+                localStorage.setItem("{{fileName}}_origin", JSON.stringify(detected_areas_origin));
+
+                if( localStorage.getItem("{{fileName}}") === null || localStorage.getItem("{{fileName}}") === "null"){
+                    localStorage.setItem("{{fileName}}", JSON.stringify(detected_areas_origin));
+                }
+
+                var this_page = 1;
+                var table_data;
+
+                $( document ).tooltip();
+                    
+                var selectionExists;
+            }
+            else if(!(localStorage.getItem("{{fileName}}") === "null")){
+                var this_page = 1;
+                var table_data;
+
+                $( document ).tooltip();
+                    
+                var selectionExists;
+            }
+
+
+			$(document).ready(function () {
+                if (!(localStorage.getItem("{{fileName}}") === "null" || localStorage.getItem("{{fileName}}") === null )){
+                    var dtd_pg = JSON.parse(localStorage.getItem("{{fileName}}"));
+
+                    var htmls = "";
+
+                    for(idx=1 ; idx<Object.keys(dtd_pg).length+1 ; idx++){
+                        var tables_len = dtd_pg[idx].length;
+
+                        if (tables_len > 0){
+                            htmls += "<div class='thumb_page thumb_page_"+idx+" thumb_table thumb_check_none'>\
+                                        <center>\
+                                        <img src='/static/icon/check.png' class='check_page' style='display:none'>\
+                                        <img src='/static/icon/table.png' class='exist_class' style='display: inline;'>\
+                                        <br>";
+                            if (idx == 1){
+                                htmls += "<img\
+                                        class='thumb_img thumb_img_select'\
+                                        src=\"{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+idx+"-thumb.png\"\
+                                        onclick=\"\
+                                                move_page(this_page, '"+idx+"');\
+                                            \"\
+                                        id=\"thumb_page_"+idx+"\">";
+                            }
+                            else{
+                                htmls += "<img\
+                                            class='thumb_img'\
+                                            src=\"{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+idx+"-thumb.png\"\
+                                            onclick=\"\
+                                                    move_page(this_page, '"+idx+"');\
+                                                \"\
+                                            id=\"thumb_page_"+idx+"\">";
+                            }
+                            htmls += "<br>\
+                                        <span>"+idx+"</span>\
+                                        <br>\
+                                    </center>\
+                                </div>";
+                        }
+                        else{
+                            htmls += "<div class='thumb_page thumb_page_"+idx+" thumb_table_none thumb_check_none'>\
+                                        <center>\
+                                            <img src='/static/icon/check.png' class='check_page' style='display: none'>\
+                                            <img src='/static/icon/table.png' class='exist_class' style='display: none;'>\
+                                            <br>";
+                            if (idx == 1){
+                                htmls += "<img\
+                                            class='thumb_img thumb_img_select'\
+                                            src=\"{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+idx+"-thumb.png\"\
+                                            onclick=\"\
+                                                    move_page(this_page, '"+idx+"');\
+                                                \"\
+                                            id=\"thumb_page_"+idx+"\">";
+                            }
+                            else{
+                                htmls += "<img\
+                                            class='thumb_img'\
+                                            src=\"{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+idx+"-thumb.png\"\
+                                            onclick=\"\
+                                                    move_page(this_page, '"+idx+"');\
+                                                \"\
+                                            id=\"thumb_page_"+idx+"\">";
+                            }
+                            htmls += "<br>\
+                                            <span>"+idx+"</span>\
+                                            <br>\
+                                        </center>\
+                                    </div>";
+                        }
+                    }
+
+                    $("#page_list_box").append(htmls);
+
+                    var select_items = new Set();
+                    select_items.add(".thumb_page");
+
+                    $('#page_multiple_selected').multiselect({
+                        onChange: function(option, checked, select) {
+                            var opselected = $(option).val();
+                            if(checked == true) {
+                                if (opselected == 'all') { select_items.add(".thumb_page"); } 
+                                if (opselected == 'table') { select_items.add(".thumb_table"); } 
+                                if (opselected == 'empty') { select_items.add(".thumb_table_none"); } 
+                                if (opselected == 'checked') { select_items.add(".thumb_check"); } 
+                                if (opselected == 'non_checked') { select_items.add(".thumb_check_none"); } 
+                            }
+                            else if(checked == false) {
+                                if (opselected == 'all') { select_items.delete(".thumb_page"); } 
+                                if (opselected == 'table') { select_items.delete(".thumb_table"); } 
+                                if (opselected == 'empty') { select_items.delete(".thumb_table_none"); } 
+                                if (opselected == 'checked') { select_items.delete(".thumb_check"); } 
+                                if (opselected == 'non_checked') { select_items.delete(".thumb_check_none"); } 
+                            }
+
+                            // $( ".thumb_page:not("+Array.from(select_items).join('')+")" ).css("display", "none");
+                            // $( Array.from(select_items).join('') ).css("display", "inline-block");
+                            $( ".thumb_page:not("+Array.from(select_items).join('')+")" ).hide("slow");
+                            $( Array.from(select_items).join('') ).show("slow");
+                        }
+                    });
+                    var is_page_list_expand = false;
+                    
+
+                    // 추출할 메인 이미지 교체
+                    $('img#centerImg').attr("src", "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+this_page+".png");
+                    
+                    $('img#prvImg').attr("src", "{{url_for('static', filename='job_pdf')}}/page_out_of_range.png");
+                    $('img#nxtImg').attr("src", "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+(Number(this_page)+1)+".png");
+
+                    $('img#centerImg').selectAreas({
+                        width: window.innerWidth / 3.84,
+                        onChanged: debugQtyAreas
+                    }).one("load", function(){
+                        var imageWidth = $('#centerImg').width();
+                        var imageHeight = $('#centerImg').height();
+
+                        var fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
+
+                        $('.image-decorator div, .image-decorator img').css({'height':'70vh', 'width':fit_width});
+                        
+
+                        if( dtd_pg.hasOwnProperty(String(this_page)) ){
+                            page = String(this_page);
+                            set_select_areas( dtd_pg[page] );
+                        }
+                    });
+                    showAreaPreviewImg();
+                }
+                else{
+                    $(".center_text").show();
+                    $("#page_list_box").hide();
+                    $("#page_list_size_btn").hide();
+                    $("#article_table").hide();
+                }
+
 
 
                 $('.arrow').click(function () {
@@ -715,28 +873,6 @@
                 });
 
 
-				$('img#centerImg').selectAreas({
-                    width: window.innerWidth / 3.84,
-                    onChanged: debugQtyAreas
-				}).one("load", function(){
-                    var imageWidth = $('#centerImg').width();
-                    var imageHeight = $('#centerImg').height();
-
-                    var fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
-
-                    $('.image-decorator div, .image-decorator img').css({'height':'70vh', 'width':fit_width});
-                    
-                    var dtd_pg = JSON.parse(localStorage.getItem("{{fileName}}"));
-
-                    if( dtd_pg.hasOwnProperty(String(this_page)) ){
-                        page = String(this_page);
-                        set_select_areas( dtd_pg[page] );
-                    }
-                });
-                showAreaPreviewImg();
-
-
-
                 $("#page_list_size_btn").click(function(){
                     if(is_page_list_expand){
                         is_page_list_expand = false;
@@ -778,26 +914,6 @@
                     }
                 });
 			});
-
-			var selectionExists;
-
-			function areaToString (area) {
-				return (typeof area.id === "undefined" ? "" : (area.id + ": ")) + area.x + ':' + area.y  + ' ' + area.width + 'x' + area.height + '<br />'
-			}
-
-			function output (text) {
-				$('#output').html(text);
-			}
-
-			// Display areas coordinates in a div
-			function displayAreas (areas) {
-				var text = "";
-				$.each(areas, function (id, area) {
-					text += areaToString(area);
-				});
-				output(text);
-			};
-
 		</script>
 	</head>
 
@@ -805,6 +921,10 @@
         <div class="loader loader-default" data-text="Processing..."></div>
 
         {% include "menu_template.html" %}
+
+        <div class='center_text' style='display: none'>
+            <h3>Not uploaded PDF File</h3>
+        </div>
 
         <div id='page_list_box'>
             <div id='page_multiple_box'>
@@ -817,71 +937,6 @@
                     <option value="non_checked">non_checked</option>
                 </select>
             </div>
-
-            {% for idx in range(1, totalPage+1) %}
-                {% set tables_len = detected_areas[idx]|length %}
-                {% if tables_len > 0 %}
-                <div class='thumb_page thumb_page_{{idx}} thumb_table thumb_check_none'>
-                    <center>
-                        <img src='/static/icon/check.png' class='check_page' style='display:none'>
-                        <img src='/static/icon/table.png' class='exist_class' style='display: inline;'>
-                        <br>
-                        {% if idx == 1 %}
-                        <img
-                            class='thumb_img thumb_img_select'
-                            src="{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-{{idx}}-thumb.png"
-                            onclick="
-                                    move_page(this_page, '{{idx}}');
-                                "
-                            id="thumb_page_{{idx}}">
-
-                        {% else %}
-                        
-                        <img
-                            class='thumb_img'
-                            src="{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-{{idx}}-thumb.png"
-                            onclick="
-                                    move_page(this_page, '{{idx}}');
-                                "
-                            id="thumb_page_{{idx}}">
-                        {% endif %}
-                        <br>
-                        <span>{{idx}}</span>
-                        <br>
-                    </center>
-                </div>
-                {% else %}
-                <div class='thumb_page thumb_page_{{idx}} thumb_table_none thumb_check_none'>
-                    <center>
-                        <img src='/static/icon/check.png' class='check_page' style='display: none'>
-                        <img src='/static/icon/table.png' class='exist_class' style='display: none;'>
-                        <br>
-                        {% if idx == 1 %}
-                        <img
-                            class='thumb_img thumb_img_select'
-                            src="{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-{{idx}}-thumb.png"
-                            onclick="
-                                    move_page(this_page, '{{idx}}');
-                                "
-                            id="thumb_page_{{idx}}">
-
-                        {% else %}
-                        
-                        <img
-                            class='thumb_img'
-                            src="{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-{{idx}}-thumb.png"
-                            onclick="
-                                    move_page(this_page, '{{idx}}');
-                                "
-                            id="thumb_page_{{idx}}">
-                        {% endif %}
-                        <br>
-                        <span>{{idx}}</span>
-                        <br>
-                    </center>
-                </div>
-                {% endif %}
-            {% endfor %}
         </div>
         <span id='page_list_size_btn'>▶</span>
 

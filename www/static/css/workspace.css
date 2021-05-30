@@ -13,6 +13,14 @@ body {
 	height: 100vh;
 }
 
+.center_text{
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+
+
 #page_list_box{
 	position: absolute;
 	float: left;
