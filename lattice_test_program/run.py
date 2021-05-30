@@ -1,4 +1,5 @@
-﻿# 210523
+﻿# start date : 210523
+# update date : 210530
 # minuKoo
 # lattice test program flask server
 
@@ -15,7 +16,6 @@ from flask import (
 )
 from werkzeug.utils import secure_filename
 from PyPDF2 import PdfFileReader
-# from utils.tasks import split as task_split
 
 from Lattice_2 import Lattice2
 # from check_lattice.check_line_scale import GetLineScale
@@ -52,7 +52,7 @@ def extract():
         print("PDF file name :", pdf_File.filename)
         is_pdf = pdf_File.filename.split(".")[-1].lower() == "pdf"
         
-        if not is_pdf:
+        if not is_pdf: # if not pdf format
             print("This is not pdf file")
             return render_template("index.html")
         
@@ -72,17 +72,14 @@ def extract():
             tb.to_html(result_save_path+".html")
             htmls.append( str(open(result_save_path+".html", "rt").read()) )
             camelot.plot(tb, kind='contour')
-            # plt.save(result_save_path+".png")
-            plt.savefig(result_save_path+".png", dpi=400)
-            # plt.show()
-        
+            plt.savefig(result_save_path+".png", dpi=300)
+            
         
         return render_template("index.html", html_data=htmls, max_index = index+1)#, data = data)
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-    # app.run()
     
 
 
