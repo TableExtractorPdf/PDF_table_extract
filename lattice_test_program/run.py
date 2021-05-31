@@ -1,5 +1,5 @@
 ﻿# start date : 210523
-# update date : 210530
+# update date : 210531
 # minuKoo
 # lattice test program flask server
 
@@ -7,11 +7,8 @@ from flask import (
     Flask,
     request,
     render_template,
-    jsonify,
     Blueprint,
     redirect,
-    url_for,
-    current_app,
     session
 )
 from werkzeug.utils import secure_filename
@@ -28,6 +25,9 @@ import matplotlib.pyplot as plt
 import camelot
 import numpy as np
 import pandas as pd
+import os.path
+import os
+from flask_caching import Cache
 
 app = Flask(__name__)
 
@@ -37,13 +37,16 @@ def index():
 
 @app.route('/extract', methods=['POST'])
 def extract():
-    if request.method == 'POST': 
+    if request.method == 'POST':
         pdf_File = request.files['pdf_input']
-        pdf_page = int( request.form['pdf_page'] )
+        pdf_page = request.form['pdf_page']
         line_scale = int( request.form['line_scale'] )
-        process_background = int( request.form['process_background'] )
+        process_background_num = int( request.form['process_background'] )
+        process_background = False
+        if process_background_num == 1:
+            process_background = True
         copy_text = request.form['copy_text'] 
-        shift_text = int( request.form['shift_text'] )
+        shift_text = request.form['shift_text'] 
         joint_tol = int( request.form['joint_tol'] )
         split_text = request.form['split_text'] 
         line_tol = int( request.form['line_tol'] )
@@ -59,27 +62,53 @@ def extract():
         save_path = './static/extracted/'
         pdf_save_path = save_path +"test.pdf"
         #secure_filename(pdf_File.filename)
+        print("pdf save path:", pdf_save_path)
+        
+        
+        if os.path.isfile(pdf_save_path) :
+            os.remove(pdf_save_path)
+        
         pdf_File.save(pdf_save_path)
         
-        tables = camelot.read_pdf(pdf_save_path, flavor="lattice", line_scale=50)
+        tables = camelot.read_pdf(pdf_save_path, 
+                                pages = pdf_page, 
+                                flavor="lattice", 
+                                line_scale = line_scale,
+                                # process_background = process_background,
+                                # copy_text=copy_text,
+                                # shift_text=shift_text,
+                                # joint_tol=joint_tol,
+                                # split_text=split_text,
+                                # line_tol=line_tol,
+                                # iterations=iterations
+                                )
+                                
         print("Lattice go on")
-        # parser = Lattice2( line_scale=45)
-        # tables = parser.extract_tables(image_save_path)
         htmls = []
         for index, tb in enumerate(tables):
-            print( tb.df )
-            result_save_path = save_path+str(index)
-            tb.to_html(result_save_path+".html")
-            htmls.append( str(open(result_save_path+".html", "rt").read()) )
-            camelot.plot(tb, kind='contour')
-            plt.savefig(result_save_path+".png", dpi=300)
             
-        
+            result_save_path = save_path+str(index)
+            html_path = result_save_path+".html"
+            if os.path.isfile(html_path) :
+                os.remove(html_path)
+            tb.to_html(html_path)
+            htmls.append( str(open(html_path, "rt").read()) )
+            camelot.plot(tb, kind='contour')
+            
+            png_path = result_save_path+".png"
+            if os.path.isfile(png_path) :
+                print("png remove")
+                os.remove(png_path)
+            
+            plt.savefig(png_path, dpi=300)
+            
         return render_template("index.html", html_data=htmls, max_index = index+1)#, data = data)
 
 
 if __name__ == '__main__':
     app.run(debug=True)
+    app.config["CACHE_TYPE"] = "null"
+    cache.init_app(app)
     
 
 
