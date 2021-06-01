@@ -1,5 +1,5 @@
 ﻿# start date : 210523
-# update date : 210531
+# update date : 210601
 # minuKoo
 # lattice test program flask server
 
@@ -52,7 +52,6 @@ def extract():
         line_tol = int( request.form['line_tol'] )
         iterations = int( request.form['iterations'] )
         
-        print("PDF file name :", pdf_File.filename)
         is_pdf = pdf_File.filename.split(".")[-1].lower() == "pdf"
         
         if not is_pdf: # if not pdf format
@@ -61,9 +60,6 @@ def extract():
         
         save_path = './static/extracted/'
         pdf_save_path = save_path +"test.pdf"
-        #secure_filename(pdf_File.filename)
-        print("pdf save path:", pdf_save_path)
-        
         
         if os.path.isfile(pdf_save_path) :
             os.remove(pdf_save_path)
@@ -83,22 +79,21 @@ def extract():
                                 # iterations=iterations
                                 )
                                 
-        print("Lattice go on")
         htmls = []
         for index, tb in enumerate(tables):
             
             result_save_path = save_path+str(index)
             html_path = result_save_path+".html"
-            if os.path.isfile(html_path) :
-                os.remove(html_path)
+            # if os.path.isfile(html_path) :
+                # os.remove(html_path)
             tb.to_html(html_path)
             htmls.append( str(open(html_path, "rt").read()) )
             camelot.plot(tb, kind='contour')
             
             png_path = result_save_path+".png"
-            if os.path.isfile(png_path) :
-                print("png remove")
-                os.remove(png_path)
+            # if os.path.isfile(png_path) :
+                # print("png remove")
+                # os.remove(png_path)
             
             plt.savefig(png_path, dpi=300)
             
@@ -107,8 +102,9 @@ def extract():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    # remove cache
     app.config["CACHE_TYPE"] = "null"
-    cache.init_app(app)
+    # cache.init_app(app)
     
 
 
