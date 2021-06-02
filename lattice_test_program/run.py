@@ -10,14 +10,11 @@ from flask import (
     Blueprint,
     redirect,
     session
-)
+    )
 from werkzeug.utils import secure_filename
 from PyPDF2 import PdfFileReader
 
 from Lattice_2 import Lattice2
-# from check_lattice.check_line_scale import GetLineScale
-# from ..check_lattice.Lattice_2 import Lattice2
-# from .check_lattice.check_line_scale import GetLineScale
 import cv2
 import os
 import json
