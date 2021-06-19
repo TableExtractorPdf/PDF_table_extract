@@ -7,13 +7,14 @@
             '/upload',
             'PDF file upload',
             'width=700px,height=400px,scrollbars=yes, menubar=no, location=no,toolbar=no,status=no');
+
+        return popup;
     }
 </script>
 <header>
     <ul>
-        <li onclick=popup_upload()>Upload</li>
-        <li>Workspace</li>
-        <li>Download</li>
+        <li id='upload_page_btn'>Upload PDFs</li>
+        <li>Save PDF</li>
         <!-- <li style='font-size: 24px;'><b>{{fileName}}.pdf</b>&nbsp;&nbsp;&nbsp; p{{page}}</li> -->
     </ul>
 </header>

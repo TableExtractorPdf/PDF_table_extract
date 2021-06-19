@@ -138,6 +138,8 @@ def uploadPDF2():
 	
     files = request.files.getlist('file')
 
+    print(f'files: {files}')
+
     errors = {}
     success = False
     filepath = None

@@ -17,7 +17,6 @@
             function close_btn(target){
                 $(target).parent().remove();
                 $(target).parent().find("#non-upload-box").css("display", "block");
-                alert($("#file").val());
                 $("#file").val(null);
                 // $(".extract_btn").remove();
             }
@@ -174,7 +173,7 @@
                                 formData.append("file", files[i]);
                             }
 
-                            opener.parent.extract_pdf(formData, files);
+                            opener.parent.upload_pdf(formData, files);
                         });
 
                     }
