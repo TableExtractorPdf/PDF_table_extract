@@ -23,11 +23,22 @@ def show_plot(title, img):
         plt.savefig("./result/"+title+'.png', dpi=300)
     plt.show()
 
-filename = "background1.png"
+filename = "background3.png"
 # filename = "sample.png"
 
 imagename = "./pdf_sample/"+filename
 
+
+img = cv2.imread(imagename)
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) #흑백 전환
+gray = cv2.cvtColor(gray, cv2.COLOR_BGR2RGB)
+plt.imshow(gray)
+plt.savefig("./result/"+filename+"gray"+'.png', dpi=300)
+g2 = np.invert(gray)
+plt.imshow(g2)
+plt.savefig("./result/"+filename+"invert-gray"+'.png', dpi=300)
+'''
+'''
 # read = cv2.imread(imagename)
 # show_plot("", read)
 # gray = cv2.cvtColor(read, cv2.COLOR_BGR2GRAY)
@@ -46,7 +57,7 @@ threshold_blocksize, threshold_constant = 15, 0
 
 
 background, backtitle = True, "-true"
-background , backtitle = False, "-false"
+# background , backtitle = False, "-false"
 
 image, threshold = adaptive_threshold(
             imagename,
@@ -59,14 +70,12 @@ image, threshold = adaptive_threshold(
 show_plot( filename+"background"+backtitle, threshold)
 
 
-
-
 ################
 
 regions = None
 # regions = [[a[0],  b[0],a[1], b[1]]]
-line_scale= 30
-iterations = 1
+line_scale= 20
+iterations = 0
 
 vertical_mask, vertical_segments = find_lines(
     threshold,
@@ -90,6 +99,7 @@ show_plot(filename+"-file-lines"+backtitle, vertical_mask + horizontal_mask)
 
 
 contours = find_contours(vertical_mask, horizontal_mask)
+
 
 
 '''
