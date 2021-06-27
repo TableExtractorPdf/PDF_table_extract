@@ -2,6 +2,8 @@
 <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/menu_template.css')}}">
 
 <script>
+    var popup_window;
+
     function popup_upload(){
         var popup = window.open(
             '/upload',
@@ -10,6 +12,142 @@
 
         return popup;
     }
+    
+    function autodetect_to_localstorage(){
+        $.ajax({
+            type: 'POST',
+            url: '/getDetectedAreas',
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function (data) {
+                let keys = Object.keys(data.detected_areas);
+                
+                for(i=0 ; i<keys.length ; i++){
+                    filename = keys[i];
+
+                    localStorage.setItem("PDF__"+filename+"_origin", JSON.stringify(data.detected_areas[filename]));
+                }
+            }
+        });
+    }
+
+    function auto_detect_progress(){
+            $(".background-grey").css("display", "block");
+            $(".loading").css("display", "block");
+
+            var percent = document.querySelector('.percent');
+            var progress = document.querySelector('.progress2');
+            var text = document.querySelector('.text');
+            var count = 4;
+            var per = 16;
+            var loading = setInterval(getProgress, 500);
+
+            function getProgress(){
+                $.ajax({
+                    type: 'POST',
+                    url: '/getProgress',
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        let keys = Object.keys(data.split_progress);
+
+                        // var is_finish = true;
+
+                        for(i=0 ; i<keys.length ; i++){
+                            filename = keys[i];
+                            // if(data[ filename ] != 100){
+                            //     is_finish = false;
+                            // }
+
+                            var window_body = popup_window.document.getElementById("body");
+
+                            $(window_body).css("padding", "100px");
+                            $(window_body).find("#"+filename.split(".")[0]+"_progress + > div").css("width", data.split_progress[ filename ]+"%");
+                            $(window_body).find("#"+filename.split(".")[0]+"_progress + > div").text(data.split_progress[ filename ]+"%");
+                        }
+
+                        // if(is_finish){
+                        if(!data.is_working){
+                            clearInterval(loading);
+
+                            autodetect_to_localstorage();
+
+                            popup_window.close();
+                            // location.href = '/workspace';
+                        }
+                    }
+                });
+            }
+        }
+
+    function auto_extract(files, popup_window){
+        var html = "";
+        var file_names = [];
+
+        for(i=0 ; i<files.length ; i++){
+            html += "<span id='"+files[i].name.split('.')[0]+"_progress'>" + files[i].name + "</span>";
+            html += "<div class='progress'>";
+            html += "<div class='progress-bar progress-bar-striped progress-bar-animated' style='width: 0%'>0%</div>";
+            html += "</div><br>";
+            file_names.push(files[i].name);
+        }
+
+        // $(".center_text").html(html);
+        popup_window.document.getElementById("body").innerHTML = html;
+
+        auto_detect_progress(popup_window);
+
+        $.ajax({
+            type: 'POST',
+            url: '/autoExtract',
+            traditional: true,
+            data: {file_names},
+            success: function (data) {
+                console.log("success");
+
+                let keys = Object.keys(data.detected_areas);
+
+                for(i=0 ; i<keys.length ; i++){
+                    filename = keys[i];
+                    localStorage.setItem("PDF__"+filename.split('.')[0], JSON.stringify(data.detected_areas[filename]));
+                }
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    }
+    
+    function upload_pdf(formData, files){
+        $.ajax({
+            type: 'POST',
+            url: '/uploadPDF',
+            processData: false,
+            contentType: false,
+            xhrFields: {
+                withCredentials: true
+            },
+            data: formData,
+            success: function (data) {
+                if(data.message == 'Files successfully uploaded'){
+                    // popup_window.close();
+                    auto_extract(files, popup_window);
+                    // location.href = '{{url_for("views.workspace")}}'+'?fileName='+fileName.split('.')[0];
+                    // location.href = '/workspace?fileName='+files[0].split('.')[0];
+                }
+                else{
+                    alert("파일 업로드 실패");
+                }
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    }
+
 </script>
 <header>
     <ul>

@@ -15,7 +15,8 @@ from flask import (
     redirect,
     url_for,
     current_app,
-    session
+    session,
+    g
 )
 from werkzeug.utils import secure_filename
 
@@ -40,6 +41,7 @@ import numpy as np
 views = Blueprint("views", __name__)
 split_progress = {} # split 작업 진행도
 detected_areas = {}
+is_working = False # 현재 작업중인지 확인
 
 
 # 인덱스 페이지
@@ -74,9 +76,6 @@ def example():
 # jquery ajax로 파일 업로드 요청시 오게되는 라우트
 @views.route("/uploadPDF", methods = ['POST'])
 def uploadPDF():
-    global split_progress
-    global detected_areas
-
     if 'file' not in request.files:
         resp = jsonify({'message' : 'No file part in the request'})
         resp.status_code = 400
@@ -104,6 +103,8 @@ def uploadPDF():
             # pdf file save (with uploaded)
             file.save(filepath)
             success = True
+            
+            split_progress[filename] = 0
 
         else:
             errors[file.filename] = 'File type is not allowed'
@@ -125,62 +126,34 @@ def uploadPDF():
         resp.status_code = 400
         return resp
 
-# jquery ajax로 파일 업로드 요청시 오게되는 라우트
-@views.route("/uploadPDF2", methods = ['POST'])
-def uploadPDF2():
+
+# jquery ajax로 
+@views.route("/autoExtract", methods = ['POST'])
+def autoExtract():
     global split_progress
     global detected_areas
+    global is_working
 
-    if 'file' not in request.files:
-        resp = jsonify({'message' : 'No file part in the request'})
-        resp.status_code = 400
-        return resp
-	
-    files = request.files.getlist('file')
+    is_working = True
 
-    print(f'files: {files}')
-
-    errors = {}
-    success = False
-    filepath = None
-
-    for file in files:
-        if file:
-            # filename = secure_filename(file.filename) # secure_filename은 한글명을 지원하지 않음
-            filename = file.filename
-            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-            file_page_path = os.path.splitext(filepath)[0]
-
-            # make filename folder
-            if not os.path.exists(file_page_path):
-                os.makedirs(file_page_path)
-
-            filepath = os.path.join(file_page_path, filename)
-            
-            # pdf file save (with uploaded)
-            file.save(filepath)
-            success = True
-
-        else:
-            errors[file.filename] = 'File type is not allowed'
+    file_names = request.form.getlist('file_names')
     
-    if success and errors:
-        errors['message'] = 'File(s) successfully uploaded'
-        resp = jsonify(errors)
-        resp.status_code = 206
-        return resp
 
-    # main 
-    if success:
-        # original pdf -> split 1, 2 .... n page pdf
-        
+    # original pdf -> split 1, 2 .... n page pdf
+    for file_name in file_names:
+        split_progress[file_name] = 0
+
+        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], file_name)
+        file_page_path = os.path.splitext(filepath)[0]
+        filepath = os.path.join(file_page_path, file_name)
+
         inputstream = open(filepath, "rb")
         infile = PdfFileReader(inputstream, strict=False)
         total_page = infile.getNumPages()
         inputstream.close()
         empty_pages = []
 
-        result = task_split(filepath, file_page_path, split_progress)
+        result = task_split(file_name, filepath, file_page_path, split_progress)
 
         if result is not None and len(result) > 0:
             v = {}
@@ -198,9 +171,6 @@ def uploadPDF2():
                     
                 bboxs = ";".join(bboxs)
                 result[page] = bboxs
-
-            # for page in [str(i) for i in range(1, total_page+1)]:
-            # for page in range(1, total_page+1):
             
             for page in result.keys():
                 if result.get(page) is None or result.get(page) == '':
@@ -215,38 +185,49 @@ def uploadPDF2():
         else:
             bboxs = 0
 
-        detected_areas[filename.replace('.pdf', '').replace('.PDF', '')] = result
+        detected_areas[file_name.replace('.pdf', '').replace('.PDF', '')] = result
 
-        resp = jsonify({'message' : 'Files successfully uploaded'})
-        resp.status_code = 201
-        return resp
+    resp = jsonify({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':split_progress})
+    resp.status_code = 201
 
-    else:
-        resp = jsonify(errors)
-        resp.status_code = 400
-        return resp
+    is_working = False
+    split_progress = {}
+    return resp
 
 
 # progress 진행도를 반환하는 라우트
 @views.route('/getProgress', methods = ['POST'])
 def getProgress():
     global split_progress
+    global is_working
 
-    result = split_progress.get('progress')
-    return jsonify(result)
+    return jsonify({'split_progress':split_progress, 'is_working':is_working})
+
+# detected_areas를 반환하는 라우트
+@views.route('/getDetectedAreas', methods = ['POST'])
+def getDetectedAreas():
+    global detected_areas
+
+    return jsonify({'detected_areas':detected_areas})
+
+# 작업중인지 반환하는 라우트
+@views.route('/isWorking', methods = ['POST'])
+def isWorking():
+    global is_working
+
+    return jsonify(is_working)
 
 
 # 추출할 pdf파일이 정해졌을때 추출을 진행하는 라우트 (Get 요청으로 pdf파일 명시)
 @views.route("/workspace", methods=['GET'])
 def workspace():
     global detected_areas
+    global split_progress
 
     fileName = request.args.get("fileName")
-    # page = request.args.get("page")
-    # if page is None:
-    #     page = 1
 
-    # if fileName is not None and page is not None:
+    print(f'split_progress:{split_progress}')
+
     if fileName is not None:
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], fileName)
         file_page_path = os.path.splitext(filepath)[0]
@@ -263,17 +244,18 @@ def workspace():
                 fileName=fileName,
                 totalPage=total_page,
                 detected_areas=detected_areas[fileName],
+                split_progress=split_progress
                 # page=page
             )
 
     return render_template(
         'workspace.html',
         fileName=fileName,
-        detected_areas=-1
+        detected_areas=-1,
+        split_progress=split_progress
     )
     # else:
     #     return render_template('error.html', error='해당 페이지를 찾을 수 없습니다.')
-
 
 
 @views.route("/pre_extract", methods=['POST'])

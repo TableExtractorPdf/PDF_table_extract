@@ -14,10 +14,17 @@ body {
 }
 
 .center_text{
-	position: absolute;
+	position: relative;
+	/* position: absolute; */
+	width: fit-content;
 	left: 50%;
 	top: 50%;
 	transform: translate(-50%, -50%);
+}
+.center_text > div{
+	display: inline-block;
+	margin: auto 100px;
+	vertical-align: top;
 }
 
 
@@ -201,14 +208,12 @@ div.image-decorator {
     font-size: 30px;
     cursor: pointer;
 }
-
 #table_printer table{
     /* float: left; */
     /* border-collapse: collapse; */
     /* margin-top: 15px; */
 	width: fit-content;
 }
-
 #table_printer > div{
 	border: 3px solid green;
 	margin-bottom: 10px;
@@ -223,6 +228,9 @@ div.image-decorator {
 
 
 /* progress */
+.progress{
+	width: 500px;
+}
 .background-grey{
     position: absolute;
     width: 100%;
