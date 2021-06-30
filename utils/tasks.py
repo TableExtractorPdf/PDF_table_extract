@@ -8,22 +8,14 @@
 #
 
 import os
-import glob
-import json
 import logging
-import subprocess
-import datetime as dt
 import cv2
 
-import camelot
-from camelot.core import TableList
 
 from camelot.parsers import Stream
 from check_lattice.Lattice_2 import Lattice2
 
 from camelot.ext.ghostscript import Ghostscript
-
-from flask import session
 
 from PyPDF2 import PdfFileReader, PdfFileWriter
 from camelot.utils import get_page_layout, get_text_objects, get_rotation
@@ -31,7 +23,7 @@ from utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_a
 
 # from .utils.file import mkdirs
 
-def split(file_name, originalFilePath, PDFS_FOLDER, split_progress, line_scale=40, pages='all'):
+def split(file_name, originalFilePath, PDFS_FOLDER, split_progress, logger, line_scale=40, pages='all'):
     try:
         extract_pages, total_pages = get_pages(originalFilePath, pages)
 
@@ -45,7 +37,7 @@ def split(file_name, originalFilePath, PDFS_FOLDER, split_progress, line_scale=4
         ) = ({} for i in range(6))
 
         for page in extract_pages:
-            progress = int( page / total_pages * 100 )
+            progress = int( page / total_pages * 80 )
             split_progress[file_name] = progress
 
             # extract into single-page PDF
@@ -80,8 +72,15 @@ def split(file_name, originalFilePath, PDFS_FOLDER, split_progress, line_scale=4
             imagedims[page] = get_image_dim(imagepath)
             # lattice
             parser = Lattice2(line_scale=line_scale)
-            tables = parser.extract_tables(filepath) # 여기서 에러
+            try:
+                tables = parser.extract_tables(filepath) # 여기서 에러
+            except Exception as e:
+                print(f"Error! {e}")
+                logger.error(e)
+                tables = ''
+            
             detected_areas[page] = tables
+
         return detected_areas
     except Exception as e:
         logging.exception(e)

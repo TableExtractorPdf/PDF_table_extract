@@ -3,11 +3,10 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-08
-# Last modified on 2021-03-28
+# Last modified on 2021-06-27
 #
 
 from flask import (
-    Flask,
     request,
     render_template,
     jsonify,
@@ -15,8 +14,7 @@ from flask import (
     redirect,
     url_for,
     current_app,
-    session,
-    g
+    session
 )
 from werkzeug.utils import secure_filename
 
@@ -34,8 +32,22 @@ from PyPDF2 import PdfFileReader
 import cv2
 import os
 import json
-import matplotlib.pyplot as plt
-import numpy as np
+
+import logging
+import logging.config
+from datetime import datetime
+import pickle
+
+# 설정 파일 읽어오기
+logging.config.fileConfig('config/logging.conf')
+
+# 로거 생성
+logger = logging.getLogger(__name__)
+
+fh = logging.FileHandler('log/{:%Y-%m}.log'.format(datetime.now()))
+formatter = logging.Formatter('%(asctime)s | %(levelname)-8s | %(lineno)04d | %(message)s')
+fh.setFormatter(formatter)
+logger.addHandler(fh)
 
 
 views = Blueprint("views", __name__)
@@ -78,6 +90,7 @@ def example():
 def uploadPDF():
     if 'file' not in request.files:
         resp = jsonify({'message' : 'No file part in the request'})
+        logger.error('No file part in the request')
         resp.status_code = 400
         return resp
 	
@@ -108,9 +121,11 @@ def uploadPDF():
 
         else:
             errors[file.filename] = 'File type is not allowed'
+            logger.error('File type is not allowed')
     
     if success and errors:
         errors['message'] = 'File(s) successfully uploaded'
+        logger.error('File(s) successfully uploaded')
         resp = jsonify(errors)
         resp.status_code = 206
         return resp
@@ -123,6 +138,7 @@ def uploadPDF():
 
     else:
         resp = jsonify(errors)
+        logger.error(errors)
         resp.status_code = 400
         return resp
 
@@ -153,11 +169,17 @@ def autoExtract():
         inputstream.close()
         empty_pages = []
 
-        result = task_split(file_name, filepath, file_page_path, split_progress)
+        result = task_split(file_name, filepath, file_page_path, split_progress, logger)
 
         if result is not None and len(result) > 0:
+            # with open(f"table_data/{file_name}-table-data.pickle", "wb") as fw:
+            #     pickle.dump(result, fw)
+
             v = {}
             for page, tables in result.items():
+                progress = int( page / len(result) * 20 )
+                split_progress[file_name] = 80 + progress
+
                 bboxs = []
 
                 page_file = file_page_path + f"\\page-{page}.pdf"
