@@ -94,6 +94,7 @@ def find_lines(
     if direction == "vertical":
         size = threshold.shape[0] // line_scale
         el = cv2.getStructuringElement(cv2.MORPH_RECT, (1, size)) # 구조체 정의
+        el_temp = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 3))
         '''
         모폴로지 연산
         morph cross 십자가형
@@ -103,6 +104,7 @@ def find_lines(
     elif direction == "horizontal":
         size = threshold.shape[1] // line_scale
         el = cv2.getStructuringElement(cv2.MORPH_RECT, (size, 1))
+        el_temp = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 1))
     elif direction is None:
         raise ValueError("Specify direction as either 'vertical' or 'horizontal'")
 
@@ -112,8 +114,11 @@ def find_lines(
             x, y, w, h = region
             region_mask[y : y + h, x : x + w] = 1
         threshold = np.multiply(threshold, region_mask)
-
-    threshold = cv2.erode(threshold, el)
+    
+    print("image processing 1")
+    
+    threshold = cv2.dilate(threshold, el_temp)
+    threshold = cv2.erode(threshold, el, iterations=2)
     threshold = cv2.dilate(threshold, el) #오프닝
     dmask = cv2.dilate(threshold, el, iterations=iterations)
 
