@@ -21,7 +21,117 @@ from PyPDF2 import PdfFileReader, PdfFileWriter
 from camelot.utils import get_page_layout, get_text_objects, get_rotation
 from utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
 
-# from .utils.file import mkdirs
+from multiprocessing import Process, Manager, cpu_count
+import numpy as np
+
+def task_split_process(file_name, split_extract_pages, total_pages, originalFilePath, PDFS_FOLDER, split_progress, logger, line_scale, pages, detected_areas, num_of_cpu):
+    for page in split_extract_pages:
+        # progress = int( page / total_pages * 80/ num_of_cpu )
+        # progress = int( page / total_pages *num_of_cpu * 80 )
+        progress = split_progress[file_name] if split_progress[file_name] else 0.0
+        progress += float( 1 / total_pages * 80 )
+        split_progress[file_name] = round(progress, 2)
+
+        # extract into single-page PDF
+        save_page(originalFilePath, page)
+        
+        filename = f"page-{page}.pdf"
+        filepath = os.path.join(PDFS_FOLDER, filename)
+
+        imagename = "".join( [filename.replace(".pdf", ""), ".png"] )
+        thumb_imagename = "".join( [filename.replace(".pdf", ""), "-thumb.png"] )
+        imagepath = os.path.join(PDFS_FOLDER, imagename)
+        thumb_imagepath = os.path.join(PDFS_FOLDER, thumb_imagename)
+
+        
+
+        # convert single-page PDF to PNG
+
+        gs_call = "-q -sDEVICE=png16m -o {} -r300 {}".format(imagepath, filepath)
+        gs_call = gs_call.encode().split()
+        null = open(os.devnull, "wb")
+        with Ghostscript(*gs_call, stdout=null) as gs:
+            pass
+        null.close()
+
+        # creating thumbnail image
+        gs_call = "-q -sDEVICE=png16m -o {} -r50 {}".format(thumb_imagepath, filepath)
+        gs_call = gs_call.encode().split()
+        null = open(os.devnull, "wb")
+        with Ghostscript(*gs_call, stdout=null) as gs:
+            pass
+        null.close()
+
+        #################
+        # filedims[page] = get_file_dim(filepath)
+        # imagedims[page] = get_image_dim(imagepath)
+
+        # lattice
+        parser = Lattice2(line_scale=line_scale)
+        try:
+            tables = parser.extract_tables(filepath) # 여기서 에러
+        except Exception as e:
+            print(f"Error! {e}")
+            logger.error(e)
+            tables = ''
+
+        # detected_areas[int(page)] = tables
+
+        table_list = []
+        for table in tables:
+            # table_list.append(table.df)
+            table_list.append(table._bbox)
+        
+        detected_areas[int(page)] = table_list
+
+    return detected_areas
+
+def task_split(file_name, originalFilePath, PDFS_FOLDER, split_progress, logger, line_scale=40, pages='all'):
+    try:
+        extract_pages, total_pages = get_pages(originalFilePath, pages)
+        
+        num_of_cpu = cpu_count()
+
+        manager = Manager()
+
+        # detected_areas = dict()
+        detected_areas = manager.dict()
+
+        processes = []
+        
+        split_extract_pages = np.array_split(extract_pages, num_of_cpu)
+
+        for idx in range(num_of_cpu):
+            process = Process(target=task_split_process,
+                args=(
+                    file_name,
+                    split_extract_pages[idx],
+                    total_pages,
+                    originalFilePath,
+                    PDFS_FOLDER,
+                    split_progress,
+                    logger,
+                    line_scale,
+                    pages,
+                    detected_areas,
+                    num_of_cpu
+                )
+            )
+            
+            processes.append(process)
+            process.start()
+            
+        
+        for process in processes:
+            process.join()
+            process.terminate()
+            
+
+        return detected_areas.copy()
+
+    except Exception as e:
+        logging.exception(e)
+        
 
 def split(file_name, originalFilePath, PDFS_FOLDER, split_progress, logger, line_scale=40, pages='all'):
     try:
