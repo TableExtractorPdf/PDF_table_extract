@@ -34,6 +34,8 @@ def __check_dotted_line(line, repetition = 5, erosion_size=10):
         dotted_line <tuple in list> : Index of dotted line start and end
     '''
     
+    line = [1 if x>0 else 0 for x in line]
+    
     # line_meta_data : 간단하게 정리된 라인의 메타데이터들
     # count_pixel : 라인 사이즈 측정을 위한 변수
     line_meta_data, count_pixel = [], 0
@@ -88,8 +90,11 @@ def __check_dotted_line(line, repetition = 5, erosion_size=10):
                     dotted_line_stack.append( pixel["start"] )
                     isDotted = True
             else:
-                if isDotted and len(dotted_line_stack) >= repetition:
-                    dotted_line_section.append( dotted_line_stack )
+                if isDotted:
+                    dotted_line_stack.append( pixel["start"] )
+                    if len(dotted_line_stack) >= repetition:
+                        # dotted_line_stack.append( pixel["start"] )
+                        dotted_line_section.append( dotted_line_stack )
                 
                 dotted_line_stack = [ pixel["start"] ]
                 isDotted = False
@@ -97,7 +102,11 @@ def __check_dotted_line(line, repetition = 5, erosion_size=10):
             
         else: # space
             if this_size == space_size:
-                pass
+                if len(dotted_line_stack) == 1:
+                    dotted_line_stack.append( pixel["start"] )
+                if this_size >= erosion_size :
+                    line_size = 0
+                    dotted_line_stack = []
             else:
                 if isDotted :
                     if len(dotted_line_stack) >= repetition:
@@ -109,31 +118,59 @@ def __check_dotted_line(line, repetition = 5, erosion_size=10):
                     
                     line_size = 0
                     dotted_line_stack = []
+                else:
+                    dotted_line_stack = [ pixel["start"] ]
             space_size = this_size
     
-    print("=="*20)
-    print(dotted_line_section)
+    # print("=="*20)
+    # print(dotted_line_section)
     
     
     return dotted_line_section
 
-def detect_dotted_line(images, direction="v", line_scale=15):
+# 점선을 실선으로 만들어서 반환
+def __dotted2solid(threshold, sections, direction, index):
+    if direction == "h" :
+        for sec in sections:
+            start, end = sec[0], sec[-1]
+            threshold[index][start: end+1] = 255
+            
+    elif direction == "v" :
+        for sec in sections:
+            start, end = sec[0], sec[-1]
+            threshold[ start:end+1 , index:index+1 ] = 255
+            # print("start", start, "end", end, "index", index)
+    return threshold
+
+
+def detect_dotted_line(threshold, direction="v", line_scale=15, rep = 5):
     '''
     Parameters
     
     returns
     
     '''
+    size = threshold.shape[0] // line_scale
+    board = threshold.copy()
     
     if direction.lower() == "v":
-        size = threshold.shape[0] // line_scale
-        el = cv2.getStructuringElement(cv2.MORPH_RECT, (1, size))
-    
+        for index in range( len(threshold[0]) ):
+            row = threshold[:,index]
+            # if index> 340 and index<350:
+                # print("index", index, row[170:210])
+            dotted_section = __check_dotted_line(row, 
+                                                repetition = rep, 
+                                                erosion_size=size)
+            if dotted_section: print(index, ":",dotted_section)
+            board = __dotted2solid(board, dotted_section, "v", index)
+            
     elif direction.lower() == "h":
-        size = threshold.shape[1] // line_scale
-        el = cv2.getStructuringElement(cv2.MORPH_RECT, (size, 1))
-        
-    return render
+        for index, col in enumerate(threshold):
+            dotted_section = __check_dotted_line(col, 
+                                                repetition = rep, 
+                                                erosion_size=size)
+            board = __dotted2solid(board, dotted_section, "h", index)
+    return board
 
 
 if __name__ == "__main__":
