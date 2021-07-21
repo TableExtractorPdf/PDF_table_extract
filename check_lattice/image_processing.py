@@ -117,8 +117,8 @@ def find_lines(
     
     print("image processing 1")
     
-    threshold = cv2.dilate(threshold, el_temp)
-    threshold = cv2.erode(threshold, el, iterations=2)
+    # threshold = cv2.dilate(threshold, el_temp)
+    threshold = cv2.erode(threshold, el, iterations=1)
     threshold = cv2.dilate(threshold, el) #오프닝
     dmask = cv2.dilate(threshold, el, iterations=iterations)
 
