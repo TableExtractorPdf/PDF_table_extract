@@ -19,6 +19,7 @@
                 $(target).parent().remove();
                 $(target).parent().find("#non-upload-box").css("display", "block");
                 $("#file").val(null);
+                formData.append("file", files[i]);
                 // $(".extract_btn").remove();
             }
 
@@ -103,6 +104,9 @@
                     }, 100);
                 }
 
+                
+                var formData = new FormData();
+
                 function uploadFiles(e) {
                     if($(e.target).get(0) != $('#file').get(0)){
                         e.stopPropagation();
@@ -162,13 +166,13 @@
                             }
                         }
                         
+                        
                         $("#dropZ").append("<div class='extract_btn'>"+
                                         "Extract Tables"+
                                     "</div>");
                         
 
                         $('.extract_btn').click(function(){
-                            var formData = new FormData();
 
                             for(i=0 ; i<files.length ; i++){
                                 formData.append("file", files[i]);

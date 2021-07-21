@@ -20,7 +20,8 @@ from werkzeug.utils import secure_filename
 
 from utils.file_path import file_path_select
 from utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
-from utils.tasks import split as task_split
+# from utils.tasks import split as task_split
+from utils.tasks import task_split
 
 from check_lattice.Lattice_2 import Lattice2
 from check_lattice.check_line_scale import GetLineScale
@@ -37,6 +38,7 @@ import logging
 import logging.config
 from datetime import datetime
 import pickle
+import multiprocessing
 
 # 설정 파일 읽어오기
 logging.config.fileConfig('config/logging.conf')
@@ -51,7 +53,11 @@ logger.addHandler(fh)
 
 
 views = Blueprint("views", __name__)
-split_progress = {} # split 작업 진행도
+
+manager = multiprocessing.Manager()
+
+# split_progress = {} # split 작업 진행도
+split_progress = manager.dict() # split 작업 진행도
 detected_areas = {}
 is_working = False # 현재 작업중인지 확인
 
@@ -171,12 +177,15 @@ def autoExtract():
 
         result = task_split(file_name, filepath, file_page_path, split_progress, logger)
 
+        print("이거 끝")
+
         if result is not None and len(result) > 0:
             # with open(f"table_data/{file_name}-table-data.pickle", "wb") as fw:
             #     pickle.dump(result, fw)
 
             v = {}
-            for page, tables in result.items():
+            for page, tables in sorted(result.items()):
+                print(f'page : {page}')
                 progress = int( page / len(result) * 20 )
                 split_progress[file_name] = 80 + progress
 
@@ -187,8 +196,9 @@ def autoExtract():
 
                 v['imageHeight'], v['imageWidth'], _ = cv2.cv2.imread(image_file).shape
 
-                for table in tables:
-                    bbox = table._bbox
+                # for table in tables:
+                #     bbox = table._bbox
+                for bbox in tables:
                     bboxs.append( bbox_to_areas(v, bbox, page_file)+f",{v['imageWidth']},{v['imageHeight']}" )
                     
                 bboxs = ";".join(bboxs)
@@ -209,7 +219,7 @@ def autoExtract():
 
         detected_areas[file_name.replace('.pdf', '').replace('.PDF', '')] = result
 
-    resp = jsonify({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':split_progress})
+    resp = jsonify({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':dict(split_progress)})
     resp.status_code = 201
 
     is_working = False
@@ -223,7 +233,7 @@ def getProgress():
     global split_progress
     global is_working
 
-    return jsonify({'split_progress':split_progress, 'is_working':is_working})
+    return jsonify({'split_progress':dict(split_progress), 'is_working':is_working})
 
 # detected_areas를 반환하는 라우트
 @views.route('/getDetectedAreas', methods = ['POST'])
@@ -266,7 +276,7 @@ def workspace():
                 fileName=fileName,
                 totalPage=total_page,
                 detected_areas=detected_areas[fileName],
-                split_progress=split_progress
+                split_progress=dict(split_progress)
                 # page=page
             )
 
@@ -274,7 +284,7 @@ def workspace():
         'workspace.html',
         fileName=fileName,
         detected_areas=-1,
-        split_progress=split_progress
+        split_progress=dict(split_progress)
     )
     # else:
     #     return render_template('error.html', error='해당 페이지를 찾을 수 없습니다.')
