@@ -31,7 +31,7 @@ def __check_dotted_line(line, repetition = 5, erosion_size=10):
         line <nd.array> : Line on Image
         repetitionn <int> : Constant number of pattern iterations (default = 5)
     returns
-        dotted_line <tuple in list> : Index of dotted line start and end
+        dotted_line <list in list> : Index of dotted line start and end
     '''
     
     line = [1 if x>0 else 0 for x in line]
@@ -161,7 +161,7 @@ def detect_dotted_line(threshold, direction="v", line_scale=15, rep = 5):
             dotted_section = __check_dotted_line(row, 
                                                 repetition = rep, 
                                                 erosion_size=size)
-            if dotted_section: print(index, ":",dotted_section)
+            # if dotted_section: print(index, ":",dotted_section)
             board = __dotted2solid(board, dotted_section, "v", index)
             
     elif direction.lower() == "h":
