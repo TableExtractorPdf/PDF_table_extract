@@ -85,7 +85,7 @@ def __check_dotted_line(line, repetition = 5, erosion_size=10):
     for pixel in line_meta_data:
         this_size = pixel["size"]
         if pixel["pixel"] == 1: # line
-            if this_size == line_size:
+            if line_size-1 <= this_size <= line_size+1:
                 if this_size < erosion_size :
                     dotted_line_stack.append( pixel["start"] )
                     isDotted = True
@@ -101,7 +101,7 @@ def __check_dotted_line(line, repetition = 5, erosion_size=10):
             line_size = this_size
             
         else: # space
-            if this_size == space_size:
+            if space_size-1 <= this_size <= space_size+1:
                 if len(dotted_line_stack) == 1:
                     dotted_line_stack.append( pixel["start"] )
                 if this_size >= erosion_size :
