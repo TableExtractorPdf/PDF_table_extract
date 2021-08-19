@@ -70,6 +70,27 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='dist/css-loader.css') }}">
         <!---------------->
 
+
+        
+
+        <!-- JSpreadsheet -->
+        <script src="https://jspreadsheet.com/v7/jspreadsheet.js"></script>
+        <script src="https://jsuites.net/v4/jsuites.js"></script>
+        <link rel="stylesheet" href="https://jspreadsheet.com/v7/jspreadsheet.css" type="text/css" />
+        <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+
+        <!-- JSpreadSheet Extension -->
+        <script src="/static/js/autoWidth.min.js"></script>
+        <script type="text/javascript" src="/static/js/jquery.techbytarun.excelexportjs.js"></script>
+
+        <!-- Customization Functions -->
+        <script src="/static/js/jspread.js"></script>
+        <link rel="stylesheet" href="/static/css/jspread.css" type="text/css" />
+        <script lang="javascript" src="/static/js/xlsx.full.min.js"></script>
+
+
+
+
 	<!-- <link rel="icon" href="{{ url_for('static', filename='css/image/icon.png') }}"> -->
         
 		<script type="text/javascript">
@@ -258,8 +279,24 @@
                     document.getElementById('table_printer').appendChild(iframe);
                 }
             }
-
+            
             function show_jss(data){
+                csvs = data.csvs;
+
+                <!-- for(i=0 ; i<csvs.length ; i++){ -->
+                for(i=0 ; i<1 ; i++){
+                    data = "/static/job_pdf/{{fileName}}/page-"+this_page+"-table-"+(i+1)+".csv";
+                    data = "/static/page-18-table-1.csv";
+
+                    license_key = 'MjE3YjQyMzhhNzNhNjBjYjFmNzJmYjE3YzU0ZmQ3MDVhMzU5M2Y3MGZlMDg3MGEyODE0Mzc5ZGZjMGQ2OWEwZDM3NTg1OTFhZDQ1ODVlMDQyNzNhNzNkM2Q0ZjA4ZTkyOTI0NDBhNWU1N2UwNjQyZTkwMzU4ZTBmYTlhMmU0OTYsZXlKdVlXMWxJam9pZEdGclpXNTVNVGs1T0NJc0ltUmhkR1VpT2pFMk16RTNORFk0TURBc0ltUnZiV0ZwYmlJNld5SnNiMk5oYkdodmMzUWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2TUN3aWMyTnZjR1VpT2xzaWRqY2lMQ0oyT0NKZGZRPT0=';
+                    spreadsheet = createSheet("spreadsheet-"+i, "spreadsheet", data, license_key);
+                }
+                return;
+
+
+
+
+
                 $("#table_printer").html('');
 
                 csvs = data.csvs;
@@ -345,6 +382,7 @@
                     });
                 }
             }
+
 
             function debugQtyAreas (event, id, areas) {
                 // console.log(areas.length + " areas", arguments);
@@ -490,6 +528,8 @@
 
 
 			$(document).ready(function () {
+                show_jss("a");
+                setPop();
                 console.log(localStorage.getItem("PDF__{{fileName}}"));
                 if (!(localStorage.getItem("PDF__{{fileName}}") === "null" || localStorage.getItem("PDF__{{fileName}}") === null )){
                     var dtd_pg = JSON.parse(localStorage.getItem("PDF__{{fileName}}"));
@@ -696,6 +736,50 @@
                     }
                     move_page(pre_page, this_page);
 				});
+
+                document.addEventListener("keydown", function(event) {
+                    pre_page = Number(this_page);
+                    // event.preventDefault();
+                    const key = event.key; // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"
+                    switch (key) { // change to event.key to key to use the above variable
+                        case "ArrowLeft":
+                            // Left pressed
+                            break;
+
+                        case "ArrowRight":
+                            // Right pressed
+                            break;
+
+                        case "ArrowUp":
+                            // Up pressed
+                            this_page = Number(this_page)-1;
+                            if(this_page < 1){
+                                this_page = 1;
+                            }
+                            move_page(pre_page, this_page);
+                            break;
+
+                        case "ArrowDown":
+                            // Down pressed
+                            this_page = Number(this_page)+1;
+                            move_page(pre_page, this_page);
+                            break;
+
+                        case " ":
+                            var this_page_thumb = $(".thumb_page_"+this_page);
+                            if(this_page_thumb.hasClass("thumb_check")){
+                                this_page_thumb.removeClass("thumb_check")
+                                this_page_thumb.addClass("thumb_check_none");
+                                this_page_thumb.find(".check_page").css("display", "none");
+                            }
+                            else{
+                                this_page_thumb.addClass("thumb_check");
+                                this_page_thumb.removeClass("thumb_check_none");
+                                this_page_thumb.find(".check_page").css("display", "inline");
+                            }
+                            break;
+                    }
+                });
         
                 
                 $('#get_line_size').click(function () {
@@ -756,7 +840,7 @@
                             jsons[i] = JSON.stringify(selectedAreas[i]);
                         }
                         jsons = JSON.stringify(jsons);
-                        
+
                         $.ajax({
                             url: '/doExtract',
                             data: {"jsons":jsons, "fileName":"{{fileName}}", "page":this_page, "table_option":table_option, "line_scale":$("#line_scale").val()},
@@ -772,8 +856,8 @@
                                 var gs_url = data.gs_url;
                                 var iframe = null;
 
-                                show_gs(data);
-                                // show_jss(data);
+                                // show_gs(data);
+                                show_jss(data);
 
                                 if(bboxs != 0){
                                     bboxs = bboxs.split(";");
@@ -1034,6 +1118,7 @@
                     <br>
 
                     <div id='table_printer'></div>
+                    <div id='spreadsheet'></div>
                 </td>
             </tr>
        </table>

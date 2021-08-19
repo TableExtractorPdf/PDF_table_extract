@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!-- JQuery -->
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <!-- JSpreadsheet -->
+    <script src="https://jspreadsheet.com/v7/jspreadsheet.js"></script>
+    <script src="https://jsuites.net/v4/jsuites.js"></script>
+    <link rel="stylesheet" href="https://jspreadsheet.com/v7/jspreadsheet.css" type="text/css" />
+    <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+
+    <!-- JSpreadSheet Extension -->
+    <script src="js/autoWidth.min.js"></script>
+    <script type="text/javascript" src="js/jquery.techbytarun.excelexportjs.js"></script>
+
+    <!-- Customization Functions -->
+    <script src="js/jspread.js"></script>
+    <link rel="stylesheet" href="css/jspread.css" type="text/css" />
+    <script lang="javascript" src="js/xlsx.full.min.js"></script>
+
+</head>
+<body>
+    <div id="spreadsheet"></div>
+    <script>
+        // data = [
+        //     ['∎ 문화시설 인벤토리', '', ''],
+        //     ['1. 정의', '전체 행정구역 중 문화시설 개소 및 인벤토리 계획 여부', ''],
+        //     ['2. 측정단위', '개소', ''],
+        //     ['3. 지표선정의 필요성', '', ''],
+        //     ['- 목적', '문화예술의 진흥을 위한 사업과 활동을 지원함으로써 전통문화예술을 계승하고 새로운\n문화를 창조하여 민족문화 창달에 이바지함을 목적으로 하는 지표이다.', ''],
+        //     ['- 고려 요소', '▶ 고려 요소 범위 ', '▶ 핵심요소'],
+        //     ['',
+        //     '- 공연장 등 공연시설\n- 박물관 및 미술관 등 전시시설\n- 도서관 등 도서시설\n- 문화예술회관 등 공연시설과 다른 문화시설이\n복합된 종합시설\n- 예술인이 창작활동을 영위하기 위한 창작공간으로서 다중이용에 제공되는 시설\n또는 예술인의창작물을 공연·전시 등을 하기 위하여 조성된 시설\n- 그 밖에 대통령령으로 정하는 시설',
+        //     '- 지역성을 강조한 지역축제\n- 대중교통 및 문화시설 이용의 편의성\n- 문화시설과 주변지역과의 연계\n- 주민 참여도']
+        // ]
+        data = "/page-18-table-1.csv"
+
+        license_key = 'MjE3YjQyMzhhNzNhNjBjYjFmNzJmYjE3YzU0ZmQ3MDVhMzU5M2Y3MGZlMDg3MGEyODE0Mzc5ZGZjMGQ2OWEwZDM3NTg1OTFhZDQ1ODVlMDQyNzNhNzNkM2Q0ZjA4ZTkyOTI0NDBhNWU1N2UwNjQyZTkwMzU4ZTBmYTlhMmU0OTYsZXlKdVlXMWxJam9pZEdGclpXNTVNVGs1T0NJc0ltUmhkR1VpT2pFMk16RTNORFk0TURBc0ltUnZiV0ZwYmlJNld5SnNiMk5oYkdodmMzUWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2TUN3aWMyTnZjR1VpT2xzaWRqY2lMQ0oyT0NKZGZRPT0=';
+        spreadsheet = createSheet('spreadsheet', data, license_key);
+
+    </script>
+</body>
+</html>

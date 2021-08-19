@@ -232,6 +232,7 @@ def autoExtract():
 def getProgress():
     global split_progress
     global is_working
+    print(f'split_progress_ajax : {split_progress}\t{id(split_progress)}')
 
     return jsonify({'split_progress':dict(split_progress), 'is_working':is_working})
 

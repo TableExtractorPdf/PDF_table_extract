@@ -12,4 +12,4 @@ app = create_app()
 
 app.debug = True
 # app.run(host='lion.cju.ac.kr')
-app.run(use_reloader=False)
+app.run(host="0.0.0.0", port=5001, use_reloader=False)

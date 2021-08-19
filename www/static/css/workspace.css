@@ -17,9 +17,7 @@ body {
 	position: relative;
 	/* position: absolute; */
 	width: fit-content;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%, -50%);
+	margin: 0 auto;
 }
 .center_text > div{
 	display: inline-block;
