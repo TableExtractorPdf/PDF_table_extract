@@ -81,7 +81,18 @@ def task_split_process(file_name, split_extract_pages, total_pages, originalFile
         table_list = []
         for table in tables:
             # table_list.append(table.df)
-            table_list.append(table._bbox)
+            # table_list.append(table._bbox)
+            table_list.append(
+                {
+                    table.order: {
+                        "page": page,
+                        "bbox": table._bbox,
+                        "line_scale": line_scale,
+                        "dataframe": table.df,
+                        "cells": table.cells
+                    }
+                }
+            )
         
         detected_areas[int(page)] = table_list
 
