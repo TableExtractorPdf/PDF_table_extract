@@ -30,7 +30,7 @@ def task_split_process(file_name, split_extract_pages, total_pages, originalFile
         # progress = int( page / total_pages *num_of_cpu * 80 )
         progress = split_progress[file_name] if split_progress[file_name] else 0.0
         progress += float( 1 / total_pages * 80 )
-        split_progress[file_name] = progress
+        split_progress[file_name] = round(progress, 2)
         print(f'split_progress_task : {split_progress}\t{id(split_progress)}')
 
         # extract into single-page PDF
