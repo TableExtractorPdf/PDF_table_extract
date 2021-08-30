@@ -1,7 +1,7 @@
 ﻿'''
-start : 21.07.20
-updated : 21.07.21
-minku koo
+# start : 21.07.20
+# updated : 21.08.30
+# minku koo
 
 점선 감지 후, 연결 작업
 Camelot Github Issue
@@ -14,10 +14,6 @@ https://github.com/atlanhq/camelot/issues/370
 목적
 동일한 길이와 패턴으로 이어진 점선의 감지
 ex) __ __ __ __ or _ _ _ _
-
-이슈
-동일하지 않은 길이의 점선은 어떻게 감지할 것인가
-ex) ___ _ ___ _ 
 
 '''
 
@@ -71,13 +67,6 @@ def __check_dotted_line(line, repetition = 5, erosion_size=10):
     [{'start': 0, 'pixel': 0, 'size': 1}, {'start': 1, 'pixel': 1, 'size': 4}, ...]
     '''
     
-    '''
-    여기에 조건 걸기
-    - 만약 line meta data 길이가 몇개 이하라면 패스
-    - 
-    '''
-    
-    # print(line_meta_data)
     
     dotted_line_section, dotted_line_stack = [], []
     line_size, space_size = 0, 0
@@ -110,10 +99,6 @@ def __check_dotted_line(line, repetition = 5, erosion_size=10):
             else:
                 if isDotted :
                     if len(dotted_line_stack) >= repetition:
-                        # 초기화
-                        # line_size = 0
-                        # dotted_line_stack = []
-                    # else:
                         dotted_line_section.append( dotted_line_stack )
                     
                     line_size = 0
@@ -122,8 +107,6 @@ def __check_dotted_line(line, repetition = 5, erosion_size=10):
                     dotted_line_stack = [ pixel["start"] ]
             space_size = this_size
     
-    # print("=="*20)
-    # print(dotted_line_section)
     
     
     return dotted_line_section
@@ -139,16 +122,18 @@ def __dotted2solid(threshold, sections, direction, index):
         for sec in sections:
             start, end = sec[0], sec[-1]
             threshold[ start:end+1 , index:index+1 ] = 255
-            # print("start", start, "end", end, "index", index)
     return threshold
 
 
 def detect_dotted_line(threshold, direction="v", line_scale=15, rep = 5):
     '''
     Parameters
-    
+        threshold <nd.array> : Readed Image to Threshold
+        direction <String> : Direction to check
+        line_scale <int> : Camelot read_pdf Parameter line_scale
+        rep <int> : Number of times the dotted line repeats
     returns
-    
+        board <nd.array> : Threshold of changing a dotted to solid
     '''
     size = threshold.shape[0] // line_scale
     board = threshold.copy()
@@ -156,12 +141,11 @@ def detect_dotted_line(threshold, direction="v", line_scale=15, rep = 5):
     if direction.lower() == "v":
         for index in range( len(threshold[0]) ):
             row = threshold[:,index]
-            # if index> 340 and index<350:
-                # print("index", index, row[170:210])
+            
             dotted_section = __check_dotted_line(row, 
                                                 repetition = rep, 
                                                 erosion_size=size)
-            # if dotted_section: print(index, ":",dotted_section)
+                                                
             board = __dotted2solid(board, dotted_section, "v", index)
             
     elif direction.lower() == "h":
@@ -179,5 +163,23 @@ if __name__ == "__main__":
     line = [0,0,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,0,0,0,1]
     
     __check_dotted_line(line, repetition = 5)
+    
+    '''
+    # How to Use?
+    threshold : Readed Image to Threshold
+    repeat : Number of times the dotted line repeats (int)
+    
+    threshold = detect_dotted_line(threshold, 
+                                    direction = "v", 
+                                    line_scale = 15, 
+                                    rep = repeat)
+                                    
+    threshold = detect_dotted_line(threshold, 
+                                    direction = "h", 
+                                    line_scale = 15, 
+                                    rep = repeat)
+    
+    '''
+    
     pass
 
