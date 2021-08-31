@@ -1,19 +1,19 @@
 ﻿'''
 # start : 21.07.20
-# updated : 21.08.30
+# updated : 21.08.31
 # minku koo
 
-점선 감지 후, 연결 작업
-Camelot Github Issue
-https://github.com/atlanhq/camelot/issues/370
+# 점선 감지 후, 연결 작업
+# Camelot Github Issue
+# https://github.com/atlanhq/camelot/issues/370
 
-원인
-점선은 line_scale 보다 작은 길이의 선의 경우에만 감지되지 않음
-보다 큰 길이의 점선의 경우 > iterations를 증가함으로써 부분적으로 해결 가능함
+# [원인]
+# 점선은 line_scale 보다 작은 길이의 선의 경우에만 감지되지 않음
+# 보다 큰 길이의 점선의 경우 > iterations를 증가함으로써 부분적으로 해결 가능함
 
-목적
-동일한 길이와 패턴으로 이어진 점선의 감지
-ex) __ __ __ __ or _ _ _ _
+# [목적]
+# 동일한 길이와 패턴으로 이어진 점선의 감지
+# ex) __ __ __ __ or _ _ _ _
 
 '''
 
@@ -158,12 +158,6 @@ def detect_dotted_line(threshold, direction="v", line_scale=15, rep = 5):
 
 
 if __name__ == "__main__":
-    line = [0,1,1,1,1,0,0,1,1,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,0,0,0]
-    line2 = [0,0,0,0,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0]
-    line = [0,0,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,0,0,0,0,1]
-    
-    __check_dotted_line(line, repetition = 5)
-    
     '''
     # How to Use?
     threshold : Readed Image to Threshold
@@ -180,6 +174,5 @@ if __name__ == "__main__":
                                     rep = repeat)
     
     '''
-    
     pass
 
