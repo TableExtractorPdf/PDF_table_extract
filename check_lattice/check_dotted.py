@@ -1,7 +1,7 @@
 ﻿'''
-# start : 21.07.20
-# updated : 21.08.31
-# minku koo
+# Start : 21.07.20
+# Updated : 21.08.31
+# Minku Koo
 
 # 점선 감지 후, 연결 작업
 # Camelot Github Issue
