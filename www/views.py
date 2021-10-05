@@ -200,11 +200,8 @@ def autoExtract():
                 #     bbox = table._bbox
                 for table in tables:
                     for page in table.keys():
-                        print(f"page : {page}\t\ttable : {table}")
-                        print(type(table[page]))
-                        for info in table[page]:
-                            print(f"info : {info}")
-                            bboxs.append( bbox_to_areas(v, info.get("bbox"), page_file)+f",{v['imageWidth']},{v['imageHeight']}" )
+                        info = table[page]
+                        bboxs.append( bbox_to_areas(v, info.get("bbox"), page_file)+f",{v['imageWidth']},{v['imageHeight']}" )
                     
                 bboxs = ";".join(bboxs)
                 result[page] = bboxs
