@@ -51,7 +51,16 @@
                         withCredentials: true
                     },
                     success: function (data) {
-                        console.log(data);
+                        if(!data.is_working){
+                            clearInterval(loading);
+
+                            autodetect_to_localstorage();
+
+                            popup_window.close();
+                            // location.href = '/workspace';
+                        }
+
+                        // console.log(data);
                         let keys = Object.keys(data.split_progress);
 
                         // var is_finish = true;
@@ -70,14 +79,6 @@
                         }
 
                         // if(is_finish){
-                        if(!data.is_working){
-                            clearInterval(loading);
-
-                            autodetect_to_localstorage();
-
-                            popup_window.close();
-                            // location.href = '/workspace';
-                        }
                     }
                 });
             }

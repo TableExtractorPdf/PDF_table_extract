@@ -223,9 +223,9 @@ def autoExtract():
 
         detected_areas[file_name.replace('.pdf', '').replace('.PDF', '')] = result
     
-    print("detected_areas : ")
-    for i, v in detected_areas.items():
-        print(f"row : {i}\n{v}\n\n")
+    # print("detected_areas : ")
+    # for i, v in detected_areas.items():
+    #     print(f"row : {i}\n{v}\n\n")
 
 
     # resp = jsonify({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':dict(split_progress)})
@@ -251,7 +251,7 @@ def getProgress():
 def getDetectedAreas():
     global detected_areas
 
-    return jsonify({'detected_areas':detected_areas})
+    return jsonify(json.dumps({'detected_areas':detected_areas}, cls=NumpyEncoder))
 
 # 작업중인지 반환하는 라우트
 @views.route('/isWorking', methods = ['POST'])
