@@ -3,13 +3,13 @@
 	<head>
         <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
         <title>PDF Table Extractor</title>
+        <script type="text/javascript" src = "{{url_for('static', filename='js/jquery-1.11.3.min.js')}}"></script>
         <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/upload.css')}}">
         <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='resources/jquery.selectareas.css')}}">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
         <script type="text/javascript" src="{{ url_for('static', filename='docs/js/bootstrap-3.3.2.min.js') }}"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 		<!--[if lte IE 8]><link href="../resources/jquery.selectareas.ie8.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
-       <script type="text/javascript" src = "{{url_for('static', filename='js/jquery-1.11.3.min.js')}}"></script>
         
 	<!-- <link rel="icon" href="{{ url_for('static', filename='css/image/icon.png') }}"> -->
         
@@ -49,10 +49,14 @@
                     }
 
                     function animate(per){
+                        // console.log("count : ", count);
+                        // console.log("per : ", per);
+                        // console.log("\n\n");
                         if(count == 100 && per == 400){
                             percent.classList.add("text-blink");
                             text.style.display = "block";
                             clearInterval(loading);
+                            // console.log("clear interval");
                         }
                         else{
                             progress.style.width = per*4 + 'px';

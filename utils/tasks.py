@@ -88,8 +88,8 @@ def task_split_process(file_name, split_extract_pages, total_pages, originalFile
                         "page": page,
                         "bbox": table._bbox,
                         "line_scale": line_scale,
-                        "dataframe": table.df,
-                        "cells": table.cells
+                        "dataframe": None,#table.df,
+                        "cells": [[{"text":j.text, "vspan":j.vspan, "hspan":j.hspan} for j in i] for i in table.cells]
                     }
                 }
             )

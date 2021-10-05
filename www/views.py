@@ -40,6 +40,8 @@ from datetime import datetime
 import pickle
 import multiprocessing
 
+from numpyencoder import NumpyEncoder
+
 # 설정 파일 읽어오기
 logging.config.fileConfig('config/logging.conf')
 
@@ -220,8 +222,14 @@ def autoExtract():
             bboxs = 0
 
         detected_areas[file_name.replace('.pdf', '').replace('.PDF', '')] = result
+    
+    print("detected_areas : ")
+    for i, v in detected_areas.items():
+        print(f"row : {i}\n{v}\n\n")
 
-    resp = jsonify({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':dict(split_progress)})
+
+    # resp = jsonify({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':dict(split_progress)})
+    resp = jsonify( json.dumps({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':dict(split_progress)}, cls=NumpyEncoder) )
     resp.status_code = 201
 
     is_working = False
