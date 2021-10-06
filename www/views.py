@@ -286,7 +286,7 @@ def workspace():
                 'workspace.html',
                 fileName=fileName,
                 totalPage=total_page,
-                detected_areas=detected_areas[fileName],
+                detected_areas=json.dumps(detected_areas[fileName], cls=NumpyEncoder),
                 split_progress=dict(split_progress)
                 # page=page
             )

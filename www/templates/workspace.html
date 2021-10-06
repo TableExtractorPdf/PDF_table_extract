@@ -8,6 +8,7 @@
 		<!--[if lte IE 8]><link href="../resources/jquery.selectareas.ie8.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
         <!-- <script type="text/javascript" src = "{{url_for('static',filename='js/jquery-1.11.3.min.js')}}"></script> -->
         <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script src="https://code.jquery.com/jquery-migrate-1.4.1.min.js"></script>
 
         <!-- bootstrap -->
         <link rel="stylesheet" href="{{ url_for('static', filename='docs/css/bootstrap-3.3.2.min.css') }}" type="text/css">
@@ -214,13 +215,13 @@
                     // 정상 이미지 로딩, do nothing
                 })
                 .error(function(){
-                    $(this).attr("src", "{{url_for('static', filename='job_pdf')}}/page_out_of_range.png");
+                    $(this).attr("src", "{{url_for('static', filename='img')}}/page_out_of_range.png");
                 });
                 $('img#nxtImg').attr('src', "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+(Number(nxt_page))+".png").load(function(){
                     // 정상 이미지 로딩, do nothing
                 })
                 .error(function(){
-                    $(this).attr("src", "{{url_for('static', filename='job_pdf')}}/page_out_of_range.png");
+                    $(this).attr("src", "{{url_for('static', filename='img')}}/page_out_of_range.png");
                 });
 
 
@@ -531,7 +532,7 @@
 			$(document).ready(function () {
                 show_jss("a");
                 setPop();
-                console.log(localStorage.getItem("PDF__{{fileName}}"));
+                // console.log(localStorage.getItem("PDF__{{fileName}}"));
                 if (!(localStorage.getItem("PDF__{{fileName}}") === "null" || localStorage.getItem("PDF__{{fileName}}") === null )){
                     var dtd_pg = JSON.parse(localStorage.getItem("PDF__{{fileName}}"));
 
@@ -637,7 +638,7 @@
                     // 추출할 메인 이미지 교체
                     $('img#centerImg').attr("src", "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+this_page+".png");
                     
-                    $('img#prvImg').attr("src", "{{url_for('static', filename='job_pdf')}}/page_out_of_range.png");
+                    $('img#prvImg').attr("src", "{{url_for('static', filename='img')}}/page_out_of_range.png");
                     $('img#nxtImg').attr("src", "{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+(Number(this_page)+1)+".png");
 
                     $('img#centerImg').selectAreas({
@@ -911,7 +912,7 @@
 
 
                 $(document).on('click', '.preview_canvas', function(){
-                    if ($(this).find("img").attr('src') == "{{url_for('static', filename='job_pdf')}}/page_out_of_range.png") return;
+                    if ($(this).find("img").attr('src') == "{{url_for('static', filename='img')}}/page_out_of_range.png") return;
                     destroy_select_areas();
                     
                     var target = $(this).find("img");
