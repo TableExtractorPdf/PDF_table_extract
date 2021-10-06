@@ -59,26 +59,25 @@
                             popup_window.close();
                             // location.href = '/workspace';
                         }
+                        else{
+                            // console.log(data);
+                            let keys = Object.keys(data.split_progress);
 
-                        // console.log(data);
-                        let keys = Object.keys(data.split_progress);
+                            // var is_finish = true;
 
-                        // var is_finish = true;
+                            for(i=0 ; i<keys.length ; i++){
+                                filename = keys[i];
+                                // if(data[ filename ] != 100){
+                                //     is_finish = false;
+                                // }
 
-                        for(i=0 ; i<keys.length ; i++){
-                            filename = keys[i];
-                            // if(data[ filename ] != 100){
-                            //     is_finish = false;
-                            // }
+                                var window_body = popup_window.document.getElementById("body");
 
-                            var window_body = popup_window.document.getElementById("body");
-
-                            $(window_body).css("padding", "100px");
-                            $(window_body).find("#"+filename.split(".")[0]+"_progress + > div").css("width", data.split_progress[ filename ]+"%");
-                            $(window_body).find("#"+filename.split(".")[0]+"_progress + > div").text(data.split_progress[ filename ]+"%");
+                                $(window_body).css("padding", "100px");
+                                $(window_body).find("#"+filename.split(".")[0]+"_progress + > div").css("width", data.split_progress[ filename ]+"%");
+                                $(window_body).find("#"+filename.split(".")[0]+"_progress + > div").text(data.split_progress[ filename ]+"%");
+                            }
                         }
-
-                        // if(is_finish){
                     }
                 });
             }
@@ -109,7 +108,15 @@
             success: function (data) {
                 console.log("success");
 
+                data = JSON.jsonify(data);
+
+                console.log("data : ", data);
+
+                console.log(data.detected_areas);
+
                 let keys = Object.keys(data.detected_areas);
+
+                console.log("keys : ", keys);
 
                 for(i=0 ; i<keys.length ; i++){
                     filename = keys[i];
