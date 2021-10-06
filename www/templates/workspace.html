@@ -479,7 +479,7 @@
 
                     if(Object.prototype.toString.call(areas) === "[object String]"){
                         var arr = areas.split(";");
-                        
+
                         for(j=0 ; j<arr.length ; j++){
                             var arr2 = arr[j].split(",");
                             if(arr2.length>=4){
@@ -941,10 +941,6 @@
                         width: window.innerWidth / 3.84,
                         onChanged: debugQtyAreas
                     })
-
-                    // $("div.image-decorator:has(#prvImg)").css("margin-left", "0px");
-                    // $("div.image-decorator:has(#centerImg)").css("margin-left", "250px");
-                    // $("div.image-decorator:has(#nxtImg)").css("margin-left", "600px");
                     
                     $("div.image-decorator:has(#prvImg)").animate({
                         marginLeft:"0"
@@ -957,7 +953,6 @@
                     });
                     
                     if($(".nowImg").attr("id") == "nxtImg")
-                        // $("#top_tools").css("margin-left", "600px");
                         $("#top_tools").animate({
                             marginLeft:'600px'
                         });
@@ -998,8 +993,6 @@
                 $("#page_list_size_btn").click(function(){
                     if(is_page_list_expand){
                         is_page_list_expand = false;
-                        // $("#page_list_box").css("width", "177px");
-                        // $("#page_list_size_btn").css("left", "177px");
                         $("#page_list_box").animate({
                             width:"177px"
                         });
@@ -1010,8 +1003,6 @@
                     }
                     else{
                         is_page_list_expand = true;
-                        // $("#page_list_box").css("width", "1200px");
-                        // $("#page_list_size_btn").css("left", "1200px");
                         $("#page_list_box").animate({
                             width:"1200px"
                         });
@@ -1054,7 +1045,6 @@
                 <select id="page_multiple_selected" class="select" multiple="multiple">
                     <option value="all" selected="selected">All</option>
                     <option value="table">Table</option>
-                    <!-- Option 3 will be selected in advance ... -->
                     <option value="empty">Empty</option>
                     <option value="checked">Checked</option>
                     <option value="non_checked">non_checked</option>
@@ -1109,7 +1099,6 @@
                         
                         <center>
                             <span class="arrow">◀</span>
-                            <!-- <input type="text"> -->
                             <input id="check_page_btn" type="button" class="btn btn-lg btn-info" value="Check this page">
 
                             <span class="arrow">▶</span>
