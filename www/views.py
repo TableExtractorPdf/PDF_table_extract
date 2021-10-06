@@ -409,6 +409,7 @@ def doExtract_page():
         table_width = []
         bboxs = []
         gs = []
+        gs_url = ""
 
         if len(result) > 0:
 
