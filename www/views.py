@@ -410,6 +410,7 @@ def doExtract_page():
         bboxs = []
         gs = []
         gs_url = ""
+        message = ""
 
         if len(result) > 0:
 
@@ -438,10 +439,11 @@ def doExtract_page():
             gs_url = make_google_sheets(file_name, gs, header='c')
             
         else:
-            html = "<span>발견된 테이블 없음</span>"
+            # html = "<span>발견된 테이블 없음</span>"
+            message = "발견된 테이블 없음"
             bboxs = 0
             
-        return jsonify({'html':html, 'bboxs':bboxs, 'jsons':jsons, 'col_width':col_width, 'table_width':table_width, 'csvs':csvs, 'gs_url':gs_url})
+        return jsonify({'html':html, 'bboxs':bboxs, 'jsons':jsons, 'col_width':col_width, 'table_width':table_width, 'csvs':csvs, 'gs_url':gs_url, 'message':message})
         # return jsonify({'html':html, 'bboxs':bboxs, 'gs_url':gs_url})
 
 

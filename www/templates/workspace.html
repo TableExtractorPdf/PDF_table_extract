@@ -866,6 +866,8 @@
                             success: function (data) {
                                 table_data = data;
 
+                                console.log("table_data:", table_data);
+
                                 var bboxs = data.bboxs;
                                 var jsons = data.jsons;
                                 var csvs = data.csvs;
@@ -898,6 +900,10 @@
                                     $("#table_show_type").css("display", "block");
                                     $('.loader').removeClass('is-active');
                                 }
+                                else{
+                                    alert(data.message);
+                                }
+                                $('.loader').removeClass('is-active');
                             },
                             error: function (error) {
                                 console.error(error);
