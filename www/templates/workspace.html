@@ -191,6 +191,7 @@
 
             // 페이지 이동 함수 (pre_page는 현재 페이지, page는 이동할 페이지)
             function move_page(pre_page, page){
+                $('.loader').addClass("is-active");
                 
                 if($('.nowImg').attr("id") == "centerImg"){
                     destroy_select_areas();
@@ -286,6 +287,7 @@
                     if( dtd_pg.hasOwnProperty(String(page)) ){
                         set_select_areas( dtd_pg[page] );
                     }
+                    $('.loader').removeClass("is-active");
                 });
 
                 $("#table_printer").html('');
