@@ -68,10 +68,13 @@ def bbox_to_areas(v, bbox, page_file):
     scalingFactorX = fileDims[0] / imageWidth
     scalingFactorY = fileDims[1] / imageHeight
     
-    x = bbox[0] / scalingFactorX
-    y = abs(imageHeight - bbox[1]/ scalingFactorY)
-    width = bbox[2] / scalingFactorX - x
-    height = abs( imageHeight - bbox[3] / scalingFactorY - y )
+    # if "(" in bbox:
+    #     bbox = bbox[1:-1].split(", ")
+
+    x = float(bbox[0]) / scalingFactorX
+    y = abs(imageHeight - float(bbox[1])/ scalingFactorY)
+    width = float(bbox[2]) / scalingFactorX - x
+    height = abs( imageHeight - float(bbox[3]) / scalingFactorY - y )
     y -= height
     
     return f"{int(x)},{int(y)},{int(width)},{int(height)}"

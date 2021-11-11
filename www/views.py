@@ -187,11 +187,9 @@ def autoExtract():
 
             v = {}
             for page, tables in sorted(result.items()):
-                print(f'page : {page}')
+
                 progress = int( page / len(result) * 20 )
                 split_progress[file_name] = 80 + progress
-
-                bboxs = []
 
                 page_file = file_page_path + f"\\page-{page}.pdf"
                 image_file = file_page_path + f"\\page-{page}.png"
@@ -199,14 +197,22 @@ def autoExtract():
                 v['imageHeight'], v['imageWidth'], _ = cv2.cv2.imread(image_file).shape
 
                 # for table in tables:
-                #     bbox = table._bbox
-                for table in tables:
-                    for page in table.keys():
-                        info = table[page]
-                        bboxs.append( bbox_to_areas(v, info.get("bbox"), page_file)+f",{v['imageWidth']},{v['imageHeight']}" )
+                    # bbox = table.bbox
+
+                for table_key in tables.keys():
+                    table = tables[table_key]
+
+                    for idx in table.keys():
+                        info = table[idx]
+                        bbox =  bbox_to_areas(v, info.get("bbox"), page_file)+f",{v['imageWidth']},{v['imageHeight']}"
+                        table[idx]["bbox"] = str(bbox)
+
+                    tables[table_key] = table
                     
-                bboxs = ";".join(bboxs)
-                result[page] = bboxs
+                # bboxs = ";".join(bboxs)
+                # result[page] = bboxs
+                result[page] = tables
+                print(f'page:{page}\ttables : {tables}')
             
             for page in result.keys():
                 if result.get(page) is None or result.get(page) == '':
@@ -222,10 +228,6 @@ def autoExtract():
             bboxs = 0
 
         detected_areas[file_name.replace('.pdf', '').replace('.PDF', '')] = result
-    
-    # print("detected_areas : ")
-    # for i, v in detected_areas.items():
-    #     print(f"row : {i}\n{v}\n\n")
 
 
     # resp = jsonify({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':dict(split_progress)})
@@ -251,7 +253,7 @@ def getProgress():
 def getDetectedAreas():
     global detected_areas
 
-    return jsonify(json.dumps({'detected_areas':detected_areas}, cls=NumpyEncoder))
+    return jsonify(json.dumps({'detected_areas':detected_areas}, cls=NumpyEncoder, ensure_ascii=False))
 
 # 작업중인지 반환하는 라우트
 @views.route('/isWorking', methods = ['POST'])
@@ -282,6 +284,11 @@ def workspace():
         inputstream.close()
 
         if detected_areas.get(fileName) is not None:
+            print("ㅗㅗ")
+            print(detected_areas.get(fileName))
+            # for k, v in detected_areas[fileName].items():
+            #     for i in v:
+
             return render_template(
                 'workspace.html',
                 fileName=fileName,
@@ -291,6 +298,7 @@ def workspace():
                 # page=page
             )
 
+    print("ㅜㅜ")
     return render_template(
         'workspace.html',
         fileName=fileName,
