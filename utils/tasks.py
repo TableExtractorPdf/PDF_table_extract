@@ -4,7 +4,7 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-16
-# Last modified on 2021-03-29
+# Last modified on 2021-11-11
 #
 
 import os
@@ -79,26 +79,29 @@ def task_split_process(file_name, split_extract_pages, total_pages, originalFile
         # detected_areas[int(page)] = tables
 
         table_list = {}
-        for table in tables:
+        for idx, table in enumerate(tables, 1):
             # table_list.append(table.df)
             # table_list.append(table._bbox)
             
             bbox = table._bbox
             if "(" in bbox:
                 bbox = bbox[1:-1].split(", ")
-            table_list[table.order] = {
-                        "page": str(page),
-                        "bbox": bbox,
-                        "line_scale": line_scale,
-                        #"dataframe": None,#table.df,
-                        # "cells": [
-                        #             [
-                        #                 {"text":str(j.text), "vspan":str(j.vspan), "hspan":str(j.hspan)}
-                        #                 for j in i
-                        #             ]
-                        #             for i in table.cells
-                        #         ]
-                    }
+            
+            table.df.to_csv(f'{PDFS_FOLDER}\\page-{page}-table-{idx}.csv', index=False)
+            table_list[str(table.order)] = {
+                "page": str(page),
+                "bbox": bbox,
+                "line_scale": line_scale,
+                # "csv": table.df.to_csv(index=False),
+                #"dataframe": None,#table.df,
+                "cells": [
+                            [
+                                {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
+                                for j in i
+                            ]
+                            for i in table.cells
+                        ]
+            }
         
         detected_areas[int(page)] = table_list
 

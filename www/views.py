@@ -3,7 +3,7 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-08
-# Last modified on 2021-06-27
+# Last modified on 2021-11-11
 #
 
 from flask import (
@@ -199,20 +199,27 @@ def autoExtract():
                 # for table in tables:
                     # bbox = table.bbox
 
-                for table_key in tables.keys():
-                    table = tables[table_key]
+                if tables != -1:
+                    for table_key in tables.keys():
+                        # table = tables[table_key]
 
-                    for idx in table.keys():
-                        info = table[idx]
-                        bbox =  bbox_to_areas(v, info.get("bbox"), page_file)+f",{v['imageWidth']},{v['imageHeight']}"
-                        table[idx]["bbox"] = str(bbox)
+                        # for idx in table.keys():
+                        #     info = table[idx]
+                        #     print(f"table : {table}\t\tinfo : {info}")
+                        #     bbox =  bbox_to_areas(v, info.get("bbox"), page_file)+f",{v['imageWidth']},{v['imageHeight']}"
+                        #     table[idx]["bbox"] = str(bbox)
 
-                    tables[table_key] = table
+                        table = tables[table_key]
+                        
+                        bbox =  bbox_to_areas(v, table.get("bbox"), page_file)+f",{v['imageWidth']},{v['imageHeight']}"
+                        table["bbox"] = str(bbox)
+
+                        tables[table_key] = table
                     
-                # bboxs = ";".join(bboxs)
-                # result[page] = bboxs
-                result[page] = tables
-                print(f'page:{page}\ttables : {tables}')
+                    # bboxs = ";".join(bboxs)
+                    # result[page] = bboxs
+                    result[page] = tables
+                # print(f'page:{page}\ttables : {tables}')
             
             for page in result.keys():
                 if result.get(page) is None or result.get(page) == '':
@@ -284,7 +291,6 @@ def workspace():
         inputstream.close()
 
         if detected_areas.get(fileName) is not None:
-            print("ㅗㅗ")
             print(detected_areas.get(fileName))
             # for k, v in detected_areas[fileName].items():
             #     for i in v:
