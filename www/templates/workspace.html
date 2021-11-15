@@ -102,8 +102,9 @@
                 if(bboxs != 0 || bboxs != {}){
                     if(typeof bboxs === "object"){
                         // for(idx=0 ; idx<Object.keys(bboxs).length ; idx++){
+                        arrs = [];
                         for(key in bboxs){
-                            arrs = [];
+                            console.log("hi"+key);
                             value = bboxs[key];
 
                             // for (const [key, value] of Object.entries(bboxs[table_idx])) {
@@ -125,8 +126,8 @@
                                 height: Number(arr[3]/ scalingFactorY),
                             });
                             // }
-                            $(".nowImg").selectAreas('add', arrs);
                         }
+                            $(".nowImg").selectAreas('add', arrs);
                     }
                     else{
                         bboxs = bboxs.split(";");
@@ -617,58 +618,50 @@
                                         <img src='/static/icon/table.png' class='exist_class' style='display: inline;'>
                                         <br>`;
                             if (idx == 1){
-                                htmls += "<img\
-                                        class='thumb_img thumb_img_select'\
-                                        src=\"{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+idx+"-thumb.png\"\
-                                        onclick=\"\
-                                                move_page(this_page, '"+idx+"');\
-                                            \"\
-                                        id=\"thumb_page_"+idx+"\">";
+                                htmls += `<img
+                                        class='thumb_img thumb_img_select'
+                                        src="{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-${idx}-thumb.png"
+                                        onclick="move_page(this_page, '${idx}');"
+                                        id="thumb_page_${idx}">`;
                             }
                             else{
-                                htmls += "<img\
-                                            class='thumb_img'\
-                                            src=\"{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+idx+"-thumb.png\"\
-                                            onclick=\"\
-                                                    move_page(this_page, '"+idx+"');\
-                                                \"\
-                                            id=\"thumb_page_"+idx+"\">";
+                                htmls += `<img
+                                            class='thumb_img'
+                                            src="{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-${idx}-thumb.png"
+                                            onclick="move_page(this_page, '${idx}');"
+                                            id="thumb_page_${idx}">`;
                             }
-                            htmls += "<br>\
-                                        <span>"+idx+"</span>\
-                                        <br>\
-                                    </center>\
-                                </div>";
+                            htmls += `<br>
+                                        <span>${idx}</span>
+                                        <br>
+                                    </center>
+                                </div>`;
                         }
                         else{
-                            htmls += "<div class='thumb_page thumb_page_"+idx+" thumb_table_none thumb_check_none'>\
-                                        <center>\
-                                            <img src='/static/icon/check.png' class='check_page' style='display: none'>\
-                                            <img src='/static/icon/table.png' class='exist_class' style='display: none;'>\
-                                            <br>";
+                            htmls += `<div class='thumb_page thumb_page_${idx} thumb_table_none thumb_check_none'>
+                                        <center>
+                                            <img src='/static/icon/check.png' class='check_page' style='display: none'>
+                                            <img src='/static/icon/table.png' class='exist_class' style='display: none;'>
+                                            <br>`;
                             if (idx == 1){
-                                htmls += "<img\
-                                            class='thumb_img thumb_img_select'\
-                                            src=\"{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+idx+"-thumb.png\"\
-                                            onclick=\"\
-                                                    move_page(this_page, '"+idx+"');\
-                                                \"\
-                                            id=\"thumb_page_"+idx+"\">";
+                                htmls += `<img
+                                            class='thumb_img thumb_img_select'
+                                            src="{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-${idx}-thumb.png"
+                                            onclick="move_page(this_page, '${idx}');"
+                                            id="thumb_page_${idx}">`;
                             }
                             else{
-                                htmls += "<img\
-                                            class='thumb_img'\
-                                            src=\"{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-"+idx+"-thumb.png\"\
-                                            onclick=\"\
-                                                    move_page(this_page, '"+idx+"');\
-                                                \"\
-                                            id=\"thumb_page_"+idx+"\">";
+                                htmls += `<img
+                                            class='thumb_img'
+                                            src="{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-${idx}-thumb.png"
+                                            onclick="move_page(this_page, '${idx}');"
+                                            id="thumb_page_${idx}">`;
                             }
-                            htmls += "<br>\
-                                            <span>"+idx+"</span>\
-                                            <br>\
-                                        </center>\
-                                    </div>";
+                            htmls += `<br>
+                                            <span>${idx}</span>
+                                            <br>
+                                        </center>
+                                    </div>`;
                         }
                     }
 
