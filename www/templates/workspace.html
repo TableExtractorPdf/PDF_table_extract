@@ -604,11 +604,9 @@
 
                     for(idx=1 ; idx<Object.keys(dtd_pg).length+1 ; idx++){
                         var tables_len = 0;
-                        if(dtd_pg[idx] == -1){
-                            tables_len = 0;
-                        }
-                        else{
-                            tables_len = dtd_pg[idx].length;
+
+                        if(dtd_pg[idx] != -1){
+                            tables_len = Object.keys(dtd_pg[idx]).length;
                         }
 
                         if (tables_len > 0){
@@ -626,10 +624,10 @@
                             }
                             else{
                                 htmls += `<img
-                                            class='thumb_img'
-                                            src="{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-${idx}-thumb.png"
-                                            onclick="move_page(this_page, '${idx}');"
-                                            id="thumb_page_${idx}">`;
+                                        class='thumb_img'
+                                        src="{{url_for('static', filename='job_pdf')}}/{{fileName}}/page-${idx}-thumb.png"
+                                        onclick="move_page(this_page, '${idx}');"
+                                        id="thumb_page_${idx}">`;
                             }
                             htmls += `<br>
                                         <span>${idx}</span>
