@@ -277,7 +277,6 @@ def workspace():
     global split_progress
 
     fileName = request.args.get("fileName")
-
     print(f'split_progress:{split_progress}')
 
     if fileName is not None:
@@ -304,7 +303,6 @@ def workspace():
                 # page=page
             )
 
-    print("ㅜㅜ")
     return render_template(
         'workspace.html',
         fileName=fileName,
