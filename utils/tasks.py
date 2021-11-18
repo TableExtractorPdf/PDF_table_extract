@@ -20,6 +20,7 @@ from camelot.ext.ghostscript import Ghostscript
 from PyPDF2 import PdfFileReader, PdfFileWriter
 from camelot.utils import get_page_layout, get_text_objects, get_rotation
 from utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
+from utils.cell_control import *
 
 from multiprocessing import Process, Manager, cpu_count
 import numpy as np
@@ -86,7 +87,7 @@ def task_split_process(file_name, split_extract_pages, total_pages, originalFile
             bbox = table._bbox
             if "(" in bbox:
                 bbox = bbox[1:-1].split(", ")
-            
+
             table.df.to_csv(f'{PDFS_FOLDER}\\page-{page}-table-{idx}.csv', index=False)
             table_list[str(table.order)] = {
                 "page": str(page),
@@ -94,13 +95,20 @@ def task_split_process(file_name, split_extract_pages, total_pages, originalFile
                 "line_scale": line_scale,
                 # "csv": table.df.to_csv(index=False),
                 #"dataframe": None,#table.df,
-                "cells": [
+                "merge_data": find_merge_cell([
                             [
                                 {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
                                 for j in i
                             ]
                             for i in table.cells
-                        ]
+                        ]),
+                # "cells": [
+                #             [
+                #                 {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
+                #                 for j in i
+                #             ]
+                #             for i in table.cells
+                #         ]
             }
         
         detected_areas[int(page)] = table_list

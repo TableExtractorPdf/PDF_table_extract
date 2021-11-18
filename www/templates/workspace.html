@@ -36,23 +36,6 @@
         <!------------->
 
 
-        <!-- JSpreadSheet -->
-        <script src="https://bossanova.uk/jspreadsheet/v4/jexcel.js"></script>
-        <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jexcel.css" type="text/css" />
-        
-        <script src="https://jsuites.net/v4/jsuites.js"></script>
-        <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
-
-        
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jexcel/2.1.0/css/jquery.jexcel.min.css" type="text/css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jexcel/2.1.0/css/jquery.jdropdown.min.css" type="text/css" />
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.0/spectrum.min.css" type="text/css" />
-
-        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Material+Icons" />
-        <!------------------->
-
 
         <!-- JExcel -->
         <!-- <link rel="stylesheet" href="{{url_for('static',filename='ce-master/dist/jexcel.css')}}" />
@@ -74,21 +57,21 @@
 
 
         
-
         <!-- JSpreadsheet -->
-        <script src="https://jspreadsheet.com/v7/jspreadsheet.js"></script>
+        <script src="https://jspreadsheet.com/v8/jspreadsheet.js"></script>
         <script src="https://jsuites.net/v4/jsuites.js"></script>
-        <link rel="stylesheet" href="https://jspreadsheet.com/v7/jspreadsheet.css" type="text/css" />
+        <link rel="stylesheet" href="https://jspreadsheet.com/v8/jspreadsheet.css" type="text/css" />
         <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
 
+
         <!-- JSpreadSheet Extension -->
-        <script src="/static/js/autoWidth.min.js"></script>
-        <script type="text/javascript" src="/static/js/jquery.techbytarun.excelexportjs.js"></script>
+        <!-- <script src="js/autoWidth.min.js"></script> -->
+        <script src="/static/js/autoWidth-8.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jszip@3.6.0/dist/jszip.min.js"></script>
 
         <!-- Customization Functions -->
         <script src="/static/js/jspread.js"></script>
         <link rel="stylesheet" href="/static/css/jspread.css" type="text/css" />
-        <script lang="javascript" src="/static/js/xlsx.full.min.js"></script>
 
 
 
@@ -108,7 +91,8 @@
 
                             // for (const [key, value] of Object.entries(bboxs[table_idx])) {
                             var arr = value.bbox.split(',');
-                            show_jss(key);
+
+                            show_jss(value.page, key, value.merge_data);
 
                             fileDimsX = Number(arr[4])
                             fileDimsY = Number(arr[5])
@@ -291,6 +275,8 @@
                         set_select_areas( dtd_pg[page] );
                     }
                     $('.loader').removeClass("is-active");
+                    
+                    setPop();
                 });
 
                 $("#table_printer").html('');
@@ -315,16 +301,19 @@
                 }
             }
             
-            function show_jss(i){
+            function show_jss(page, table_index, merge_data){
                 // csvs = data.csvs;
 
                 // for(i=0 ; i<csvs.length ; i++){
                 // for(i=0 ; i<1 ; i++){
-                data = "/static/job_pdf/{{fileName}}/page-"+this_page+"-table-"+(i)+".csv";
+                data = `/static/job_pdf/{{fileName}}/page-${this_page}-table-${table_index}.csv`;
                 // data = "/static/page-18-table-1.csv";
 
-                license_key = 'MjE3YjQyMzhhNzNhNjBjYjFmNzJmYjE3YzU0ZmQ3MDVhMzU5M2Y3MGZlMDg3MGEyODE0Mzc5ZGZjMGQ2OWEwZDM3NTg1OTFhZDQ1ODVlMDQyNzNhNzNkM2Q0ZjA4ZTkyOTI0NDBhNWU1N2UwNjQyZTkwMzU4ZTBmYTlhMmU0OTYsZXlKdVlXMWxJam9pZEdGclpXNTVNVGs1T0NJc0ltUmhkR1VpT2pFMk16RTNORFk0TURBc0ltUnZiV0ZwYmlJNld5SnNiMk5oYkdodmMzUWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2TUN3aWMyTnZjR1VpT2xzaWRqY2lMQ0oyT0NKZGZRPT0=';
-                spreadsheet = createSheet("spreadsheet-"+i, "spreadsheet", data, license_key);
+                license_key = 'NDIyYzYwYzVhNjk1M2ZiOTdkZWQ2MTEwZGY4MjFmODhjZDE0NjhlZGQzZTZjZjRkNDRmYjJkOGUwODgxNWQyMjc1ZWQ5OThmNWI5MjA2MDc1ZjEyZGUyY2E5MWY5OGRiYjQxOWU2Y2ZhNzkzZWVkNDNjOWZmM2NjZjk0ZTE3YWUsZXlKdVlXMWxJam9pZEdGclpXNTVNVGs1T0NJc0ltUmhkR1VpT2pFMk16YzVOekV5TURBc0ltUnZiV0ZwYmlJNld5SnNiMk5oYkdodmMzUWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2TUN3aWMyTnZjR1VpT2xzaWRqY2lMQ0oyT0NKZGZRPT0=';
+
+                console.log(`data : ${data}`);
+                // function createSheet(page, index, merge_meta, data, licenseKey) {
+                spreadsheet = createSheet(page, table_index, merge_data, data, license_key);
                 // }
                 return;
 
@@ -592,7 +581,6 @@
 
 			$(document).ready(function () {
                 // show_jss("a");
-                setPop();
 
                 // console.log(localStorage.getItem("PDF__{{fileName}}"));
                 if (!(localStorage.getItem("PDF__{{fileName}}") === "null" || localStorage.getItem("PDF__{{fileName}}") === null )){
@@ -608,6 +596,7 @@
                         }
 
                         if (tables_len > 0){
+
                             htmls += `<div class='thumb_page thumb_page_${idx} thumb_table thumb_check_none'>
                                         <center>
                                         <img src='/static/icon/check.png' class='check_page' style='display:none'>
@@ -1084,6 +1073,9 @@
                     }
                 });
 			});
+
+            
+
 		</script>
 	</head>
 

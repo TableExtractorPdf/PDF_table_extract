@@ -54,32 +54,18 @@
     direction: ltr;
     -webkit-font-feature-settings: 'liga';
     -webkit-font-smoothing: antialiased;
-  }
-  
+}
+
 .nanumbarungothic * {
 font-family: '나눔바른고딕', sans-serif;
 }
 
-.jexcel_overflow>tbody>tr>td {
-    overflow: hidden;
-    line-height: 1.5;
-
-    border-top: 1px solid #BDBDBD;
-    border-left: 1px solid #BDBDBD;
-    border-right: 1px solid #BDBDBD;
-    border-bottom: 1px solid #BDBDBD;
+.jss_overflow > tbody > tr > td {
+    line-height: 1.8;
 }
 
-.jexcel>thead>tr>td {
-    border-top: 1px solid #BDBDBD;
-    border-left: 1px solid #BDBDBD;
-    border-right: 1px solid #BDBDBD;
-    border-bottom: 1px solid #BDBDBD;
-}
-
-.jexcel {
+.jss_content {
     font-family: '나눔바른고딕';
-    border-collapse: collapse;
 }
 
 /* reset */
@@ -113,13 +99,12 @@ button {
 
 /* 팝업 영역 */
 .popCmmn {
-    display:none;
+    visibility: hidden;
     position:fixed;
     top:0;
     left:0;
     width:100%;
     height:100%;
-    z-index: 99999;
   }
   
   .popBg {
