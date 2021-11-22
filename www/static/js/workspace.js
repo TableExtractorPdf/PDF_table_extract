@@ -1,7 +1,6 @@
 
 // 테이블 선택 영역 표시 함수
 function set_select_areas(bboxs){
-
     if(bboxs != 0 || bboxs != {}){
         if(typeof bboxs === "object"){
             // for(idx=0 ; idx<Object.keys(bboxs).length ; idx++){
@@ -100,6 +99,8 @@ function destroy_select_areas(){
 // 페이지 이동 함수 (pre_page는 현재 페이지, page는 이동할 페이지)
 function move_page(pre_page, page){
     $('.loader').addClass("is-active");
+
+    $('.popCmmn').css('visibility', 'hidden')
     
     if($('.nowImg').attr("id") == "centerImg"){
         destroy_select_areas();
