@@ -501,16 +501,13 @@ def extract(regions, page_file, table_option, line_scale=40):
 
 
 
-import urllib.request as urllib
 
 @views.route('/downloadSheets', methods=['POST'])
 def download_sheets():
     if request.method == 'POST':
         exportObjs = request.form['exportObjs']
         exportObjs = json.loads(exportObjs)
-        for exportObj in exportObjs:
-            print(exportObjs)
-            xlsx_path = csv_to_xlsx()
+        csv_to_xlsx(exportObjs)
         return "success"
     return "failed"
 
