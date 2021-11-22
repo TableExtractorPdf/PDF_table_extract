@@ -37,15 +37,6 @@
 
 
 
-        <!-- JExcel -->
-        <!-- <link rel="stylesheet" href="{{url_for('static',filename='ce-master/dist/jexcel.css')}}" />
-        <script src="{{url_for('static',filename='ce-master/dist/index.js')}}"></script>
-        <script src="{{url_for('static',filename='ce-master/src/js/jexcel.core.js')}}"></script>
-        <script src="{{url_for('static',filename='ce-master/src/js/jexcel.extensions.js')}}"></script>
-        <script src="{{url_for('static',filename='ce-master/src/js/jexcel.formulars.js')}}"></script> -->
-        <!------------>
-
-
         <!-- X-SpreadSheet -->
         <link rel="stylesheet" href="https://unpkg.com/x-data-spreadsheet@1.1.5/dist/xspreadsheet.css">
         <script src="https://unpkg.com/x-data-spreadsheet@1.1.5/dist/xspreadsheet.js"></script>
@@ -54,7 +45,6 @@
         <!-- CSS Loader -->
         <link rel="stylesheet" href="{{ url_for('static', filename='dist/css-loader.css') }}">
         <!---------------->
-
 
         
         <!-- Customization Functions -->
@@ -79,8 +69,6 @@
         <script src="https://jspreadsheet.com/plugins/download.js"></script>
         <script src="https://jspreadsheet.com/v7/plugins/download.js"></script>
 
-
-	<!-- <link rel="icon" href="{{ url_for('static', filename='css/image/icon.png') }}"> -->
 
         <script>
             var detected_areas = {{detected_areas | tojson | safe}};
@@ -114,7 +102,7 @@
                 </select>
             </div>
         </div>
-        
+
         <span id='page_list_size_btn'>▶</span>
 
         <table id='article_table'>
