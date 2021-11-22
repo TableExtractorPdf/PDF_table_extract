@@ -223,7 +223,7 @@ function show_gs(data){
     }
 }
 
-function show_jss(page, table_index, merge_data, data){
+function show_jss(page, table_index, merge_data, data, csv_path){
 
     license_key = 'NDIyYzYwYzVhNjk1M2ZiOTdkZWQ2MTEwZGY4MjFmODhjZDE0NjhlZGQzZTZjZjRkNDRmYjJkOGUwODgxNWQyMjc1ZWQ5OThmNWI5MjA2MDc1ZjEyZGUyY2E5MWY5OGRiYjQxOWU2Y2ZhNzkzZWVkNDNjOWZmM2NjZjk0ZTE3YWUsZXlKdVlXMWxJam9pZEdGclpXNTVNVGs1T0NJc0ltUmhkR1VpT2pFMk16YzVOekV5TURBc0ltUnZiV0ZwYmlJNld5SnNiMk5oYkdodmMzUWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2TUN3aWMyTnZjR1VpT2xzaWRqY2lMQ0oyT0NKZGZRPT0=';
         
@@ -438,7 +438,7 @@ $(document).ready(function () {
                             continue;
                         }
                     }
-                    show_jss(idx, cnt ++, value.merge_data, value.cells);
+                    show_jss(idx, cnt ++, value.merge_data, value.cells, value.csv_path);
                 }
 
                 htmls += `<div class='thumb_page thumb_page_${idx} thumb_table thumb_check_none'>
