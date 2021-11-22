@@ -89,6 +89,14 @@ def task_split_process(file_name, split_extract_pages, total_pages, originalFile
                 bbox = bbox[1:-1].split(", ")
 
             table.df.to_csv(f'{PDFS_FOLDER}\\page-{page}-table-{idx}.csv', index=False)
+            cells = json_text_to_list([
+                            [
+                                {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
+                                for j in i
+                            ]
+                            for i in table.cells
+                        ])
+
             table_list[str(table.order)] = {
                 "page": str(page),
                 "bbox": bbox,
@@ -102,6 +110,7 @@ def task_split_process(file_name, split_extract_pages, total_pages, originalFile
                             ]
                             for i in table.cells
                         ]),
+                "cells": cells
                 # "cells": [
                 #             [
                 #                 {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
@@ -313,3 +322,13 @@ def get_file_dim(filepath):
 def get_image_dim(imagepath):
     image = cv2.imread(imagepath)
     return [image.shape[1], image.shape[0]]
+
+
+def json_text_to_list(cells):
+    table = []
+    for row in cells:
+        row_cells = []
+        for cell in row:
+            row_cells.append(cell['text'])
+        table.append(row_cells)
+    return table

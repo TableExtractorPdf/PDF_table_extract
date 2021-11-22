@@ -57,23 +57,27 @@
 
 
         
-        <!-- JSpreadsheet -->
-        <script src="https://jspreadsheet.com/v8/jspreadsheet.js"></script>
-        <script src="https://jsuites.net/v4/jsuites.js"></script>
-        <link rel="stylesheet" href="https://jspreadsheet.com/v8/jspreadsheet.css" type="text/css" />
-        <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
-
-
-        <!-- JSpreadSheet Extension -->
-        <!-- <script src="js/autoWidth.min.js"></script> -->
-        <script src="/static/js/autoWidth-8.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/jszip@3.6.0/dist/jszip.min.js"></script>
-
         <!-- Customization Functions -->
         <script src="/static/js/jspread.js"></script>
         <link rel="stylesheet" href="/static/css/jspread.css" type="text/css" />
 
+        <!-- JSpreadsheet -->
+        <!-- <script src="https://jspreadsheet.com/v8/jspreadsheet.js"></script>
+        <script src="https://jsuites.net/v4/jsuites.js"></script>
+        <link rel="stylesheet" href="https://jspreadsheet.com/v8/jspreadsheet.css" type="text/css" />
+        <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />-->
+        <script src="https://jspreadsheet.com/v7/jspreadsheet.js"></script>
+        <script src="https://jsuites.net/v4/jsuites.js"></script>
+        <link rel="stylesheet" href="https://jspreadsheet.com/v7/jspreadsheet.css" type="text/css" />
+        <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
 
+        <!-- JSpreadSheet Extension -->
+        <!-- <script src="js/autoWidth.min.js"></script> -->
+        <script src="/static/js/jquery.techbytarun.excelexportjs.js"></script>
+        <script src="/static/js/autoWidth-8.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jszip@3.6.0/dist/jszip.min.js"></script>
+        <script src="https://jspreadsheet.com/plugins/download.js"></script>
+        <script src="https://jspreadsheet.com/v7/plugins/download.js"></script>
 
 
 	<!-- <link rel="icon" href="{{ url_for('static', filename='css/image/icon.png') }}"> -->
@@ -92,7 +96,8 @@
                             // for (const [key, value] of Object.entries(bboxs[table_idx])) {
                             var arr = value.bbox.split(',');
 
-                            show_jss(value.page, key, value.merge_data);
+                            // 페이지 바뀔때마다
+                            // show_jss(value.page, key, value.merge_data, value.cells);
 
                             fileDimsX = Number(arr[4])
                             fileDimsY = Number(arr[5])
@@ -207,7 +212,6 @@
                     inline: 'center'
                 });
 
-                
 
                 // thumb_img_select 클래스가 적용된 썸네일은 빨간 테두리가 표시됨 (현재 선택된 페이지라는 뜻)
                 $('#thumb_page_'+pre_page).removeClass('thumb_img_select');
@@ -277,9 +281,10 @@
                     $('.loader').removeClass("is-active");
                     
                     setPop();
+                    showTableByPage(this_page);
                 });
 
-                $("#table_printer").html('');
+                // $("#table_printer").html('');
                 showAreaPreviewImg();
             }
 
@@ -301,110 +306,21 @@
                 }
             }
             
-            function show_jss(page, table_index, merge_data){
+            function show_jss(page, table_index, merge_data, data){
                 // csvs = data.csvs;
 
                 // for(i=0 ; i<csvs.length ; i++){
                 // for(i=0 ; i<1 ; i++){
-                data = `/static/job_pdf/{{fileName}}/page-${this_page}-table-${table_index}.csv`;
+                // data = `/static/job_pdf/{{fileName}}/page-${this_page}-table-${table_index}.csv`;
                 // data = "/static/page-18-table-1.csv";
 
                 license_key = 'NDIyYzYwYzVhNjk1M2ZiOTdkZWQ2MTEwZGY4MjFmODhjZDE0NjhlZGQzZTZjZjRkNDRmYjJkOGUwODgxNWQyMjc1ZWQ5OThmNWI5MjA2MDc1ZjEyZGUyY2E5MWY5OGRiYjQxOWU2Y2ZhNzkzZWVkNDNjOWZmM2NjZjk0ZTE3YWUsZXlKdVlXMWxJam9pZEdGclpXNTVNVGs1T0NJc0ltUmhkR1VpT2pFMk16YzVOekV5TURBc0ltUnZiV0ZwYmlJNld5SnNiMk5oYkdodmMzUWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2TUN3aWMyTnZjR1VpT2xzaWRqY2lMQ0oyT0NKZGZRPT0=';
-
-                console.log(`data : ${data}`);
+                    
+                d = data
                 // function createSheet(page, index, merge_meta, data, licenseKey) {
                 spreadsheet = createSheet(page, table_index, merge_data, data, license_key);
                 // }
                 return;
-
-
-
-
-
-                $("#table_printer").html('');
-
-                csvs = data.csvs;
-                col_width = data.col_width;
-
-                for(i=0 ; i<csvs.length ; i++){
-                    var div = document.createElement('div');
-                    document.getElementById('table_printer').appendChild(div);
-
-                    table = jspreadsheet(div, {
-                        csv: "/static/job_pdf/{{fileName}}/page-"+this_page+"-table-"+(i)+".csv",
-                        // columns:csvs[i],
-                        colWidths: col_width[i],
-                        rowResize: true,
-                        columnResize: true,
-                        toolbar:[
-                            {
-                                type: 'i',
-                                content: 'undo',
-                                onclick: function() {
-                                    table.undo();
-                                }
-                            },
-                            {
-                                type: 'i',
-                                content: 'redo',
-                                onclick: function() {
-                                    table.redo();
-                                }
-                            },
-                            {
-                                type: 'i',
-                                content: 'save',
-                                onclick: function () {
-                                    table.download();
-                                }
-                            },
-                            {
-                                type: 'select',
-                                k: 'font-family',
-                                v: ['Arial','Verdana']
-                            },
-                            {
-                                type: 'select',
-                                k: 'font-size',
-                                v: ['9px','10px','11px','12px','13px','14px','15px','16px','17px','18px','19px','20px']
-                            },
-                            {
-                                type: 'i',
-                                content: 'format_align_left',
-                                k: 'text-align',
-                                v: 'left'
-                            },
-                            {
-                                type:'i',
-                                content:'format_align_center',
-                                k:'text-align',
-                                v:'center'
-                            },
-                            {
-                                type: 'i',
-                                content: 'format_align_right', 
-                                k: 'text-align',
-                                v: 'right'
-                            },
-                            {
-                                type: 'i',
-                                content: 'format_bold',
-                                k: 'font-weight',
-                                v: 'bold'
-                            },
-                            {
-                                type: 'color',
-                                content: 'format_color_text',
-                                k: 'color'
-                            },
-                            {
-                                type: 'color',
-                                content: 'format_color_fill',
-                                k: 'background-color'
-                            },
-                        ],
-                    });
-                }
             }
 
 
@@ -564,8 +480,7 @@
                 $( document ).tooltip();
                     
                 var selectionExists;
-            }
-            else if(!(localStorage.getItem("PDF__{{fileName}}") === "null")){
+            } else if(!(localStorage.getItem("PDF__{{fileName}}") === "null")){
                 var this_page = 1;
                 var table_data;
 
@@ -596,6 +511,25 @@
                         }
 
                         if (tables_len > 0){
+                            // 최초 로딩
+                            // console.log(`dtd_pg[idx] : ${dtd_pg[idx]}`);
+                            var cnt = 1;
+                            for(const[key, value] of Object.entries(dtd_pg[idx])){
+                                var isTextExist = false
+                                if(value.cells == undefined) {
+                                    continue;
+                                } else {
+                                    value.cells.flat().forEach(function(item) {
+                                        if(item.length > 0) {
+                                            isTextExist = true
+                                        }
+                                    })
+                                    if(isTextExist == false) {
+                                        continue;
+                                    }
+                                }
+                                show_jss(idx, cnt ++, value.merge_data, value.cells);
+                            }
 
                             htmls += `<div class='thumb_page thumb_page_${idx} thumb_table thumb_check_none'>
                                         <center>
@@ -1173,6 +1107,7 @@
                     <br>
 
                     <div id='table_printer'></div>
+                    <a id="tests">다운로드</a>
                     <div id='spreadsheet'></div>
                 </td>
             </tr>

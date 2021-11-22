@@ -11,7 +11,7 @@
  * @license This plugin is distribute under MIT License
  */
 
-function autoWidth(instance) {
+function autoWidth(instance, meta_list) {
 
 	function init() {
 		saveStyle();
@@ -44,25 +44,84 @@ function autoWidth(instance) {
 	function removeLayoutAuto() {
 		instance.table.style.cssText = oldValue_styleTable;
 	}
-	
+
+	const transpose = matrix => matrix.reduce(
+		(result, row) => row.map((_, i) => [...(result[i] || []), row[i]]),
+		[]
+	  );
+
+	function getAlpha(num){
+		var s = '', t;
+		
+		while (num > 0) {
+			t = (num - 1) % 26;
+			s = String.fromCharCode(65 + t) + s;
+			num = (num - t)/26 | 0;
+		}
+		return s || undefined;
+	}
+	  
 	/**
 	 * get Width offset of columns
 	 * @returns {jexcel.autoWidthL#16.jexcel.autoWidthL#16#L#17.getWidthColumns.cols}
 	 */
 	function getWidthColumns() {
-		var cols = [];
-		var tr = instance.table.querySelector("tbody>tr");
-		if(tr) {
-			var tds = tr.querySelectorAll("td");
-			for(var ite_td=0; ite_td<tds.length; ite_td++) {
-				if(ite_td==0) { // Skip index
-					continue; 
-				}
-				var td = tds[ite_td];
-				cols.push(td.offsetWidth);
+		var rows = [];
+		var result = [];
+		var trs = $(instance.table).find("tbody>tr")
+		$(trs).each(function(index){
+			var tds = $(this).find('td');
+			var cols = [];
+
+			arr = [];
+
+			for (const [key, value] of Object.entries(meta_list)) {
+				arr.push( JSON.parse(value).address );
 			}
-		}
-		return cols;
+			tds.each(function(index) {
+				if(index > 0) {
+					var td = $(this);
+					var r = td.attr("data-y");
+					var c = td.attr("data-x");
+					r ++; c ++;
+					var addr = getAlpha(c) + r;
+
+					$(td).css("white-space", "nowrap");
+					if(!arr.includes(addr)) {
+						cols.push(td.outerWidth(true) * 1.2);
+					} else {
+						cols.push(50)
+					}
+					$(td).css("white-space", "pre-wrap");
+				}
+			});
+			rows.push(cols);
+		});
+		var cols = transpose(rows)
+
+		cols.forEach(function(col) {
+			var maxWidth = 0
+			col.forEach(function(cell) {
+				if(cell > maxWidth) {
+					maxWidth = cell;
+				}
+			})
+			result.push(maxWidth)
+		})
+		// if(tr) {
+		// 	var tds = tr.querySelectorAll("td");
+			
+		// 	for(var ite_td=0; ite_td<tds.length; ite_td++) {
+		// 		if(ite_td==0) { // Skip index
+		// 			continue; 
+		// 		}
+		// 		var td = tds[ite_td];
+		// 		$(td).css("white-space", "nowrap");
+
+		// 		cols.push(td.offsetWidth);
+		// 	}
+		// }
+		return result;
 	}
 	
 	/**
@@ -88,11 +147,12 @@ function autoWidth(instance) {
 		for(var ite_col=0; ite_col<instance.options.columns.length; ite_col++) {
 			var column = instance.options.columns[ite_col];
 			if(column.width==="auto") {
-				if(colsWidth[ite_col]) {
-					var newWidth = Math.max(instance.options.defaultColWidth, colsWidth[ite_col]);
-				} else {
-					var newWidth = instance.options.defaultColWidth;
-				}
+				// if(colsWidth[ite_col]) {
+				// 	var newWidth = Math.max(instance.options.defaultColWidth, colsWidth[ite_col]);
+				// } else {
+				// 	var newWidth = instance.options.defaultColWidth;
+				// }
+				var newWidth = colsWidth[ite_col];
 				instance.setWidth(ite_col, newWidth);
 			}
 		}

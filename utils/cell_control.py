@@ -18,6 +18,7 @@ def json_text_to_list(cells):
     return table
 
 def find_merge_cell(cells):
+    
     result = []
     visited = []
     rows, cols = len(cells), len(cells[0])
@@ -25,7 +26,7 @@ def find_merge_cell(cells):
         for col in range(cols):
             colspan, rowspan = 1, 1
             curt_cell = cells[row][col]
-            if (row, col) not in visited:#len(curt_cell['text']) >  0:
+            if len(curt_cell['text']) >  0: #(row, col) not in visited:
                 # 수직 방향 검사
                 if curt_cell['vspan'] == True:
                     while True:

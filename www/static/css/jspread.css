@@ -57,14 +57,14 @@
 }
 
 .nanumbarungothic * {
-font-family: '나눔바른고딕', sans-serif;
+    font-family: '나눔바른고딕', sans-serif;   
 }
 
-.jss_overflow > tbody > tr > td {
-    line-height: 1.8;
+.jexcel_overflow > tbody > tr > td {
+    line-height: 1.8 !important;
 }
 
-.jss_content {
+.jexcel_overflow  {
     font-family: '나눔바른고딕';
 }
 
@@ -89,8 +89,8 @@ button {
     font-size:16px;
     opacity:0.7;
     transition:all 0.3s;
-    
-    /* z-index : -999; */
+    display: none;
+    z-index : -999;
 }
 
 .popOpenBtnCmmn:hover {

@@ -33,7 +33,6 @@ from PyPDF2 import PdfFileReader
 import cv2
 import os
 import json
-
 import logging
 import logging.config
 from datetime import datetime
@@ -235,7 +234,6 @@ def autoExtract():
             bboxs = 0
 
         detected_areas[file_name.replace('.pdf', '').replace('.PDF', '')] = result
-
 
     # resp = jsonify({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':dict(split_progress)})
     resp = jsonify( json.dumps({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':dict(split_progress)}, cls=NumpyEncoder) )
@@ -502,7 +500,17 @@ def extract(regions, page_file, table_option, line_scale=40):
 
 
 
+import urllib.request as urllib
 
+@views.route('/downloadSheets', methods=['POST'])
+def download_sheets():
+    if request.method == 'POST':
+        uris = request.form['exportObjs']
+        uris = json.loads(uris)
+        for obj in uris:
+            urllib.urlretrieve(obj['uri'], obj['name'] + ".xls")
+        return "success"
+    return "failed"
 
 import math
 
