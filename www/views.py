@@ -22,6 +22,7 @@ from utils.file_path import file_path_select
 from utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
 # from utils.tasks import split as task_split
 from utils.tasks import task_split
+from utils.cell_control import *
 
 from check_lattice.Lattice_2 import Lattice2
 from check_lattice.check_line_scale import GetLineScale
@@ -505,10 +506,11 @@ import urllib.request as urllib
 @views.route('/downloadSheets', methods=['POST'])
 def download_sheets():
     if request.method == 'POST':
-        uris = request.form['exportObjs']
-        uris = json.loads(uris)
-        for obj in uris:
-            urllib.urlretrieve(obj['uri'], obj['name'] + ".xls")
+        exportObjs = request.form['exportObjs']
+        exportObjs = json.loads(exportObjs)
+        for exportObj in exportObjs:
+            print(exportObjs)
+            xlsx_path = csv_to_xlsx()
         return "success"
     return "failed"
 

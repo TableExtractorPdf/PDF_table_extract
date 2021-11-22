@@ -110,7 +110,7 @@ def task_split_process(file_name, split_extract_pages, total_pages, originalFile
                             ]
                             for i in table.cells
                         ]),
-                "cells": cells
+                "cells": cells,
                 # "cells": [
                 #             [
                 #                 {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
@@ -118,6 +118,7 @@ def task_split_process(file_name, split_extract_pages, total_pages, originalFile
                 #             ]
                 #             for i in table.cells
                 #         ]
+                "csv_path": f'{PDFS_FOLDER}\\page-{page}-table-{idx}.csv'
             }
         
         detected_areas[int(page)] = table_list
