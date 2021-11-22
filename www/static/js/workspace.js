@@ -100,7 +100,7 @@ function destroy_select_areas(){
 function move_page(pre_page, page){
     $('.loader').addClass("is-active");
 
-    $('.popCmmn').css('visibility', 'hidden')
+    // $('.popCmmn').css('visibility', 'hidden')
     
     if($('.nowImg').attr("id") == "centerImg"){
         destroy_select_areas();
