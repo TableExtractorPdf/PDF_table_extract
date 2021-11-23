@@ -225,11 +225,9 @@ function show_gs(data){
 
 function show_jss(page, table_index, merge_data, data, csv_path){
 
-    license_key = 'NDIyYzYwYzVhNjk1M2ZiOTdkZWQ2MTEwZGY4MjFmODhjZDE0NjhlZGQzZTZjZjRkNDRmYjJkOGUwODgxNWQyMjc1ZWQ5OThmNWI5MjA2MDc1ZjEyZGUyY2E5MWY5OGRiYjQxOWU2Y2ZhNzkzZWVkNDNjOWZmM2NjZjk0ZTE3YWUsZXlKdVlXMWxJam9pZEdGclpXNTVNVGs1T0NJc0ltUmhkR1VpT2pFMk16YzVOekV5TURBc0ltUnZiV0ZwYmlJNld5SnNiMk5oYkdodmMzUWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2TUN3aWMyTnZjR1VpT2xzaWRqY2lMQ0oyT0NKZGZRPT0=';
+    license_key = 'ODdmZWU1MWNhMjhjYTNhODQ2ZmNiNjFiZjhiNzY1NGFkM2RmYWZlZTUxYzcwY2YxZmM0YzMzZGYxYTBmOTBhNjg3NzQyMTE2NTFkNmMzY2E5NzZkZDFlY2M5ZjZjZWY0ZTcyYzE0MGUxMTRiZTE4NTQyNjgyMjIwODQ1ZDViOGIsZXlKdVlXMWxJam9pZEdGclpXNTVNVGs1T0NJc0ltUmhkR1VpT2pFMk5EQXhNekV5TURBc0ltUnZiV0ZwYmlJNld5SnNiMk5oYkdodmMzUWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2TUN3aWMyTnZjR1VpT2xzaWRqY2lMQ0oyT0NKZGZRPT0=';
         
-    d = data
-    // function createSheet(page, index, merge_meta, data, licenseKey) {
-    spreadsheet = createSheet(page, table_index, merge_data, data, license_key);
+    spreadsheet = createSheet(page, table_index, merge_data, data,  csv_path, license_key);
     // }
     return;
 }
