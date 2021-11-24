@@ -751,11 +751,34 @@ $(document).ready(function () {
                     console.log("table_data:", table_data);
 
                     var bboxs = data.bboxs;
+
+
+                    // --- Google Sheet Code ---
                     var jsons = data.jsons;
                     var csvs = data.csvs;
                     
                     var gs_url = data.gs_url;
                     var iframe = null;
+
+                    var htmls = "";
+                    // --- ----------------- ---
+                    
+
+
+                    var dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
+
+                    for(idx=1 ; idx<Object.keys(dtd_pg).length+1 ; idx++){
+                        var tables_len = 0;
+
+                        if(dtd_pg[idx] != -1){
+                            tables_len = Object.keys(dtd_pg[idx]).length;
+                        }
+
+                        if (tables_len > 0){
+                            // 최초 로딩
+                            // console.log(`dtd_pg[idx] : ${dtd_pg[idx]}`);
+                            var cnt = 1;
+                            for(const[key, value] of Object.entries(dtd_pg[idx])){
 
                     show_jss(idx, cnt ++, value.merge_data, value.cells, value.csv_path);
 

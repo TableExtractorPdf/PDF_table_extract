@@ -413,17 +413,21 @@ def doExtract_page():
 
         result = extract(regions, page_file, table_option, line_scale)
         
-        # html = []
         jsons = []
+        bboxs = []
+        message = ""
+
+        # --- Google Sheet Code ---
+        # html = []
         # csvs = []
         # col_width = []
         # table_width = []
-        bboxs = []
         # gs = []
         # gs_url = ""
-        message = ""
+        # --- ----------------- ---
 
         if len(result) > 0:
+            print(f"result : {result}")
 
             for idx, table in enumerate(result, 1):
                 df = table.df
@@ -485,6 +489,16 @@ def get_line_scale():
         return jsonify({'line_scale':getlinescale.line_scale})
 
 
+@views.route('/downloadSheets', methods=['POST'])
+def download_sheets():
+    if request.method == 'POST':
+        exportObjs = request.form['exportObjs']
+        exportObjs = json.loads(exportObjs)
+        csv_to_xlsx(exportObjs)
+        return "success"
+    return "failed"
+
+
 # 지정 pdf파일 지정 영역의 테이블을 추출하는 함수
 def extract(regions, page_file, table_option, line_scale=40):
     # output_camelot = read_pdf(page_file, flavor="lattice", table_regions=regions)
@@ -500,14 +514,3 @@ def extract(regions, page_file, table_option, line_scale=40):
     
     return tables
 
-
-
-
-@views.route('/downloadSheets', methods=['POST'])
-def download_sheets():
-    if request.method == 'POST':
-        exportObjs = request.form['exportObjs']
-        exportObjs = json.loads(exportObjs)
-        csv_to_xlsx(exportObjs)
-        return "success"
-    return "failed"
