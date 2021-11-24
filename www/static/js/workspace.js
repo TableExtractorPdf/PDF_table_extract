@@ -330,26 +330,26 @@ function showAreaImg(target){
             for(j=0 ; j<arr.length ; j++){
                 var arr2 = arr[j].split(",");
                 if(arr2.length>=4){
-                    ctx.strokeRect(arr2[0]/scalingFactorX, arr2[1]/scalingFactorY, arr2[2]/scalingFactorX, arr2[3]/scalingFactorY);
+                    ctx.strokeRect(
+                        arr2[0]/scalingFactorX,
+                        arr2[1]/scalingFactorY,
+                        arr2[2]/scalingFactorX,
+                        arr2[3]/scalingFactorY
+                    );
                 }
             }
         }
         else{
-            // for(i=0 ; i<areas.length ; i++){
-            //     for(j=0 ; j<areas[i].length ; j++){
-            //         var arr2 = areas[i][j].bbox;
-            //         console.log(`arr2 : ${arr2}`);
-            //         if(arr2.length>=4){
-            //             ctx.strokeRect(arr2[0]/scalingFactorX, arr2[1]/scalingFactorY, arr2[2]/scalingFactorX, arr2[3]/scalingFactorY);
-            //         }
-            //     }
-            // }
-            
             for(idx=0 ; idx<areas.length ; idx++){
                 for (const [key, value] of Object.entries(areas[idx])) {
                     var arr2 = value.bbox.split(",");
                     if(arr2.length>=4){
-                        ctx.strokeRect(arr2[0]/scalingFactorX, arr2[1]/scalingFactorY, arr2[2]/scalingFactorX, arr2[3]/scalingFactorY);
+                        ctx.strokeRect(
+                            arr2[0]/scalingFactorX,
+                            arr2[1]/scalingFactorY,
+                            arr2[2]/scalingFactorX,
+                            arr2[3]/scalingFactorY
+                        );
                     }
                 }
             }
@@ -377,10 +377,15 @@ function displayAreas (areas) {
 // 빨간 줄 그어져도 에러 안남
 if(detected_areas != "-1"){
     var detected_areas_origin = JSON.parse( detected_areas );
-    localStorage.setItem(`PDF__${file_name}_origin`, JSON.stringify(detected_areas_origin));
+    localStorage.setItem(
+        `PDF__${file_name}_origin`, JSON.stringify(detected_areas_origin)
+    );
 
-    if( localStorage.getItem(`PDF__${file_name}`) === null || localStorage.getItem(`PDF__${file_name}`) === "null"){
-        localStorage.setItem(`PDF__${file_name}`, JSON.stringify(detected_areas_origin));
+    if( localStorage.getItem(`PDF__${file_name}`) === null
+        || localStorage.getItem(`PDF__${file_name}`) === "null"){
+        localStorage.setItem(
+            `PDF__${file_name}`, JSON.stringify(detected_areas_origin)
+        );
     }
 
     var this_page = 1;
@@ -406,7 +411,8 @@ $(window).load(function() {
 $(document).ready(function () {
     // show_jss("a");
 
-    if (!(localStorage.getItem(`PDF__${file_name}`) === "null" || localStorage.getItem(`PDF__${file_name}`) === null )){
+    if (!(localStorage.getItem(`PDF__${file_name}`) === "null"
+        || localStorage.getItem(`PDF__${file_name}`) === null )) {
         var dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
 
         var htmls = "";
@@ -540,7 +546,9 @@ $(document).ready(function () {
 
             var fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
 
-            $('.image-decorator div, .image-decorator img').css({'height':'70vh', 'width':fit_width});
+            $('.image-decorator div, .image-decorator img').css(
+                {'height':'70vh', 'width':fit_width}
+            );
             
 
             if( dtd_pg.hasOwnProperty(String(this_page)) ){
@@ -567,9 +575,11 @@ $(document).ready(function () {
         while ( i-- ) {
             count++;
 
-            html += "<span id='"+keys[i].split('.')[0]+"_progress'>" + keys[i] + "</span>";
+            html += `<span id='${keys[i].split('.')[0]}_progress'>${keys[i]}</span>`;
             html += "<div class='progress'>";
-            html += "<div class='progress-bar progress-bar-striped progress-bar-animated' style='width: 0%'>0%</div>";
+            html += `<div
+            class='progress-bar progress-bar-striped progress-bar-animated'
+            style='width: 0%'>0%</div>`;
             html += "</div><br>";
         }
 
