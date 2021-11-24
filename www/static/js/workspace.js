@@ -287,8 +287,9 @@ function showAreaPreviewImg(){
 }
 
 function showAreaImg(target){
-    if ($(target).parent().is("canvas") )
+    if ($(target).parent().is("canvas") ){
         $(target).unwrap();
+    }
         
     var img_width = target.width;
     var img_height = target.height;
@@ -296,8 +297,8 @@ function showAreaImg(target){
     var img_width_n = target.naturalWidth;
     var img_height_n = target.naturalHeight;
 
-    $(target).wrap("<canvas class='preview_canvas' width='"+img_width+"' height='"+img_height+"'></canvas>")
-    // $(this).wrap("<canvas class='preview_canvas' width='350px' height='auto'></canvas>")
+    $(target).wrap(`<canvas class='preview_canvas'
+        width='${img_width}' height='${img_height}'></canvas>`);
     
     $("canvas.preview_canvas:has(#prvImg)").css("left", "0px");
     $("canvas.preview_canvas:has(#centerImg)").css("left", "250px");
