@@ -803,10 +803,14 @@ $(document).ready(function () {
 
         dtd_pg[page] = dtd_pg_origin[page];
 
-        if( dtd_pg.hasOwnProperty(String(page)) ){
+        if(Object.keys(dtd_pg[page]).length < 1){
+            alert("자동 검출 모드로 테이블을 인식하지 못했습니다.");
+        }
+        else if( dtd_pg.hasOwnProperty(String(page)) ){
             $(".nowImg").selectAreas('reset');
             set_select_areas( dtd_pg[page] );
             localStorage.setItem(`PDF__${file_name}`, JSON.stringify( dtd_pg ));
+            alert(`자동 검출 모드로 ${Object.keys(dtd_pg[page]).length}개의 테이블을 인식했습니다.`);
         }
     });
 
