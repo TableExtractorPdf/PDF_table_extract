@@ -757,8 +757,7 @@ $(document).ready(function () {
                     var gs_url = data.gs_url;
                     var iframe = null;
 
-                    // show_gs(data);
-                    show_jss(data);
+                    show_jss(idx, cnt ++, value.merge_data, value.cells, value.csv_path);
 
                     if(bboxs != 0){
                         for(idx=0 ; idx<bboxs.length ; idx++){

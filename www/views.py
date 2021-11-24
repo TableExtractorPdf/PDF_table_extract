@@ -413,14 +413,14 @@ def doExtract_page():
 
         result = extract(regions, page_file, table_option, line_scale)
         
-        html = []
+        # html = []
         jsons = []
-        csvs = []
-        col_width = []
-        table_width = []
+        # csvs = []
+        # col_width = []
+        # table_width = []
         bboxs = []
-        gs = []
-        gs_url = ""
+        # gs = []
+        # gs_url = ""
         message = ""
 
         if len(result) > 0:
@@ -429,32 +429,33 @@ def doExtract_page():
                 df = table.df
                 df.reset_index(drop=True, inplace=True)
 
-                gs.append(table)
+                # gs.append(table)
 
-                html.append( df.to_html(index=False, header=False).replace('\\n', '<br>') )
+                # html.append( df.to_html(index=False, header=False).replace('\\n', '<br>') )
 
-                cols, width_sum = getWidth(df)
-                col_width.append( cols )
-                table_width.append( width_sum )
-                csvs.append( df.to_csv(index=False) )
+                # cols, width_sum = getWidth(df)
+                # col_width.append( cols )
+                # table_width.append( width_sum )
+                # csvs.append( df.to_csv(index=False) )
                 df.to_csv(f'{filepath}\\page-{page}-table-{idx}.csv', index=False)
 
                 
                 bbox = table._bbox
                 bboxs.append( bbox_to_areas(v, bbox, page_file) )
                 
-            html = "<br>".join(html)
+            # html = "<br>".join(html)
             bboxs = ";".join(bboxs)
 
             # 구글시트 호출
-            gs_url = make_google_sheets(file_name, gs, header='c')
+            # gs_url = make_google_sheets(file_name, gs, header='c')
             
         else:
             # html = "<span>발견된 테이블 없음</span>"
             message = "발견된 테이블 없음"
             bboxs = 0
-            
-        return jsonify({'html':html, 'bboxs':bboxs, 'jsons':jsons, 'col_width':col_width, 'table_width':table_width, 'csvs':csvs, 'gs_url':gs_url, 'message':message})
+
+        return jsonify({'bboxs':bboxs, 'jsons':jsons, 'message':message})  
+        # return jsonify({'bboxs':bboxs, 'jsons':jsons, 'col_width':col_width, 'table_width':table_width, 'csvs':csvs, 'gs_url':gs_url, 'message':message})
         # return jsonify({'html':html, 'bboxs':bboxs, 'gs_url':gs_url})
 
 
