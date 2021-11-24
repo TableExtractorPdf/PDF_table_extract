@@ -627,6 +627,9 @@ $(document).ready(function () {
     });
 
     document.addEventListener("keydown", function(event) {
+        if(isPopupOpen){
+            return;
+        }
         pre_page = Number(this_page);
         // event.preventDefault();
         const key = event.key; // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"
