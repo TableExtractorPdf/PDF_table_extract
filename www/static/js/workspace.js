@@ -742,7 +742,13 @@ $(document).ready(function () {
 
             $.ajax({
                 url: '/doExtract',
-                data: {"jsons":jsons, "fileName":file_name, "page":this_page, "table_option":table_option, "line_scale":$("#line_scale").val()},
+                data: {
+                    "jsons": jsons,
+                    "fileName": file_name,
+                    "page": this_page,
+                    "table_option": table_option,
+                    "line_scale": $("#line_scale").val()
+                },
                 dataType:'json',
                 type: 'POST',
                 success: function (data) {
