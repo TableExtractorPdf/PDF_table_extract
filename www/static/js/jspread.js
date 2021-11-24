@@ -118,7 +118,8 @@ function setPop() {
         isPopupOpen = true
         var divid = $(this).attr('sheet-name');
         var index = $(this).attr('index');
-        console.log(divid)
+        // console.log(divid)
+
         $('#popUp_'+ divid).css('visibility', 'visible')
         var popupWidth = $('#popUp_' + divid).find('.popInnerBox').width()
         var popupHeight = $('#popUp_' + divid).find('.popInnerBox').height() * 0.75;

@@ -213,7 +213,6 @@ div.image-decorator {
 	width: fit-content;
 }
 #table_printer > div{
-	border: 3px solid green;
 	margin-bottom: 10px;
 }
 #table_printer > iframe{
