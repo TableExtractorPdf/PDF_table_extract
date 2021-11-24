@@ -754,13 +754,14 @@ $(document).ready(function () {
 
 
                     // --- Google Sheet Code ---
-                    var jsons = table_data.jsons;
-                    var csvs = table_data.csvs;
                     
-                    var gs_url = table_data.gs_url;
-                    var iframe = null;
+                    // var jsons = table_data.jsons;
+                    // var csvs = table_data.csvs;
+                    
+                    // var gs_url = table_data.gs_url;
+                    // var iframe = null;
 
-                    var htmls = "";
+                    // var htmls = "";
                     // --- ----------------- ---
                     
                     if(bboxs != 0){
