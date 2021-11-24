@@ -166,12 +166,10 @@ function move_page(pre_page, page){
     $('#centerImg').addClass('nowImg');
     $('#centerImg').removeClass('previewImg');
 
-    // $("div.image-decorator:has(#centerImg)").css("margin-left", "250px");
     $("div.image-decorator:has(#centerImg)").animate({
         marginLeft: '250px'
     });
 
-    // $("#top_tools").css("margin-left", "250px");
     $("#top_tools").animate({
         marginLeft:'250px'
     });
@@ -183,7 +181,10 @@ function move_page(pre_page, page){
 
         var fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
 
-        $('.image-decorator div, .image-decorator img').css({'height':'70vh', 'width':fit_width});
+        $('.image-decorator div, .image-decorator img').css({
+            'height':'70vh',
+            'width':fit_width
+        });
         
         var dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
 
@@ -201,7 +202,6 @@ function move_page(pre_page, page){
         showTableByPage(this_page);
     });
 
-    // $("#table_printer").html('');
     showAreaPreviewImg();
 }
 
@@ -228,7 +228,7 @@ function show_jss(page, table_index, merge_data, data, csv_path){
     license_key = 'ODdmZWU1MWNhMjhjYTNhODQ2ZmNiNjFiZjhiNzY1NGFkM2RmYWZlZTUxYzcwY2YxZmM0YzMzZGYxYTBmOTBhNjg3NzQyMTE2NTFkNmMzY2E5NzZkZDFlY2M5ZjZjZWY0ZTcyYzE0MGUxMTRiZTE4NTQyNjgyMjIwODQ1ZDViOGIsZXlKdVlXMWxJam9pZEdGclpXNTVNVGs1T0NJc0ltUmhkR1VpT2pFMk5EQXhNekV5TURBc0ltUnZiV0ZwYmlJNld5SnNiMk5oYkdodmMzUWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2TUN3aWMyTnZjR1VpT2xzaWRqY2lMQ0oyT0NKZGZRPT0=';
         
     spreadsheet = createSheet(page, table_index, merge_data, data,  csv_path, license_key);
-    // }
+    
     return;
 }
 
