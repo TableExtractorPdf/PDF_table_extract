@@ -114,7 +114,7 @@ button {
     width:100%;
     height:100%;
     background:rgba(0,0,0,0.7);
-    z-index: -500;
+    z-index: 1000;
   }
   
   .popInnerBox {
@@ -132,7 +132,7 @@ button {
     text-align:center;
     background:#fff;
     border-radius:5px;
-    z-index : 999;
+    z-index : 1001;
   }
   
   .popHead {

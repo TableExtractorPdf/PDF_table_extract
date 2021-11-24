@@ -426,10 +426,11 @@ $(document).ready(function () {
                     var isTextExist = false
                     if(value.cells == undefined) {
                         continue;
-                    } else {
+                    }
+                    else {
                         value.cells.flat().forEach(function(item) {
                             if(item.length > 0) {
-                                isTextExist = true
+                                isTextExist = true;
                             }
                         })
                         if(isTextExist == false) {

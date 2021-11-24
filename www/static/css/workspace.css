@@ -37,7 +37,7 @@ body {
 	padding-top: 50px;
 	padding-left: 20px;
 	background: #d8d8d8;
-	z-index: 9999;
+	z-index: 200;
 }
 
 .thumb_page{
@@ -76,7 +76,7 @@ body {
 	color: #F52C05;
 	background: #d8d8d8;
 	cursor: pointer;
-	z-index: 9999;
+	z-index: 200;
 }
 #page_multiple_box{
 	position: fixed;
@@ -91,7 +91,7 @@ body {
 	height: 92%;
 	left: 200px;
 	top: 8%;
-	z-index: 1;
+	/* z-index: 0; */
 }
 
 input :not([type=radio]){
@@ -198,7 +198,7 @@ div.image-decorator {
 	border : 1px solid #c8c8c8;
 	border-radius : 5px 5px 5px 5px;
 	box-shadow : 0 0 6px #c8c8c8;
-	z-index: 9999;
+	z-index: 10;
 }
 
 .arrow{
