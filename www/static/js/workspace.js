@@ -1,18 +1,12 @@
-
 // 테이블 선택 영역 표시 함수
 function set_select_areas(bboxs){
     if(bboxs != 0 || bboxs != {}){
         if(typeof bboxs === "object"){
-            // for(idx=0 ; idx<Object.keys(bboxs).length ; idx++){
             arrs = [];
             for(key in bboxs){
                 value = bboxs[key];
 
-                // for (const [key, value] of Object.entries(bboxs[table_idx])) {
                 var arr = value.bbox.split(',');
-
-                // 페이지 바뀔때마다
-                // show_jss(value.page, key, value.merge_data, value.cells);
 
                 fileDimsX = Number(arr[4])
                 fileDimsY = Number(arr[5])
@@ -28,14 +22,11 @@ function set_select_areas(bboxs){
                     width: Number(arr[2]/ scalingFactorX),
                     height: Number(arr[3]/ scalingFactorY),
                 });
-                // }
             }
                 $(".nowImg").selectAreas('add', arrs);
         }
         else{
             bboxs = bboxs.split(";");
-            
-            // $(".nowImg").selectAreas('reset');
             
             arrs = [];
             for(i=0 ; i<bboxs.length ; i++){
@@ -140,10 +131,12 @@ function move_page(pre_page, page){
     var nxt_page = -1;
 
     if($(target_thumb).prevAll('.thumb_page:visible:first').length > 0)
-        prv_page = target_thumb.prevAll('.thumb_page:visible:first').find('.thumb_img').attr("id").replace("thumb_page_", "");
+        prv_page = target_thumb.prevAll('.thumb_page:visible:first')
+        .find('.thumb_img').attr("id").replace("thumb_page_", "");
         
     if($(target_thumb).nextAll('.thumb_page:visible:first').length > 0)
-        nxt_page = target_thumb.nextAll('.thumb_page:visible:first').find('.thumb_img').attr("id").replace("thumb_page_", "");
+        nxt_page = target_thumb.nextAll('.thumb_page:visible:first')
+        .find('.thumb_img').attr("id").replace("thumb_page_", "");
 
 
     $('img#centerImg').attr('src', `${job_path}/page-${page}.png`);
