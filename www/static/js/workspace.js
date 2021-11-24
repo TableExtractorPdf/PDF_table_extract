@@ -420,7 +420,6 @@ $(document).ready(function () {
 
             if (tables_len > 0){
                 // 최초 로딩
-                // console.log(`dtd_pg[idx] : ${dtd_pg[idx]}`);
                 var cnt = 1;
                 for(const[key, value] of Object.entries(dtd_pg[idx])){
                     var isTextExist = false
@@ -516,8 +515,6 @@ $(document).ready(function () {
                     if (opselected == 'non_checked') { select_items.delete(".thumb_check_none"); } 
                 }
 
-                // $( ".thumb_page:not("+Array.from(select_items).join('')+")" ).css("display", "none");
-                // $( Array.from(select_items).join('') ).css("display", "inline-block");
                 $( ".thumb_page:not("+Array.from(select_items).join('')+")" ).hide("slow");
                 $( Array.from(select_items).join('') ).show("slow");
             }
@@ -905,7 +902,10 @@ $(document).ready(function () {
 
             var fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
 
-            $('.image-decorator div, .image-decorator img').css({'height':'70vh', 'width':fit_width});
+            $('.image-decorator div, .image-decorator img').css({
+                'height':'70vh',
+                'width':fit_width
+            });
             
             var dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
 
