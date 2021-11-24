@@ -590,8 +590,11 @@ $(document).ready(function () {
             count++;
 
             html += "<tr>";
-            html += "<td>"+count+"</td>";
-            html += "<td onclick='location.href=\"/workspace?fileName="+keys[i].slice(5)+"\"' style='cursor:pointer'>"+keys[i].slice(5)+".pdf</td>";
+            html += `<td>${count}</td>`;
+            html += `<td 
+            onclick=
+            'location.href="/workspace?fileName=${keys[i].slice(5)}"'
+            style='cursor:pointer'>${keys[i].slice(5)}.pdf</td>`;
             html += "</tr>";
         }
         html += "</table>";
@@ -632,7 +635,9 @@ $(document).ready(function () {
         }
         pre_page = Number(this_page);
         // event.preventDefault();
-        const key = event.key; // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"
+
+        // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"
+        const key = event.key;
         switch (key) { // change to event.key to key to use the above variable
             case "ArrowLeft":
                 // Left pressed
@@ -754,10 +759,7 @@ $(document).ready(function () {
                 success: function (data) {
                     table_data = data;
 
-                    console.log("table_data:", table_data);
-
                     var bboxs = table_data.bboxs;
-
 
                     // --- Google Sheet Code ---
                     
