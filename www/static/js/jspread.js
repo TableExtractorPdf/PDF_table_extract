@@ -154,6 +154,8 @@ function processTable(meta_list, sheet) {
 }
 
 function downloadSheets() {
+    $('.loader').addClass("is-active");
+
     exportObjs = []
     spreadSheets.forEach(function(sheetObject) {
         exportObj = {page: sheetObject.page,
@@ -168,6 +170,7 @@ function downloadSheets() {
         datatype:"json",
         type:"post",
         success: function(result) {
+            $('.loader').removeClass("is-active");
             if(result == "success") {
                 alert("작업 성공, 모든시트 다운로드 완료했습니다.");
             } else {
