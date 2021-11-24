@@ -37,8 +37,10 @@ import json
 import logging
 import logging.config
 from datetime import datetime
-import pickle
+# import pickle
 import multiprocessing
+
+from utils.cell_control import *
 
 from numpyencoder import NumpyEncoder
 
@@ -413,8 +415,10 @@ def doExtract_page():
 
         result = extract(regions, page_file, table_option, line_scale)
         
-        jsons = []
+        merge_data = []
+        cells = []
         bboxs = []
+        csv_paths = []
         message = ""
 
         # --- Google Sheet Code ---
@@ -427,12 +431,11 @@ def doExtract_page():
         # --- ----------------- ---
 
         if len(result) > 0:
-            print(f"result : {result}")
-
             for idx, table in enumerate(result, 1):
                 df = table.df
                 df.reset_index(drop=True, inplace=True)
 
+                # --- Google Sheet Code ---
                 # gs.append(table)
 
                 # html.append( df.to_html(index=False, header=False).replace('\\n', '<br>') )
@@ -441,8 +444,30 @@ def doExtract_page():
                 # col_width.append( cols )
                 # table_width.append( width_sum )
                 # csvs.append( df.to_csv(index=False) )
-                df.to_csv(f'{filepath}\\page-{page}-table-{idx}.csv', index=False)
+                # --- ----------------- ---
+                
+                merge_data.append(
+                    find_merge_cell([
+                        [
+                            {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
+                            for j in i
+                        ]
+                        for i in table.cells
+                    ])
+                )
+                cells.append(
+                    json_text_to_list([
+                        [
+                            {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
+                            for j in i
+                        ]
+                        for i in table.cells
+                    ])
+                )
 
+                csv_path = f'{filepath}\\page-{page}-table-{idx}.csv'
+                csv_paths.append(csv_path)
+                df.to_csv(csv_path, index=False)
                 
                 bbox = table._bbox
                 bboxs.append( bbox_to_areas(v, bbox, page_file) )
@@ -461,7 +486,7 @@ def doExtract_page():
             message = "발견된 테이블 없음"
             bboxs = 0
 
-        return jsonify({'bboxs':bboxs, 'jsons':jsons, 'message':message})  
+        return jsonify({'page': page, 'bboxs': bboxs, 'merge_data': merge_data, 'cells': cells, 'csv_paths': csv_paths, 'message':message})  
 
         # --- Google Sheet Code ---
         # return jsonify({'bboxs':bboxs, 'jsons':jsons, 'col_width':col_width, 'table_width':table_width, 'csvs':csvs, 'gs_url':gs_url, 'message':message})

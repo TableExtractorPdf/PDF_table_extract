@@ -750,64 +750,60 @@ $(document).ready(function () {
 
                     console.log("table_data:", table_data);
 
-                    var bboxs = data.bboxs;
+                    var bboxs = table_data.bboxs;
 
 
                     // --- Google Sheet Code ---
-                    var jsons = data.jsons;
-                    var csvs = data.csvs;
+                    var jsons = table_data.jsons;
+                    var csvs = table_data.csvs;
                     
-                    var gs_url = data.gs_url;
+                    var gs_url = table_data.gs_url;
                     var iframe = null;
 
                     var htmls = "";
                     // --- ----------------- ---
                     
-
-
-                    var dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
-
-                    for(idx=1 ; idx<Object.keys(dtd_pg).length+1 ; idx++){
-                        var tables_len = 0;
-
-                        if(dtd_pg[idx] != -1){
-                            tables_len = Object.keys(dtd_pg[idx]).length;
-                        }
-
-                        if (tables_len > 0){
-                            // 최초 로딩
-                            // console.log(`dtd_pg[idx] : ${dtd_pg[idx]}`);
-                            var cnt = 1;
-                            for(const[key, value] of Object.entries(dtd_pg[idx])){
-
-                    show_jss(idx, cnt ++, value.merge_data, value.cells, value.csv_path);
-
                     if(bboxs != 0){
-                        for(idx=0 ; idx<bboxs.length ; idx++){
-                            for (const [key, value] of Object.entries(bboxs[idx])) {
-                                $("#centerImg").selectAreas('reset');
-                                
-                                arrs = [];
+                        bboxs = bboxs.split(";");
 
-                                var arr = value.split(',');
-                                
-                                arrs.push({
-                                    x: Number(arr[0]),
-                                    y: Number(arr[1]),
-                                    width: Number(arr[2]),
-                                    height: Number(arr[3]),
-                                });
-                                
-                                $("#centerImg").selectAreas('add', arrs);
-
-                                $("#table_show_type").css("display", "block");
-                                $('.loader').removeClass('is-active');
-                            }
+                        for(table_idx=0 ; table_idx<bboxs.length ; table_idx++){
+                            show_jss(table_data.page, table_idx+1, table_data.merge_data[table_idx], table_data.cells[table_idx], table_data.csv_paths[table_idx]);
                         }
                     }
                     else{
                         alert(data.message);
                     }
+
+                    // var cnt = 1;
+                    // for(const[key, value] of Object.entries(dtd_pg[idx])){
+
+                    
+                    // if(bboxs != 0){
+                    //     for(idx=0 ; idx<bboxs.length ; idx++){
+                    //         for (const [key, value] of Object.entries(bboxs[idx])) {
+                    //             $("#centerImg").selectAreas('reset');
+                                
+                    //             arrs = [];
+
+                    //             var arr = value.split(',');
+                                
+                    //             arrs.push({
+                    //                 x: Number(arr[0]),
+                    //                 y: Number(arr[1]),
+                    //                 width: Number(arr[2]),
+                    //                 height: Number(arr[3]),
+                    //             });
+                                
+                    //             $("#centerImg").selectAreas('add', arrs);
+
+                    //             $("#table_show_type").css("display", "block");
+                    //             $('.loader').removeClass('is-active');
+                    //         }
+                    //     }
+                    // }
+                    // else{
+                    //     alert(data.message);
+                    // }
                     $('.loader').removeClass('is-active');
                 },
                 error: function (error) {
