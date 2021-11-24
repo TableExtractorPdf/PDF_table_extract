@@ -447,11 +447,14 @@ def doExtract_page():
                 bbox = table._bbox
                 bboxs.append( bbox_to_areas(v, bbox, page_file) )
                 
-            # html = "<br>".join(html)
             bboxs = ";".join(bboxs)
 
+
+            # --- Google Sheet Code ---
             # 구글시트 호출
             # gs_url = make_google_sheets(file_name, gs, header='c')
+            # html = "<br>".join(html)
+            # --- ----------------- ---
             
         else:
             # html = "<span>발견된 테이블 없음</span>"
@@ -459,7 +462,11 @@ def doExtract_page():
             bboxs = 0
 
         return jsonify({'bboxs':bboxs, 'jsons':jsons, 'message':message})  
+
+        # --- Google Sheet Code ---
         # return jsonify({'bboxs':bboxs, 'jsons':jsons, 'col_width':col_width, 'table_width':table_width, 'csvs':csvs, 'gs_url':gs_url, 'message':message})
+        # --- ----------------- ---
+
         # return jsonify({'html':html, 'bboxs':bboxs, 'gs_url':gs_url})
 
 
