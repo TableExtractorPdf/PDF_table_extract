@@ -767,8 +767,14 @@ $(document).ready(function () {
                     if(bboxs != 0){
                         bboxs = bboxs.split(";");
 
-                        for(table_idx=0 ; table_idx<bboxs.length ; table_idx++){
-                            show_jss(table_data.page, table_idx+1, table_data.merge_data[table_idx], table_data.cells[table_idx], table_data.csv_paths[table_idx]);
+                        for(idx=0 ; idx<bboxs.length ; idx++){
+                            show_jss(
+                                table_data.page,
+                                idx + 1,
+                                table_data.merge_data[idx],
+                                table_data.cells[idx],
+                                table_data.csv_paths[idx]
+                            );
                         }
                     }
                     else{
