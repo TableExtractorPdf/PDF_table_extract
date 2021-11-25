@@ -779,6 +779,23 @@ $(document).ready(function () {
                                 table_data.cells[idx],
                                 table_data.csv_paths[idx]
                             );
+                            
+                            $("#centerImg").selectAreas('reset');
+                            
+                            arrs = [];
+
+                            var arr = bboxs[idx].split(',');
+                            
+                            arrs.push({
+                                x: Number(arr[0]),
+                                y: Number(arr[1]),
+                                width: Number(arr[2]),
+                                height: Number(arr[3]),
+                            });
+                            
+                            $("#centerImg").selectAreas('add', arrs);
+
+                            $("#table_show_type").css("display", "block");
                         }
                     }
                     else{
