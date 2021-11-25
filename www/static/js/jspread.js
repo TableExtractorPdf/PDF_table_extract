@@ -1,3 +1,5 @@
+var licenseKey = 'ODdmZWU1MWNhMjhjYTNhODQ2ZmNiNjFiZjhiNzY1NGFkM2RmYWZlZTUxYzcwY2YxZmM0YzMzZGYxYTBmOTBhNjg3NzQyMTE2NTFkNmMzY2E5NzZkZDFlY2M5ZjZjZWY0ZTcyYzE0MGUxMTRiZTE4NTQyNjgyMjIwODQ1ZDViOGIsZXlKdVlXMWxJam9pZEdGclpXNTVNVGs1T0NJc0ltUmhkR1VpT2pFMk5EQXhNekV5TURBc0ltUnZiV0ZwYmlJNld5SnNiMk5oYkdodmMzUWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2TUN3aWMyTnZjR1VpT2xzaWRqY2lMQ0oyT0NKZGZRPT0=';
+
 spreadSheets = [];
 isPopupOpen = false;
 var leaf = {
@@ -40,7 +42,8 @@ var dark = {
     bodyTxt: "#CAC8CE"
 }
 
-function createSheet(page, index, merge_meta, data, csv_path, licenseKey) {
+
+function createSheet(page, index, merge_meta, data, csv_path) {
     divid = 'page-' + page + '-table-' + index; 
     var htmlPopup = '\
     <button type="button" id="btn_' + divid +'" class="popOpenBtnCmmn" index="' + spreadSheets.length + '"sheet-name="' + divid + '">' + divid + '</button>\
@@ -67,8 +70,8 @@ function createSheet(page, index, merge_meta, data, csv_path, licenseKey) {
         allowComments: true,
         tableOverflow: true,
         wordWrap: true,
-        defaultColWidth:'10px'
-        // tableHeight: '600px',
+        defaultColWidth:'10px',
+        tableHeight: '60vh',
     });
     // setMerge(merge_meta, spreadSheet);
     var sheetObject = {
@@ -84,6 +87,20 @@ function createSheet(page, index, merge_meta, data, csv_path, licenseKey) {
     spreadSheets.push(sheetObject)
 }
 
+function modifySheet(page, index, merge_meta, data, csv_path) {
+    spreadSheets.forEach(function(sheetObject, i) {
+        
+        if(sheetObject.page == page && sheetObject.index == index) {
+            $('#btn_' + sheetObject.divid).remove()
+            $('#popUp_' + sheetObject.divid).remove()
+            spreadSheets.splice(i, 1);
+            createSheet(page, index, merge_meta, data, csv_path)
+            
+            $('#btn_' + sheetObject.divid).show()
+            setPop();
+        } 
+    })
+}
 function showTableByPage(page) {
     spreadSheets.forEach(function(item) {
         if(item.page == String(page)) {
@@ -124,7 +141,7 @@ function setPop() {
         var popupWidth = $('#popUp_' + divid).find('.popInnerBox').width()
         var popupHeight = $('#popUp_' + divid).find('.popInnerBox').height() * 0.75;
         $('#' + divid).find('.jtabs-content').css("max-width", popupWidth + "px");
-        $('#' + divid).find('.jss_content').css("max-height", popupHeight + "px");
+        // $('#' + divid).find('.jss_content').css("max-height", popupHeight + "px");
         $('#popUp_' + divid).find('.popInnerBox').draggable({ 
             handle : '.popHead' // drag 대상 안 특정 요소에 제한 (여러개 사용 가능) }
         });

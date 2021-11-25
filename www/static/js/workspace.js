@@ -1,3 +1,4 @@
+
 // 테이블 선택 영역 표시 함수
 function set_select_areas(bboxs){
     if(bboxs != 0 || bboxs != {}){
@@ -216,14 +217,6 @@ function show_gs(data){
     }
 }
 
-function show_jss(page, table_index, merge_data, data, csv_path){
-
-    license_key = 'ODdmZWU1MWNhMjhjYTNhODQ2ZmNiNjFiZjhiNzY1NGFkM2RmYWZlZTUxYzcwY2YxZmM0YzMzZGYxYTBmOTBhNjg3NzQyMTE2NTFkNmMzY2E5NzZkZDFlY2M5ZjZjZWY0ZTcyYzE0MGUxMTRiZTE4NTQyNjgyMjIwODQ1ZDViOGIsZXlKdVlXMWxJam9pZEdGclpXNTVNVGs1T0NJc0ltUmhkR1VpT2pFMk5EQXhNekV5TURBc0ltUnZiV0ZwYmlJNld5SnNiMk5oYkdodmMzUWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2TUN3aWMyTnZjR1VpT2xzaWRqY2lMQ0oyT0NKZGZRPT0=';
-        
-    spreadsheet = createSheet(page, table_index, merge_data, data,  csv_path, license_key);
-    
-    return;
-}
 
 
 function debugQtyAreas (event, id, areas) {
@@ -403,7 +396,6 @@ $(window).load(function() {
 });
 
 $(document).ready(function () {
-    // show_jss("a");
 
     if (!(localStorage.getItem(`PDF__${file_name}`) === "null"
         || localStorage.getItem(`PDF__${file_name}`) === null )) {
@@ -436,7 +428,8 @@ $(document).ready(function () {
                             continue;
                         }
                     }
-                    show_jss(idx, cnt ++, value.merge_data, value.cells, value.csv_path);
+
+                    createSheet(idx, cnt ++, value.merge_data, value.cells, value.csv_path);
                 }
 
                 htmls += `<div class='thumb_page thumb_page_${idx} thumb_table thumb_check_none'>
@@ -775,9 +768,11 @@ $(document).ready(function () {
                     
                     if(bboxs != 0){
                         bboxs = bboxs.split(";");
-
+                        
                         for(idx=0 ; idx<bboxs.length ; idx++){
-                            show_jss(
+                            // console.log(`table_data.cells[idx] : ${table_data.cells[idx]}`);
+
+                            modifySheet(
                                 table_data.page,
                                 idx + 1,
                                 table_data.merge_data[idx],
@@ -829,7 +824,6 @@ $(document).ready(function () {
             });
         }
     });
-
 
     $('#auto_detect').click(function(){
         var dtd_pg_origin = JSON.parse( localStorage.getItem(`PDF__${file_name}_origin`) );
