@@ -72,6 +72,7 @@ function createSheet(page, index, merge_meta, data, csv_path) {
         wordWrap: true,
         defaultColWidth:'10px',
         tableHeight: '60vh',
+        toolbar: true,
     });
     // setMerge(merge_meta, spreadSheet);
     var sheetObject = {
@@ -112,8 +113,8 @@ function showTableByPage(page) {
     });
 }
 
-function applyPreset(divid, header, headerTxt, body, bodyAlt, bodyTxt, border) {
-    $('#' + divid).find('td[data-x][data-y]').each( function() {
+function applyPreset(header, headerTxt, body, bodyAlt, bodyTxt, border) {
+    $('.jexcel_overflow').find('td[data-x][data-y]').each( function() {
         let row = $(this).attr('data-y');
         $(this).css({"border": "1px solid " + border,  "color":bodyTxt});
 
@@ -167,7 +168,6 @@ function processTable(meta_list, sheet) {
         table.setMerge(address, colspan, rowspan)
     });
     
-    applyPreset(divid, leaf.header, leaf.headerTxt, leaf.body, leaf.bodyAlt, leaf.bodyTxt, leaf.border);
     autoWidth(table, meta_list);
 }
 

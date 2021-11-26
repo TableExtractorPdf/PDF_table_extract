@@ -63,10 +63,10 @@
 .jexcel_overflow > tbody > tr > td {
     line-height: 1.8 !important;
 }
-
+/* 
 .jexcel_overflow  {
     font-family: '나눔바른고딕';
-}
+} */
 
 /* reset */
 button {
@@ -179,3 +179,30 @@ button {
 }
 
   /* 팝업 영역 끝 */
+
+  /* 툴바 */
+  #toolbar {
+    background-color: #ececec;
+    width:100%;
+    font-family: 나눔바른고딕;
+    vertical-align: center;
+  }
+
+  #select-font {
+    display: inline !important;
+    font-size: 16px!important;
+  }
+
+  #select-theme {
+    font-family: 넥슨 고딕;
+    text-align: center;
+  }
+
+  .toolbar-btn {
+      width:auto !important;
+      height:36px !important;
+  }
+
+  .dropdown-menu {
+      min-width: auto;
+  }

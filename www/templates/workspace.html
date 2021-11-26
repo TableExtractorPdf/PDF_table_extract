@@ -6,11 +6,16 @@
         <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/workspace.css')}}">
 
 		<!--[if lte IE 8]><link href="../resources/jquery.selectareas.ie8.css" media="screen" rel="stylesheet" type="text/css" /> <![endif]-->
+
         <script type="text/javascript" src = "{{url_for('static',filename='js/jquery-1.11.3.min.js')}}"></script>
         <!-- <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
         <script src="https://code.jquery.com/jquery-migrate-1.4.1.min.js"></script> -->
 
         <!-- bootstrap -->
+        
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
         <link rel="stylesheet" href="{{ url_for('static', filename='docs/css/bootstrap-3.3.2.min.css') }}" type="text/css">
         <script type="text/javascript" src="{{ url_for('static', filename='docs/js/bootstrap-3.3.2.min.js') }}"></script>
 
@@ -160,7 +165,7 @@
                     <input type="button" id="extract" value="추출▶" style="font-size: 18px; cursor:pointer;"/>
                 </td>
                 
-                <td style="vertical-align: top">
+                <td style="vertical-align: top;width: 360px;">
                     <!-- <div id='table_show_type' style='float:right; display:none'>
                         <label class="radio-inline">
                             <input type="radio" name="showradio" value="gs" onclick='show_gs(table_data)' checked>Google Sheet
@@ -171,8 +176,54 @@
                     </div>
                     <br> -->
 
-                    <div id='table_printer'></div>
-                    <div id='spreadsheet'></div>
+                    <div id='table_printer'>
+                        <nav class="navbar navbar-default">
+                            <!-- select font -->
+                            <select id="select-font" class="form-select toolbar-btn" >
+                                <option value="나눔바른고딕" selected>나눔바른고딕</option>
+                                <option value="마루 부리">마루 부리</option>
+                                <option value="넥슨 고딕">넥슨 고딕</option>
+                            </select>
+
+                            <div class="dropdown">
+                                <a class="btn  dropdown-toggle toolbar-btn" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="material-icons">
+                                        palette
+                                    </span>
+                                </a>
+                              
+                                <ul id="select-theme" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <li><a  class="dropdown-item" style="color:#476B4B !important">Leaf</a></li>
+                                    <li><a  class="dropdown-item" style="color:#818283 !important">Metal</a></li>
+                                    <li><a  class="dropdown-item" style="color:#004575 !important">Aqua</a></li>
+                                    <li><a  class="dropdown-item" style="color:#000000 !important">Dark</a></li>
+                                </ul>
+                            </div>
+
+                            <div class="dropdown">
+                                <a class="btn  dropdown-toggle toolbar-btn" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="material-icons">
+                                        format_align_center
+                                    </span>
+                                </a>
+                              
+                                <ul id="select-align" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <li><a class="dropdown-item">
+                                        <span class="material-icons">format_align_left</span>
+                                    </a></li>
+                                    <li><a class="dropdown-item">
+                                        <span class="material-icons">format_align_center</span>
+                                    </a></li>
+                                    <li><a class="dropdown-item">
+                                        <span class="material-icons">format_align_right</span>
+                                    </a></li>
+                                    <li><a class="dropdown-item">
+                                        <span class="material-icons">format_align_justify</span>
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
                 </td>
             </tr>
         </table>
