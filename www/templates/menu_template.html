@@ -89,7 +89,7 @@
         var file_names = [];
 
         for(i=0 ; i<files.length ; i++){
-            html += "<span id='"+files[i].name.split('.')[0]+"_progress'>" + files[i].name + "</span>";
+            html += `<span id='${files[i].name.split('.')[0]}_progress'>${files[i].name}</span>`;
             html += "<div class='progress'>";
             html += "<div class='progress-bar progress-bar-striped progress-bar-animated' style='width: 0%'>0%</div>";
             html += "</div><br>";
