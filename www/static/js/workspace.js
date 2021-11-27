@@ -1,4 +1,3 @@
-
 // 테이블 선택 영역 표시 함수
 function set_select_areas(bboxs){
     if(bboxs != 0 || bboxs != {}){
@@ -219,7 +218,6 @@ function show_gs(data){
 }
 
 
-
 function debugQtyAreas (event, id, areas) {
     // console.log(areas.length + " areas", arguments);
     // alert(areas.length + " areas", arguments);
@@ -254,11 +252,8 @@ function debugQtyAreas (event, id, areas) {
                 }
             }
         }
-
-
     });
-
-};
+}
 
 function showAreaPreviewImg(){
     $(".previewImg").each(function(i){
@@ -382,7 +377,8 @@ if(detected_areas != "-1"){
     $( document ).tooltip();
         
     var selectionExists;
-} else if(!(localStorage.getItem(`PDF__${file_name}`) === "null")){
+}
+else if(!(localStorage.getItem(`PDF__${file_name}`) === "null")){
     var this_page = 1;
     var table_data;
 
@@ -397,7 +393,6 @@ $(window).load(function() {
 });
 
 $(document).ready(function () {
-
     if (!(localStorage.getItem(`PDF__${file_name}`) === "null"
         || localStorage.getItem(`PDF__${file_name}`) === null )) {
         var dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
@@ -624,6 +619,7 @@ $(document).ready(function () {
         move_page(pre_page, this_page);
     });
 
+    // 방향키 눌렀을 때 (방향키로 페이지 이동)
     document.addEventListener("keydown", function(event) {
         if(isPopupOpen){
             return;
@@ -802,7 +798,7 @@ $(document).ready(function () {
                     else{
                         alert(data.message);
                     }
-                    
+
                     $('.loader').removeClass('is-active');
                 },
                 error: function (error) {
@@ -835,6 +831,7 @@ $(document).ready(function () {
     });
 
 
+    // 같은 페이지 내에서 다른 화면 클릭
     $(document).on('click', '.preview_canvas', function(){
         if ($(this).find("img").attr('src') == `${img_path}/page_out_of_range.png`) return;
         destroy_select_areas();
