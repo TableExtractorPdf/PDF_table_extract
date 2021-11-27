@@ -27,7 +27,7 @@
                 for(i=0 ; i<keys.length ; i++){
                     filename = keys[i];
 
-                    localStorage.setItem("PDF__"+filename+"_origin", JSON.stringify(data.detected_areas[filename]));
+                    localStorage.setItem(`PDF__${filename}_origin`, JSON.stringify(data.detected_areas[filename]));
                 }
             }
         });
