@@ -75,8 +75,8 @@
                                 var window_body = popup_window.document.getElementById("body");
 
                                 $(window_body).css("padding", "100px");
-                                $(window_body).find("#"+filename.split(".")[0]+"_progress + > div").css("width", data.split_progress[ filename ]+"%");
-                                $(window_body).find("#"+filename.split(".")[0]+"_progress + > div").text(data.split_progress[ filename ]+"%");
+                                $(window_body).find(`#${filename.split(".")[0]}_progress + > div`).css("width", data.split_progress[ filename ]+"%");
+                                $(window_body).find(`#${filename.split(".")[0]}_progress + > div`).text(data.split_progress[ filename ]+"%");
                             }
                         }
                     }
