@@ -227,9 +227,9 @@ function debugQtyAreas (event, id, areas) {
         if ($(target).attr("id") == $('.nowImg').attr('id')){
 
             page = Number(this_page);
-            if($(".nowImg").attr('id') === 'prvImg') page-=1;
-            if($(".nowImg").attr('id') === 'nxtImg') page+=1;
-            var this_page_thumb = $(".thumb_page_"+page);1
+            if($(".nowImg").attr('id') === 'prvImg') page -= 1;
+            if($(".nowImg").attr('id') === 'nxtImg') page += 1;
+            var this_page_thumb = $(`.thumb_page_${page}`);1
 
             var dtd_pg = JSON.parse( localStorage.getItem(`PDF__${file_name}`) );
 
