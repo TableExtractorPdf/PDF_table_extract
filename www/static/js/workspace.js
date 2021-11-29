@@ -272,7 +272,7 @@ function showAreaImg(target){
     if ($(target).parent().is("canvas") ){
         $(target).unwrap();
     }
-        
+    
     var img_width = target.width;
     var img_height = target.height;
 
