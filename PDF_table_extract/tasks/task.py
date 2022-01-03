@@ -4,7 +4,7 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-16
-# Last modified on 2021-11-11
+# Last modified on 2022-01-03
 #
 
 import os
@@ -13,7 +13,7 @@ import cv2
 
 
 from camelot.parsers import Stream
-from PDF_table_extract.check_lattice.Lattice_2 import Lattice2
+from PDF_table_extract.tasks.check_lattice.Lattice_2 import Lattice2
 
 from camelot.ext.ghostscript import Ghostscript
 

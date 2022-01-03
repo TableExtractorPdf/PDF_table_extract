@@ -3,8 +3,7 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-08
-# Last modified on 2021-03-09
-#
+# Last modified on 2022-01-03
 
 import copy
 from camelot.parsers import Lattice, Stream
@@ -19,8 +18,8 @@ from camelot.image_processing import (
     find_joints,
 )
 
-from PDF_table_extract.check_lattice.make_border import addOutline # call module
-from PDF_table_extract.check_lattice.merge_table import tableMerge, addVerticalLine # call module
+from PDF_table_extract.tasks.check_lattice.make_border import addOutline # call module
+from PDF_table_extract.tasks.check_lattice.merge_table import tableMerge, addVerticalLine # call module
 
 class Lattice2(Lattice):
     

@@ -3,7 +3,7 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-08
-# Last modified on 2021-11-11
+# Last modified on 2022-01-03
 #
 
 from flask import (
@@ -21,11 +21,11 @@ from werkzeug.utils import secure_filename
 from PDF_table_extract.utils.file_path import file_path_select
 from PDF_table_extract.utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
 # from utils.tasks import split as task_split
-from PDF_table_extract.utils.tasks import task_split
+from PDF_table_extract.tasks.task import task_split
 from PDF_table_extract.utils.cell_control import *
 
-from PDF_table_extract.check_lattice.Lattice_2 import Lattice2
-from PDF_table_extract.check_lattice.check_line_scale import GetLineScale
+from PDF_table_extract.tasks.check_lattice.Lattice_2 import Lattice2
+from PDF_table_extract.tasks.check_lattice.check_line_scale import GetLineScale
 
 from PDF_table_extract.data_rendering.makeGoogleSheet import make_google_sheets
 
@@ -37,23 +37,13 @@ import json
 import logging
 import logging.config
 from datetime import datetime
-# import pickle
 import multiprocessing
 
 from PDF_table_extract.utils.cell_control import *
 
 from numpyencoder import NumpyEncoder
 
-# 설정 파일 읽어오기
-logging.config.fileConfig('PDF_table_extract/config/logging.conf')
-
-# 로거 생성
-logger = logging.getLogger(__name__)
-
-fh = logging.FileHandler('PDF_table_extract/log/{:%Y-%m}.log'.format(datetime.now()))
-formatter = logging.Formatter('%(asctime)s | %(levelname)-8s | %(lineno)04d | %(message)s')
-fh.setFormatter(formatter)
-logger.addHandler(fh)
+# import pickle
 
 
 views = Blueprint("views", __name__)
@@ -545,4 +535,3 @@ def extract(regions, page_file, table_option, line_scale=40):
     tables = parser.extract_tables(page_file)
     
     return tables
-
