@@ -18,16 +18,16 @@ from flask import (
 )
 from werkzeug.utils import secure_filename
 
-from utils.file_path import file_path_select
-from utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
+from PDF_table_extract.utils.file_path import file_path_select
+from PDF_table_extract.utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
 # from utils.tasks import split as task_split
-from utils.tasks import task_split
-from utils.cell_control import *
+from PDF_table_extract.utils.tasks import task_split
+from PDF_table_extract.utils.cell_control import *
 
-from check_lattice.Lattice_2 import Lattice2
-from check_lattice.check_line_scale import GetLineScale
+from PDF_table_extract.check_lattice.Lattice_2 import Lattice2
+from PDF_table_extract.check_lattice.check_line_scale import GetLineScale
 
-from data_rendering.makeGoogleSheet import make_google_sheets
+from PDF_table_extract.data_rendering.makeGoogleSheet import make_google_sheets
 
 from PyPDF2 import PdfFileReader
 
@@ -40,17 +40,17 @@ from datetime import datetime
 # import pickle
 import multiprocessing
 
-from utils.cell_control import *
+from PDF_table_extract.utils.cell_control import *
 
 from numpyencoder import NumpyEncoder
 
 # 설정 파일 읽어오기
-logging.config.fileConfig('config/logging.conf')
+logging.config.fileConfig('PDF_table_extract/config/logging.conf')
 
 # 로거 생성
 logger = logging.getLogger(__name__)
 
-fh = logging.FileHandler('log/{:%Y-%m}.log'.format(datetime.now()))
+fh = logging.FileHandler('PDF_table_extract/log/{:%Y-%m}.log'.format(datetime.now()))
 formatter = logging.Formatter('%(asctime)s | %(levelname)-8s | %(lineno)04d | %(message)s')
 fh.setFormatter(formatter)
 logger.addHandler(fh)

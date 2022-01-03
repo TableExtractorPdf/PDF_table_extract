@@ -13,14 +13,14 @@ import cv2
 
 
 from camelot.parsers import Stream
-from check_lattice.Lattice_2 import Lattice2
+from PDF_table_extract.check_lattice.Lattice_2 import Lattice2
 
 from camelot.ext.ghostscript import Ghostscript
 
 from PyPDF2 import PdfFileReader, PdfFileWriter
 from camelot.utils import get_page_layout, get_text_objects, get_rotation
-from utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
-from utils.cell_control import *
+from PDF_table_extract.utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
+from PDF_table_extract.utils.cell_control import *
 
 from multiprocessing import Process, Manager, cpu_count
 import numpy as np

@@ -3,10 +3,10 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-08
-# Last modified on 2021-03-08
+# Last modified on 2022-01-03
 #
 
-from flask import Flask, Blueprint
+from flask import Flask
 from .views import views
 import os
 

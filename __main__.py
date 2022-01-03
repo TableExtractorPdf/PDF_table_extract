@@ -3,13 +3,9 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-08
-# Last modified on 2021-03-08
+# Last modified on 2022-01-03
 #
+from PDF_table_extract import app
 
-from www.app import create_app
-
-app = create_app()
-
-app.debug = True
-# app.run(host='lion.cju.ac.kr')
-app.run(host="127.0.0.1", port=5001, use_reloader=False)
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=5001, use_reloader=False)

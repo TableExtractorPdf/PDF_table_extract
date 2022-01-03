@@ -19,8 +19,8 @@ from camelot.image_processing import (
     find_joints,
 )
 
-from check_lattice.make_border import addOutline # call module
-from check_lattice.merge_table import tableMerge, addVerticalLine # call module
+from PDF_table_extract.check_lattice.make_border import addOutline # call module
+from PDF_table_extract.check_lattice.merge_table import tableMerge, addVerticalLine # call module
 
 class Lattice2(Lattice):
     
