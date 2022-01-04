@@ -180,12 +180,19 @@ def autoExtract():
         inputstream.close()
         empty_pages = []
 
-        result = task_split(file_name, filepath, file_page_path, split_progress)
+        result = task_split(
+            file_name,
+            filepath,
+            file_page_path,
+            split_progress
+        )
 
         print("이거 끝")
 
         if result is not None and len(result) > 0:
-            # with open(f"table_data/{file_name}-table-data.pickle", "wb") as fw:
+            # with open(
+            #   f"table_data/{file_name}-table-data.pickle", "wb"
+            # ) as fw:
             #     pickle.dump(result, fw)
 
             v = {}
