@@ -12,6 +12,7 @@ import logging
 import logging.config
 from datetime import datetime
 import multiprocessing
+from posixpath import split
 # import pickle
 
 import cv2
@@ -49,10 +50,10 @@ views = Blueprint("views", __name__)
 
 manager = multiprocessing.Manager()
 
-# split_progress = {} # split 작업 진행도
-g.split_progress = manager.dict() # split 작업 진행도
-g.detected_areas = {}
-g.is_working = False # 현재 작업중인지 확인
+split_progress = {} # split 작업 진행도
+# g.split_progress = manager.dict() # split 작업 진행도
+detected_areas = {}
+is_working = False # 현재 작업중인지 확인
 
 
 # index page (redirect to workspace)
@@ -73,6 +74,8 @@ def upload():
 # The route that comes when you request to upload a file to JQuery's AJAX.
 @views.route("/uploadPDF", methods = ['POST'])
 def uploadPDF():
+    global split_progress
+
     if 'file' not in request.files:
         resp = jsonify({'message' : 'No file part in the request'})
         g.logger.error('No file part in the request')
@@ -106,7 +109,7 @@ def uploadPDF():
             file.save(filepath)
             success = True
             
-            g.split_progress[filename] = 0
+            split_progress[filename] = 0
 
         else:
             errors[file.filename] = 'File type is not allowed'
@@ -135,18 +138,18 @@ def uploadPDF():
 # AutoExtract POST from JQuery's AJAX
 @views.route("/autoExtract", methods = ['POST'])
 def autoExtract():
-    # global split_progress
-    # global detected_areas
-    # global is_working
+    global split_progress
+    global detected_areas
+    global is_working
 
-    g.is_working = True
+    is_working = True
 
     file_names = request.form.getlist('file_names')
     
 
     # original pdf -> split 1, 2 .... n page pdf
     for file_name in file_names:
-        g.split_progress[file_name] = 0
+        split_progress[file_name] = 0
 
         filepath = os.path.join(
             current_app.config['UPLOAD_FOLDER'],
@@ -177,7 +180,7 @@ def autoExtract():
             for page, tables in sorted(result.items()):
 
                 progress = int( page / len(result) * 20 )
-                g.split_progress[file_name] = 80 + progress
+                split_progress[file_name] = 80 + progress
 
                 page_file = file_page_path + f"\\page-{page}.pdf"
                 image_file = file_page_path + f"\\page-{page}.png"
@@ -215,15 +218,15 @@ def autoExtract():
         else:
             bboxs = 0
 
-        g.detected_areas[
+        detected_areas[
             file_name.replace('.pdf', '').replace('.PDF', '')
         ] = result
 
     resp = jsonify( json.dumps(
         {
             'message': 'Files successfully uploaded',
-            'detected_areas': g.detected_areas,
-            'split_progress': dict(g.split_progress)
+            'detected_areas': detected_areas,
+            'split_progress': dict(split_progress)
         },
         cls = NumpyEncoder)
     )
@@ -237,22 +240,22 @@ def autoExtract():
 # Routes that return progress
 @views.route('/getProgress', methods = ['POST'])
 def getProgress():
-    # global split_progress
-    # global is_working
-    print(f'split_progress_ajax : {g.split_progress}\t{id(g.split_progress)}')
+    global split_progress
+    global is_working
+    print(f'split_progress_ajax : {split_progress}\t{id(split_progress)}')
 
     return jsonify({
-        'split_progress': dict(g.split_progress),
-        'is_working': g.is_working}
+        'split_progress': dict(split_progress),
+        'is_working': is_working}
     )
 
 # Routes that return detected_areas
 @views.route('/getDetectedAreas', methods = ['POST'])
 def getDetectedAreas():
-    # global detected_areas
+    global detected_areas
 
     return jsonify(json.dumps(
-        {'detected_areas': g.detected_areas},
+        {'detected_areas': detected_areas},
         cls=NumpyEncoder,
         ensure_ascii=False
     ))
@@ -260,19 +263,19 @@ def getDetectedAreas():
 # Routes that return is working
 @views.route('/isWorking', methods = ['POST'])
 def isWorking():
-    # global is_working
+    global is_working
 
-    return jsonify(g.is_working)
+    return jsonify(is_working)
 
 
 # 추출할 pdf파일이 정해졌을때 추출을 진행하는 라우트 (Get 요청으로 pdf파일 명시)
 @views.route("/workspace", methods=['GET'])
 def workspace():
-    # global detected_areas
-    # global split_progress
+    global detected_areas
+    global split_progress
 
     fileName = request.args.get("fileName")
-    print(f'split_progress:{g.split_progress}')
+    print(f'split_progress:{split_progress}')
 
     if fileName is not None:
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], fileName)
@@ -284,8 +287,8 @@ def workspace():
         total_page = infile.getNumPages()
         inputstream.close()
 
-        if g.detected_areas.get(fileName) is not None:
-            print(g.detected_areas.get(fileName))
+        if detected_areas.get(fileName) is not None:
+            print(detected_areas.get(fileName))
             # for k, v in detected_areas[fileName].items():
             #     for i in v:
 
@@ -294,7 +297,7 @@ def workspace():
                 fileName=fileName,
                 totalPage=total_page,
                 detected_areas=json.dumps(
-                    g.detected_areas[fileName],
+                    detected_areas[fileName],
                     cls=NumpyEncoder,
                     ensure_ascii=False
                 ),
@@ -317,7 +320,7 @@ def workspace():
 
 @views.route("/pre_extract", methods=['POST'])
 def pre_extract():
-    # global detected_areas
+    global detected_areas
 
     file_name = request.form['fileName']+".pdf"
     filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], file_name)
@@ -378,7 +381,7 @@ def pre_extract():
     else:
         bboxs = 0
 
-    g.detected_areas[file_name.replace('.pdf', '')] = result
+    detected_areas[file_name.replace('.pdf', '')] = result
 
     resp = jsonify({'message' : 'success'})
     resp.status_code = 201
@@ -410,130 +413,129 @@ def pre_extract_page():
 # 타겟 pdf 페이지 1장의 테이블을 추출하는 라우트
 @views.route("/doExtract", methods=['POST'])
 def doExtract_page():
-    if request.method == 'POST':
-        page = request.form['page']
-        file_name = request.form['fileName']
-        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], file_name)
+    page = request.form['page']
+    file_name = request.form['fileName']
+    filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], file_name)
 
-        page_file = f"{filepath}\\page-{page}.pdf"
+    page_file = f"{filepath}\\page-{page}.pdf"
+
+    table_option = request.form['table_option']
+    line_scale = request.form['line_scale']
     
-        table_option = request.form['table_option']
-        line_scale = request.form['line_scale']
-        
-        jsons = request.form['jsons']
-        jsons = json.loads(jsons)
-        
-        regions = []
-        for k, v in jsons.items():
-            v = json.loads(v)
-            regions.append( get_regions(v, page_file) )
+    jsons = request.form['jsons']
+    jsons = json.loads(jsons)
+    
+    regions = []
+    for k, v in jsons.items():
+        v = json.loads(v)
+        regions.append( get_regions(v, page_file) )
 
-        result = extract(regions, page_file, table_option, line_scale)
-        
-        merge_data = []
-        cells = []
-        bboxs = []
-        csv_paths = []
-        message = ""
+    result = extract(regions, page_file, table_option, line_scale)
+    
+    merge_data = []
+    cells = []
+    bboxs = []
+    csv_paths = []
+    message = ""
 
-        # --- Google Sheet Code ---
-        # html = []
-        # csvs = []
-        # col_width = []
-        # table_width = []
-        # gs = []
-        # gs_url = ""
-        # --- ----------------- ---
+    # --- Google Sheet Code ---
+    # html = []
+    # csvs = []
+    # col_width = []
+    # table_width = []
+    # gs = []
+    # gs_url = ""
+    # --- ----------------- ---
 
-        if len(result) > 0:
-            for idx, table in enumerate(result, 1):
-                df = table.df
-                df.reset_index(drop=True, inplace=True)
-
-                # --- Google Sheet Code ---
-                # gs.append(table)
-
-                # html.append(
-                    # df.to_html(index=False, header=False)
-                     # .replace('\\n', '<br>')
-                # )
-
-                # cols, width_sum = getWidth(df)
-                # col_width.append( cols )
-                # table_width.append( width_sum )
-                # csvs.append( df.to_csv(index=False) )
-                # --- ----------------- ---
-                
-                merge_data.append(
-                    find_merge_cell([
-                        [
-                            {
-                                "text": str(j.text),
-                                "vspan": j.vspan,
-                                "hspan": j.hspan
-                            }
-                            for j in i
-                        ]
-                        for i in table.cells
-                    ])
-                )
-                cells.append(
-                    json_text_to_list([
-                        [
-                            {
-                                "text": str(j.text),
-                                "vspan": j.vspan,
-                                "hspan": j.hspan
-                            }
-                            for j in i
-                        ]
-                        for i in table.cells
-                    ])
-                )
-
-                csv_path = f'{filepath}\\page-{page}-table-{idx}.csv'
-                csv_paths.append(csv_path)
-                df.to_csv(csv_path, index=False)
-                
-                bbox = table._bbox
-                bboxs.append( bbox_to_areas(v, bbox, page_file) )
-                
-            bboxs = ";".join(bboxs)
-
+    if len(result) > 0:
+        for idx, table in enumerate(result, 1):
+            df = table.df
+            df.reset_index(drop=True, inplace=True)
 
             # --- Google Sheet Code ---
-            # 구글시트 호출
-            # gs_url = make_google_sheets(file_name, gs, header='c')
-            # html = "<br>".join(html)
+            # gs.append(table)
+
+            # html.append(
+                # df.to_html(index=False, header=False)
+                    # .replace('\\n', '<br>')
+            # )
+
+            # cols, width_sum = getWidth(df)
+            # col_width.append( cols )
+            # table_width.append( width_sum )
+            # csvs.append( df.to_csv(index=False) )
             # --- ----------------- ---
             
-        else:
-            # html = "<span>발견된 테이블 없음</span>"
-            message = "발견된 테이블 없음"
-            bboxs = 0
+            merge_data.append(
+                find_merge_cell([
+                    [
+                        {
+                            "text": str(j.text),
+                            "vspan": j.vspan,
+                            "hspan": j.hspan
+                        }
+                        for j in i
+                    ]
+                    for i in table.cells
+                ])
+            )
+            cells.append(
+                json_text_to_list([
+                    [
+                        {
+                            "text": str(j.text),
+                            "vspan": j.vspan,
+                            "hspan": j.hspan
+                        }
+                        for j in i
+                    ]
+                    for i in table.cells
+                ])
+            )
 
-        return jsonify({
-            'page': page,
-            'bboxs': bboxs,
-            'merge_data': merge_data,
-            'cells': cells,
-            'csv_paths': csv_paths,
-            'message': message
-        })
+            csv_path = f'{filepath}\\page-{page}-table-{idx}.csv'
+            csv_paths.append(csv_path)
+            df.to_csv(csv_path, index=False)
+            
+            bbox = table._bbox
+            bboxs.append( bbox_to_areas(v, bbox, page_file) )
+            
+        bboxs = ";".join(bboxs)
+
 
         # --- Google Sheet Code ---
-        # return jsonify({
-            # 'bboxs': bboxs,
-            # 'jsons': jsons,
-            # 'col_width': col_width,
-            # 'table_width': table_width,
-            # 'csvs': csvs,
-            # 'gs_url': gs_url,
-            # 'message': message
-        # })
+        # 구글시트 호출
+        # gs_url = make_google_sheets(file_name, gs, header='c')
+        # html = "<br>".join(html)
         # --- ----------------- ---
+        
+    else:
+        # html = "<span>발견된 테이블 없음</span>"
+        message = "발견된 테이블 없음"
+        bboxs = 0
 
-        # return jsonify({'html':html, 'bboxs':bboxs, 'gs_url':gs_url})
+    return jsonify({
+        'page': page,
+        'bboxs': bboxs,
+        'merge_data': merge_data,
+        'cells': cells,
+        'csv_paths': csv_paths,
+        'message': message
+    })
+
+    # --- Google Sheet Code ---
+    # return jsonify({
+        # 'bboxs': bboxs,
+        # 'jsons': jsons,
+        # 'col_width': col_width,
+        # 'table_width': table_width,
+        # 'csvs': csvs,
+        # 'gs_url': gs_url,
+        # 'message': message
+    # })
+    # --- ----------------- ---
+
+    # return jsonify({'html':html, 'bboxs':bboxs, 'gs_url':gs_url})
 
 
 # 라인스케일 요청시 적절한 값 반환해주는 라우트

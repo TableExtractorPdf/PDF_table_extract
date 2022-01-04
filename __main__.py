@@ -7,14 +7,12 @@
 #
 import logging
 from datetime import datetime
-from flask import g
 
 from flask import g
 
 from PDF_table_extract import app
 
 if __name__ == "__main__":
-
     # 설정 파일 읽어오기
     logging.config.fileConfig('PDF_table_extract/config/logging.conf')
 
