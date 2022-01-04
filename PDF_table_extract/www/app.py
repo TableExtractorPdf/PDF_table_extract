@@ -15,7 +15,7 @@ def create_app():
     app.register_blueprint(views)
     app.secret_key = 'secret key@#(*@&@(*&#(*@#sfds@'
 
-    UPLOAD_FOLDER = os.getcwd() + r'\www\static\job_pdf'
+    UPLOAD_FOLDER = os.getcwd() + r'\PDF_TABLE_extract\www\static\job_pdf'
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
     return app
