@@ -45,8 +45,6 @@ from PDF_table_extract.data_rendering.makeGoogleSheet import make_google_sheets
 from PDF_table_extract.utils.cell_control import *
 
 
-
-
 views = Blueprint("views", __name__)
 
 manager = multiprocessing.Manager()
@@ -57,7 +55,7 @@ g.detected_areas = {}
 g.is_working = False # 현재 작업중인지 확인
 
 
-# 인덱스 페이지
+# index page (redirect to workspace)
 @views.route("/", methods=['GET'])
 def index():
     return redirect(url_for("views.workspace"))
@@ -66,7 +64,7 @@ def index():
     # return redirect(url_for('views.example'))
     
 
-# 업로드 페이지, 이곳에서 pdf파일을 업로드할 수 있음
+# Upload Page, You can upload a pdf file here.
 @views.route("/upload", methods=['GET'])
 def upload():
     return render_template('upload.html')
