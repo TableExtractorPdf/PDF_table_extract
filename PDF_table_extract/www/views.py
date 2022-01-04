@@ -68,25 +68,9 @@ def index():
 @views.route("/upload", methods=['GET'])
 def upload():
     return render_template('upload.html')
-    
-
-# 각종 테스트 페이지. 현재 사용안함
-@views.route("/test", methods=['GET'])
-def test():
-    return render_template('test.html')
 
 
-# table_shape.pdf파일로 테스트하던 예시 페이지
-@views.route("/example", methods=['GET'])
-def example():
-    page = request.args.get("page")
-    if page is None:
-        page = "166"
-    
-    return render_template('example.html', page=page)
-
-
-# jquery ajax로 파일 업로드 요청시 오게되는 라우트
+# The route that comes when you request to upload a file to JQuery's AJAX.
 @views.route("/uploadPDF", methods = ['POST'])
 def uploadPDF():
     if 'file' not in request.files:
@@ -122,7 +106,7 @@ def uploadPDF():
             file.save(filepath)
             success = True
             
-            split_progress[filename] = 0
+            g.split_progress[filename] = 0
 
         else:
             errors[file.filename] = 'File type is not allowed'
@@ -148,7 +132,7 @@ def uploadPDF():
         return resp
 
 
-# jquery ajax로 
+# AutoExtract POST from JQuery's AJAX
 @views.route("/autoExtract", methods = ['POST'])
 def autoExtract():
     # global split_progress
@@ -164,7 +148,10 @@ def autoExtract():
     for file_name in file_names:
         g.split_progress[file_name] = 0
 
-        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], file_name)
+        filepath = os.path.join(
+            current_app.config['UPLOAD_FOLDER'],
+            file_name
+        )
         file_page_path = os.path.splitext(filepath)[0]
         filepath = os.path.join(file_page_path, file_name)
 
@@ -206,18 +193,6 @@ def autoExtract():
 
                 if tables != -1:
                     for table_key in tables.keys():
-                        # table = tables[table_key]
-
-                        # for idx in table.keys():
-                        #     info = table[idx]
-                        #     print(f"table : {table}\t\tinfo : {info}")
-                        #     bbox =  bbox_to_areas(
-                        #       v,
-                        #       info.get("bbox"),
-                        #       page_file
-                        #     ) + f",{v['imageWidth']},{v['imageHeight']}"
-                        #     table[idx]["bbox"] = str(bbox)
-
                         table = tables[table_key]
                         
                         bbox =  bbox_to_areas(
@@ -229,21 +204,13 @@ def autoExtract():
 
                         tables[table_key] = table
                     
-                    # bboxs = ";".join(bboxs)
-                    # result[page] = bboxs
                     result[page] = tables
-                # print(f'page:{page}\ttables : {tables}')
             
             for page in result.keys():
                 if result.get(page) is None or result.get(page) == '':
                     empty_pages.append(page)
 
-            print('@'*50)
-            print(empty_pages)
             session['empty_pages'] = empty_pages
-            print(f'total length: {total_page}\t\
-                empty length:{len(empty_pages)}')
-            print('@'*50)
             
         else:
             bboxs = 0
@@ -267,7 +234,7 @@ def autoExtract():
     return resp
 
 
-# progress 진행도를 반환하는 라우트
+# Routes that return progress
 @views.route('/getProgress', methods = ['POST'])
 def getProgress():
     # global split_progress
@@ -279,7 +246,7 @@ def getProgress():
         'is_working': g.is_working}
     )
 
-# detected_areas를 반환하는 라우트
+# Routes that return detected_areas
 @views.route('/getDetectedAreas', methods = ['POST'])
 def getDetectedAreas():
     # global detected_areas
@@ -290,7 +257,7 @@ def getDetectedAreas():
         ensure_ascii=False
     ))
 
-# 작업중인지 반환하는 라우트
+# Routes that return is working
 @views.route('/isWorking', methods = ['POST'])
 def isWorking():
     # global is_working
@@ -416,7 +383,6 @@ def pre_extract():
     resp = jsonify({'message' : 'success'})
     resp.status_code = 201
     return resp
-
 
 
 # 추출할 pdf파일이 정해졌을때 추출을 진행하는 라우트 (Get 요청으로 pdf파일 명시)
@@ -604,3 +570,19 @@ def download_sheets():
         csv_to_xlsx(exportObjs)
         return "success"
     return "failed"
+
+    
+# 각종 테스트 페이지. 현재 사용안함
+# @views.route("/test", methods=['GET'])
+# def test():
+#     return render_template('test.html')
+
+
+# table_shape.pdf파일로 테스트하던 예시 페이지
+# @views.route("/example", methods=['GET'])
+# def example():
+#     page = request.args.get("page")
+#     if page is None:
+#         page = "166"
+    
+#     return render_template('example.html', page=page)
