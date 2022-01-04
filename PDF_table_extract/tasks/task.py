@@ -4,28 +4,26 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-16
-# Last modified on 2022-01-03
+# Last modified on 2022-01-05
 #
 
 import os
 import logging
 import cv2
-
-
-from camelot.parsers import Stream
-from PDF_table_extract.tasks.check_lattice.Lattice_2 import Lattice2
-
-from camelot.ext.ghostscript import Ghostscript
-
-from PyPDF2 import PdfFileReader, PdfFileWriter
-from camelot.utils import get_page_layout, get_text_objects, get_rotation
-from PDF_table_extract.utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
-from PDF_table_extract.utils.cell_control import *
-
 from multiprocessing import Process, Manager, cpu_count
 import numpy as np
 
 from flask import g
+from PyPDF2 import PdfFileReader, PdfFileWriter
+from camelot.parsers import Stream
+from camelot.ext.ghostscript import Ghostscript
+from camelot.utils import get_page_layout, get_text_objects, get_rotation
+
+from PDF_table_extract.tasks.check_lattice.Lattice_2 import Lattice2
+from PDF_table_extract.utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
+from PDF_table_extract.utils.cell_control import *
+
+
 
 def task_split_process(file_name, split_extract_pages, total_pages, originalFilePath, PDFS_FOLDER, line_scale, pages, detected_areas, num_of_cpu):
     for page in split_extract_pages:
