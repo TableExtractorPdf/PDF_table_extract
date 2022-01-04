@@ -381,11 +381,21 @@ def pre_extract():
             page_file = file_page_path + f"\\page-{page}.pdf"
             image_file = file_page_path + f"\\page-{page}.png"
 
-            v['imageHeight'], v['imageWidth'], _ = cv2.cv2.imread(image_file).shape
+            (
+                v['imageHeight'],
+                v['imageWidth'],
+                _
+            ) = cv2.cv2.imread(image_file).shape
 
             for table in tables:
                 bbox = table._bbox
-                bboxs.append( bbox_to_areas(v, bbox, page_file)+f",{v['imageWidth']},{v['imageHeight']}" )
+                bboxs.append(
+                    bbox_to_areas(
+                        v,
+                        bbox,
+                        page_file
+                    ) + f",{v['imageWidth']},{v['imageHeight']}"
+                )
                 
             bboxs = ";".join(bboxs)
             result[page] = bboxs
@@ -431,7 +441,10 @@ def pre_extract_page():
         )
 
     else:
-        return render_template('error.html', error='해당 페이지를 찾을 수 없습니다.')
+        return render_template(
+            'error.html',
+            error='해당 페이지를 찾을 수 없습니다.'
+        )
 
 
 # 타겟 pdf 페이지 1장의 테이블을 추출하는 라우트
@@ -480,7 +493,10 @@ def doExtract_page():
                 # --- Google Sheet Code ---
                 # gs.append(table)
 
-                # html.append( df.to_html(index=False, header=False).replace('\\n', '<br>') )
+                # html.append(
+                    # df.to_html(index=False, header=False)
+                     # .replace('\\n', '<br>')
+                # )
 
                 # cols, width_sum = getWidth(df)
                 # col_width.append( cols )
@@ -491,7 +507,11 @@ def doExtract_page():
                 merge_data.append(
                     find_merge_cell([
                         [
-                            {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
+                            {
+                                "text": str(j.text),
+                                "vspan": j.vspan,
+                                "hspan": j.hspan
+                            }
                             for j in i
                         ]
                         for i in table.cells
@@ -500,7 +520,11 @@ def doExtract_page():
                 cells.append(
                     json_text_to_list([
                         [
-                            {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
+                            {
+                                "text": str(j.text),
+                                "vspan": j.vspan,
+                                "hspan": j.hspan
+                            }
                             for j in i
                         ]
                         for i in table.cells
@@ -528,7 +552,14 @@ def doExtract_page():
             message = "발견된 테이블 없음"
             bboxs = 0
 
-        return jsonify({'page': page, 'bboxs': bboxs, 'merge_data': merge_data, 'cells': cells, 'csv_paths': csv_paths, 'message':message})  
+        return jsonify({
+            'page': page,
+            'bboxs': bboxs,
+            'merge_data': merge_data,
+            'cells': cells,
+            'csv_paths': csv_paths,
+            'message': message
+        })
 
         # --- Google Sheet Code ---
         # return jsonify({'bboxs':bboxs, 'jsons':jsons, 'col_width':col_width, 'table_width':table_width, 'csvs':csvs, 'gs_url':gs_url, 'message':message})
