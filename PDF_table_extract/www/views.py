@@ -19,7 +19,12 @@ from flask import (
 from werkzeug.utils import secure_filename
 
 from PDF_table_extract.utils.file_path import file_path_select
-from PDF_table_extract.utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
+from PDF_table_extract.utils.location import(
+    get_file_dim,
+    get_regions,
+    get_regions_img,
+    bbox_to_areas
+)
 # from utils.tasks import split as task_split
 from PDF_table_extract.tasks.task import task_split
 from PDF_table_extract.utils.cell_control import *
@@ -60,7 +65,9 @@ is_working = False # 현재 작업중인지 확인
 @views.route("/", methods=['GET'])
 def index():
     return redirect(url_for("views.workspace"))
-    # return redirect(url_for('views.example')) # 예시 페이지로 리다이렉트시킴 (현재 사용 안함)
+
+    # 예시 페이지로 리다이렉트시킴 (현재 사용 안함)
+    # return redirect(url_for('views.example'))
     
 
 # 업로드 페이지, 이곳에서 pdf파일을 업로드할 수 있음
@@ -102,9 +109,13 @@ def uploadPDF():
 
     for file in files:
         if file:
-            # filename = secure_filename(file.filename) # secure_filename은 한글명을 지원하지 않음
+            # secure_filename은 한글명을 지원하지 않음
+            # filename = secure_filename(file.filename)
             filename = file.filename
-            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            filepath = os.path.join(
+                current_app.config['UPLOAD_FOLDER'],
+                filename
+            )
             file_page_path = os.path.splitext(filepath)[0]
 
             # make filename folder
@@ -169,7 +180,7 @@ def autoExtract():
         inputstream.close()
         empty_pages = []
 
-        result = task_split(file_name, filepath, file_page_path, split_progress, logger)
+        result = task_split(file_name, filepath, file_page_path, split_progress)
 
         print("이거 끝")
 
@@ -186,7 +197,11 @@ def autoExtract():
                 page_file = file_page_path + f"\\page-{page}.pdf"
                 image_file = file_page_path + f"\\page-{page}.png"
 
-                v['imageHeight'], v['imageWidth'], _ = cv2.cv2.imread(image_file).shape
+                (
+                    v['imageHeight'],
+                    v['imageWidth'],
+                    _
+                ) = cv2.cv2.imread(image_file).shape
 
                 # for table in tables:
                     # bbox = table.bbox
@@ -198,12 +213,20 @@ def autoExtract():
                         # for idx in table.keys():
                         #     info = table[idx]
                         #     print(f"table : {table}\t\tinfo : {info}")
-                        #     bbox =  bbox_to_areas(v, info.get("bbox"), page_file)+f",{v['imageWidth']},{v['imageHeight']}"
+                        #     bbox =  bbox_to_areas(
+                        #       v,
+                        #       info.get("bbox"),
+                        #       page_file
+                        #     ) + f",{v['imageWidth']},{v['imageHeight']}"
                         #     table[idx]["bbox"] = str(bbox)
 
                         table = tables[table_key]
                         
-                        bbox =  bbox_to_areas(v, table.get("bbox"), page_file)+f",{v['imageWidth']},{v['imageHeight']}"
+                        bbox =  bbox_to_areas(
+                            v,
+                            table.get("bbox"),
+                            page_file
+                        ) + f",{v['imageWidth']},{v['imageHeight']}"
                         table["bbox"] = str(bbox)
 
                         tables[table_key] = table
@@ -220,16 +243,25 @@ def autoExtract():
             print('@'*50)
             print(empty_pages)
             session['empty_pages'] = empty_pages
-            print(f'total length: {total_page}\tempty length:{len(empty_pages)}')
+            print(f'total length: {total_page}\t\
+                empty length:{len(empty_pages)}')
             print('@'*50)
             
         else:
             bboxs = 0
 
-        detected_areas[file_name.replace('.pdf', '').replace('.PDF', '')] = result
+        detected_areas[
+            file_name.replace('.pdf', '').replace('.PDF', '')
+        ] = result
 
-    # resp = jsonify({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':dict(split_progress)})
-    resp = jsonify( json.dumps({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':dict(split_progress)}, cls=NumpyEncoder) )
+    resp = jsonify( json.dumps(
+        {
+            'message': 'Files successfully uploaded',
+            'detected_areas': detected_areas,
+            'split_progress': dict(split_progress)
+        },
+        cls = NumpyEncoder)
+    )
     resp.status_code = 201
 
     is_working = False
@@ -244,14 +276,21 @@ def getProgress():
     global is_working
     print(f'split_progress_ajax : {split_progress}\t{id(split_progress)}')
 
-    return jsonify({'split_progress':dict(split_progress), 'is_working':is_working})
+    return jsonify({
+        'split_progress': dict(split_progress),
+        'is_working': is_working}
+    )
 
 # detected_areas를 반환하는 라우트
 @views.route('/getDetectedAreas', methods = ['POST'])
 def getDetectedAreas():
     global detected_areas
 
-    return jsonify(json.dumps({'detected_areas':detected_areas}, cls=NumpyEncoder, ensure_ascii=False))
+    return jsonify(json.dumps(
+        {'detected_areas': detected_areas},
+        cls=NumpyEncoder,
+        ensure_ascii=False
+    ))
 
 # 작업중인지 반환하는 라우트
 @views.route('/isWorking', methods = ['POST'])
@@ -289,7 +328,11 @@ def workspace():
                 'workspace.html',
                 fileName=fileName,
                 totalPage=total_page,
-                detected_areas=json.dumps(detected_areas[fileName], cls=NumpyEncoder, ensure_ascii=False),
+                detected_areas=json.dumps(
+                    detected_areas[fileName],
+                    cls=NumpyEncoder,
+                    ensure_ascii=False
+                ),
                 split_progress=dict(split_progress)
                 # page=page
             )
@@ -301,7 +344,10 @@ def workspace():
         split_progress=dict(split_progress)
     )
     # else:
-    #     return render_template('error.html', error='해당 페이지를 찾을 수 없습니다.')
+    #     return render_template(
+            # 'error.html',
+            # error='해당 페이지를 찾을 수 없습니다.'
+        # )
 
 
 @views.route("/pre_extract", methods=['POST'])
@@ -317,7 +363,13 @@ def pre_extract():
     empty_pages = ','.join([str(i) for i in empty_pages])
 
     line_scale = int(request.form['line_scale'])
-    result = task_split(filepath, file_page_path, split_progress, line_scale = line_scale, pages = empty_pages)
+    result = task_split(
+        filepath,
+        file_page_path,
+        split_progress,
+        line_scale=line_scale,
+        pages=empty_pages
+    )
 
     empty_pages = []
 
