@@ -10,7 +10,6 @@ import os
 import json
 import logging
 import logging.config
-from datetime import datetime
 import multiprocessing
 from posixpath import split
 # import pickle
@@ -24,8 +23,7 @@ from flask import (
     redirect,
     url_for,
     current_app,
-    session,
-    g
+    session
 )
 from werkzeug.utils import secure_filename
 from PyPDF2 import PdfFileReader
@@ -78,7 +76,7 @@ def uploadPDF():
 
     if 'file' not in request.files:
         resp = jsonify({'message' : 'No file part in the request'})
-        g.logger.error('No file part in the request')
+        logger.error('No file part in the request')
         resp.status_code = 400
         return resp
 	
@@ -113,11 +111,11 @@ def uploadPDF():
 
         else:
             errors[file.filename] = 'File type is not allowed'
-            g.logger.error('File type is not allowed')
+            logger.error('File type is not allowed')
     
     if success and errors:
         errors['message'] = 'File(s) successfully uploaded'
-        g.logger.error('File(s) successfully uploaded')
+        logger.error('File(s) successfully uploaded')
         resp = jsonify(errors)
         resp.status_code = 206
         return resp
@@ -130,7 +128,7 @@ def uploadPDF():
 
     else:
         resp = jsonify(errors)
-        g.logger.error(errors)
+        logger.error(errors)
         resp.status_code = 400
         return resp
 
@@ -167,7 +165,8 @@ def autoExtract():
         result = task_split(
             file_name,
             filepath,
-            file_page_path
+            file_page_path,
+            split_progress
         )
 
         if result is not None and len(result) > 0:
