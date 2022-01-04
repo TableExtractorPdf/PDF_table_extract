@@ -28,4 +28,9 @@ if __name__ == "__main__":
     fh.setFormatter(formatter)
     g.logger.addHandler(fh)
 
-    app.run(host= "127.0.0.1", port= 5001, use_reloader= False, debug= True)
+    app.run(
+        host= "127.0.0.1",
+        port= 5001,
+        use_reloader= False,
+        debug= True
+    )
