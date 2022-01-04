@@ -3,7 +3,7 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-08
-# Last modified on 2022-01-03
+# Last modified on 2022-01-05
 #
 from PDF_table_extract import app
 import logging
@@ -17,8 +17,12 @@ if __name__ == "__main__":
     # 로거 생성
     logger = logging.getLogger(__name__)
 
-    fh = logging.FileHandler('PDF_table_extract/log/{:%Y-%m}.log'.format(datetime.now()))
-    formatter = logging.Formatter('%(asctime)s | %(levelname)-8s | %(lineno)04d | %(message)s')
+    fh = logging.FileHandler(
+        'PDF_table_extract/log/{:%Y-%m}.log'.format(datetime.now())
+    )
+    formatter = logging.Formatter(
+        '%(asctime)s | %(levelname)-8s | %(lineno)04d | %(message)s'
+    )
     fh.setFormatter(formatter)
     logger.addHandler(fh)
 
