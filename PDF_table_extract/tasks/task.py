@@ -25,11 +25,13 @@ from PDF_table_extract.utils.cell_control import *
 from multiprocessing import Process, Manager, cpu_count
 import numpy as np
 
-def task_split_process(file_name, split_extract_pages, total_pages, originalFilePath, PDFS_FOLDER, split_progress, logger, line_scale, pages, detected_areas, num_of_cpu):
+from flask import g
+
+def task_split_process(file_name, split_extract_pages, total_pages, originalFilePath, PDFS_FOLDER, line_scale, pages, detected_areas, num_of_cpu):
     for page in split_extract_pages:
         # progress = int( page / total_pages * 80/ num_of_cpu )
         # progress = int( page / total_pages *num_of_cpu * 80 )
-        progress = split_progress[file_name] if split_progress[file_name] else 0.0
+        progress = g.split_progress[file_name] if g.split_progress[file_name] else 0.0
         progress += float( 1 / total_pages * 80 )
         split_progress[file_name] = round(progress, 2)
         print(f'split_progress_task : {split_progress}\t{id(split_progress)}')
@@ -74,7 +76,7 @@ def task_split_process(file_name, split_extract_pages, total_pages, originalFile
             tables = parser.extract_tables(filepath) # 여기서 에러
         except Exception as e:
             print(f"Error! {e}")
-            logger.error(e)
+            g.logger.error(e)
             tables = ''
 
         # detected_areas[int(page)] = tables
@@ -125,7 +127,7 @@ def task_split_process(file_name, split_extract_pages, total_pages, originalFile
 
     return detected_areas
 
-def task_split(file_name, originalFilePath, PDFS_FOLDER, split_progress, logger, line_scale=40, pages='all'):
+def task_split(file_name, originalFilePath, PDFS_FOLDER, split_progress, line_scale=40, pages='all'):
     try:
         extract_pages, total_pages = get_pages(originalFilePath, pages)
         
@@ -150,7 +152,7 @@ def task_split(file_name, originalFilePath, PDFS_FOLDER, split_progress, logger,
                     originalFilePath,
                     PDFS_FOLDER,
                     split_progress,
-                    logger,
+                    # logger,
                     line_scale,
                     pages,
                     detected_areas,
