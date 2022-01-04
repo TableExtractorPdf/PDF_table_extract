@@ -3,7 +3,7 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-08
-# Last modified on 2022-01-03
+# Last modified on 2022-01-05
 #
 
 from flask import (
@@ -14,12 +14,18 @@ from flask import (
     redirect,
     url_for,
     current_app,
-    session
+    session,
+    g
 )
 from werkzeug.utils import secure_filename
 
 from PDF_table_extract.utils.file_path import file_path_select
-from PDF_table_extract.utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
+from PDF_table_extract.utils.location import(
+    get_file_dim,
+    get_regions,
+    get_regions_img,
+    bbox_to_areas
+)
 # from utils.tasks import split as task_split
 from PDF_table_extract.tasks.task import task_split
 from PDF_table_extract.utils.cell_control import *
@@ -60,7 +66,9 @@ is_working = False # 현재 작업중인지 확인
 @views.route("/", methods=['GET'])
 def index():
     return redirect(url_for("views.workspace"))
-    # return redirect(url_for('views.example')) # 예시 페이지로 리다이렉트시킴 (현재 사용 안함)
+
+    # 예시 페이지로 리다이렉트시킴 (현재 사용 안함)
+    # return redirect(url_for('views.example'))
     
 
 # 업로드 페이지, 이곳에서 pdf파일을 업로드할 수 있음
@@ -90,7 +98,7 @@ def example():
 def uploadPDF():
     if 'file' not in request.files:
         resp = jsonify({'message' : 'No file part in the request'})
-        logger.error('No file part in the request')
+        g.logger.error('No file part in the request')
         resp.status_code = 400
         return resp
 	
@@ -102,9 +110,13 @@ def uploadPDF():
 
     for file in files:
         if file:
-            # filename = secure_filename(file.filename) # secure_filename은 한글명을 지원하지 않음
+            # secure_filename은 한글명을 지원하지 않음
+            # filename = secure_filename(file.filename)
             filename = file.filename
-            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            filepath = os.path.join(
+                current_app.config['UPLOAD_FOLDER'],
+                filename
+            )
             file_page_path = os.path.splitext(filepath)[0]
 
             # make filename folder
@@ -121,11 +133,11 @@ def uploadPDF():
 
         else:
             errors[file.filename] = 'File type is not allowed'
-            logger.error('File type is not allowed')
+            g.logger.error('File type is not allowed')
     
     if success and errors:
         errors['message'] = 'File(s) successfully uploaded'
-        logger.error('File(s) successfully uploaded')
+        g.logger.error('File(s) successfully uploaded')
         resp = jsonify(errors)
         resp.status_code = 206
         return resp
@@ -138,7 +150,7 @@ def uploadPDF():
 
     else:
         resp = jsonify(errors)
-        logger.error(errors)
+        g.logger.error(errors)
         resp.status_code = 400
         return resp
 
@@ -169,12 +181,19 @@ def autoExtract():
         inputstream.close()
         empty_pages = []
 
-        result = task_split(file_name, filepath, file_page_path, split_progress, logger)
+        result = task_split(
+            file_name,
+            filepath,
+            file_page_path,
+            split_progress
+        )
 
         print("이거 끝")
 
         if result is not None and len(result) > 0:
-            # with open(f"table_data/{file_name}-table-data.pickle", "wb") as fw:
+            # with open(
+            #   f"table_data/{file_name}-table-data.pickle", "wb"
+            # ) as fw:
             #     pickle.dump(result, fw)
 
             v = {}
@@ -186,7 +205,11 @@ def autoExtract():
                 page_file = file_page_path + f"\\page-{page}.pdf"
                 image_file = file_page_path + f"\\page-{page}.png"
 
-                v['imageHeight'], v['imageWidth'], _ = cv2.cv2.imread(image_file).shape
+                (
+                    v['imageHeight'],
+                    v['imageWidth'],
+                    _
+                ) = cv2.cv2.imread(image_file).shape
 
                 # for table in tables:
                     # bbox = table.bbox
@@ -198,12 +221,20 @@ def autoExtract():
                         # for idx in table.keys():
                         #     info = table[idx]
                         #     print(f"table : {table}\t\tinfo : {info}")
-                        #     bbox =  bbox_to_areas(v, info.get("bbox"), page_file)+f",{v['imageWidth']},{v['imageHeight']}"
+                        #     bbox =  bbox_to_areas(
+                        #       v,
+                        #       info.get("bbox"),
+                        #       page_file
+                        #     ) + f",{v['imageWidth']},{v['imageHeight']}"
                         #     table[idx]["bbox"] = str(bbox)
 
                         table = tables[table_key]
                         
-                        bbox =  bbox_to_areas(v, table.get("bbox"), page_file)+f",{v['imageWidth']},{v['imageHeight']}"
+                        bbox =  bbox_to_areas(
+                            v,
+                            table.get("bbox"),
+                            page_file
+                        ) + f",{v['imageWidth']},{v['imageHeight']}"
                         table["bbox"] = str(bbox)
 
                         tables[table_key] = table
@@ -220,16 +251,25 @@ def autoExtract():
             print('@'*50)
             print(empty_pages)
             session['empty_pages'] = empty_pages
-            print(f'total length: {total_page}\tempty length:{len(empty_pages)}')
+            print(f'total length: {total_page}\t\
+                empty length:{len(empty_pages)}')
             print('@'*50)
             
         else:
             bboxs = 0
 
-        detected_areas[file_name.replace('.pdf', '').replace('.PDF', '')] = result
+        detected_areas[
+            file_name.replace('.pdf', '').replace('.PDF', '')
+        ] = result
 
-    # resp = jsonify({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':dict(split_progress)})
-    resp = jsonify( json.dumps({'message' : 'Files successfully uploaded', 'detected_areas':detected_areas, 'split_progress':dict(split_progress)}, cls=NumpyEncoder) )
+    resp = jsonify( json.dumps(
+        {
+            'message': 'Files successfully uploaded',
+            'detected_areas': detected_areas,
+            'split_progress': dict(split_progress)
+        },
+        cls = NumpyEncoder)
+    )
     resp.status_code = 201
 
     is_working = False
@@ -244,14 +284,21 @@ def getProgress():
     global is_working
     print(f'split_progress_ajax : {split_progress}\t{id(split_progress)}')
 
-    return jsonify({'split_progress':dict(split_progress), 'is_working':is_working})
+    return jsonify({
+        'split_progress': dict(split_progress),
+        'is_working': is_working}
+    )
 
 # detected_areas를 반환하는 라우트
 @views.route('/getDetectedAreas', methods = ['POST'])
 def getDetectedAreas():
     global detected_areas
 
-    return jsonify(json.dumps({'detected_areas':detected_areas}, cls=NumpyEncoder, ensure_ascii=False))
+    return jsonify(json.dumps(
+        {'detected_areas': detected_areas},
+        cls=NumpyEncoder,
+        ensure_ascii=False
+    ))
 
 # 작업중인지 반환하는 라우트
 @views.route('/isWorking', methods = ['POST'])
@@ -289,7 +336,11 @@ def workspace():
                 'workspace.html',
                 fileName=fileName,
                 totalPage=total_page,
-                detected_areas=json.dumps(detected_areas[fileName], cls=NumpyEncoder, ensure_ascii=False),
+                detected_areas=json.dumps(
+                    detected_areas[fileName],
+                    cls=NumpyEncoder,
+                    ensure_ascii=False
+                ),
                 split_progress=dict(split_progress)
                 # page=page
             )
@@ -301,7 +352,10 @@ def workspace():
         split_progress=dict(split_progress)
     )
     # else:
-    #     return render_template('error.html', error='해당 페이지를 찾을 수 없습니다.')
+    #     return render_template(
+            # 'error.html',
+            # error='해당 페이지를 찾을 수 없습니다.'
+        # )
 
 
 @views.route("/pre_extract", methods=['POST'])
@@ -317,7 +371,13 @@ def pre_extract():
     empty_pages = ','.join([str(i) for i in empty_pages])
 
     line_scale = int(request.form['line_scale'])
-    result = task_split(filepath, file_page_path, split_progress, line_scale = line_scale, pages = empty_pages)
+    result = task_split(
+        filepath,
+        file_page_path,
+        split_progress,
+        line_scale=line_scale,
+        pages=empty_pages
+    )
 
     empty_pages = []
 
@@ -329,11 +389,21 @@ def pre_extract():
             page_file = file_page_path + f"\\page-{page}.pdf"
             image_file = file_page_path + f"\\page-{page}.png"
 
-            v['imageHeight'], v['imageWidth'], _ = cv2.cv2.imread(image_file).shape
+            (
+                v['imageHeight'],
+                v['imageWidth'],
+                _
+            ) = cv2.cv2.imread(image_file).shape
 
             for table in tables:
                 bbox = table._bbox
-                bboxs.append( bbox_to_areas(v, bbox, page_file)+f",{v['imageWidth']},{v['imageHeight']}" )
+                bboxs.append(
+                    bbox_to_areas(
+                        v,
+                        bbox,
+                        page_file
+                    ) + f",{v['imageWidth']},{v['imageHeight']}"
+                )
                 
             bboxs = ";".join(bboxs)
             result[page] = bboxs
@@ -379,7 +449,10 @@ def pre_extract_page():
         )
 
     else:
-        return render_template('error.html', error='해당 페이지를 찾을 수 없습니다.')
+        return render_template(
+            'error.html',
+            error='해당 페이지를 찾을 수 없습니다.'
+        )
 
 
 # 타겟 pdf 페이지 1장의 테이블을 추출하는 라우트
@@ -428,7 +501,10 @@ def doExtract_page():
                 # --- Google Sheet Code ---
                 # gs.append(table)
 
-                # html.append( df.to_html(index=False, header=False).replace('\\n', '<br>') )
+                # html.append(
+                    # df.to_html(index=False, header=False)
+                     # .replace('\\n', '<br>')
+                # )
 
                 # cols, width_sum = getWidth(df)
                 # col_width.append( cols )
@@ -439,7 +515,11 @@ def doExtract_page():
                 merge_data.append(
                     find_merge_cell([
                         [
-                            {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
+                            {
+                                "text": str(j.text),
+                                "vspan": j.vspan,
+                                "hspan": j.hspan
+                            }
                             for j in i
                         ]
                         for i in table.cells
@@ -448,7 +528,11 @@ def doExtract_page():
                 cells.append(
                     json_text_to_list([
                         [
-                            {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
+                            {
+                                "text": str(j.text),
+                                "vspan": j.vspan,
+                                "hspan": j.hspan
+                            }
                             for j in i
                         ]
                         for i in table.cells
@@ -476,10 +560,25 @@ def doExtract_page():
             message = "발견된 테이블 없음"
             bboxs = 0
 
-        return jsonify({'page': page, 'bboxs': bboxs, 'merge_data': merge_data, 'cells': cells, 'csv_paths': csv_paths, 'message':message})  
+        return jsonify({
+            'page': page,
+            'bboxs': bboxs,
+            'merge_data': merge_data,
+            'cells': cells,
+            'csv_paths': csv_paths,
+            'message': message
+        })
 
         # --- Google Sheet Code ---
-        # return jsonify({'bboxs':bboxs, 'jsons':jsons, 'col_width':col_width, 'table_width':table_width, 'csvs':csvs, 'gs_url':gs_url, 'message':message})
+        # return jsonify({
+            # 'bboxs': bboxs,
+            # 'jsons': jsons,
+            # 'col_width': col_width,
+            # 'table_width': table_width,
+            # 'csvs': csvs,
+            # 'gs_url': gs_url,
+            # 'message': message
+        # })
         # --- ----------------- ---
 
         # return jsonify({'html':html, 'bboxs':bboxs, 'gs_url':gs_url})
@@ -523,7 +622,11 @@ def download_sheets():
 
 # 지정 pdf파일 지정 영역의 테이블을 추출하는 함수
 def extract(regions, page_file, table_option, line_scale=40):
-    # output_camelot = read_pdf(page_file, flavor="lattice", table_regions=regions)
+    # output_camelot = read_pdf(
+        # page_file,
+        # flavor="lattice",
+        # table_regions=regions
+    # )
     tables = None
     line_scale = int(line_scale)
     

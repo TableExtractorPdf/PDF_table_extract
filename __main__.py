@@ -3,12 +3,15 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-08
-# Last modified on 2022-01-03
+# Last modified on 2022-01-05
 #
-from PDF_table_extract import app
 import logging
 from datetime import datetime
 from flask import g
+
+from flask import g
+
+from PDF_table_extract import app
 
 if __name__ == "__main__":
 
@@ -18,8 +21,12 @@ if __name__ == "__main__":
     # 로거 생성
     g.logger = logging.getLogger(__name__)
 
-    fh = logging.FileHandler('PDF_table_extract/log/{:%Y-%m}.log'.format(datetime.now()))
-    formatter = logging.Formatter('%(asctime)s | %(levelname)-8s | %(lineno)04d | %(message)s')
+    fh = logging.FileHandler(
+        'PDF_table_extract/log/{:%Y-%m}.log'.format(datetime.now())
+    )
+    formatter = logging.Formatter(
+        '%(asctime)s | %(levelname)-8s | %(lineno)04d | %(message)s'
+    )
     fh.setFormatter(formatter)
     g.logger.addHandler(fh)
 
