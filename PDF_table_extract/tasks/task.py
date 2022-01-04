@@ -20,12 +20,46 @@ from camelot.ext.ghostscript import Ghostscript
 from camelot.utils import get_page_layout, get_text_objects, get_rotation
 
 from PDF_table_extract.tasks.check_lattice.Lattice_2 import Lattice2
-from PDF_table_extract.utils.location import get_file_dim, get_regions, get_regions_img, bbox_to_areas
+from PDF_table_extract.utils.location import(
+    get_file_dim,
+    get_regions,
+    get_regions_img,
+    bbox_to_areas
+)
 from PDF_table_extract.utils.cell_control import *
 
 
+# 지정 pdf파일 지정 영역의 테이블을 추출하는 함수
+def extract(regions, page_file, table_option, line_scale=40):
+    # output_camelot = read_pdf(
+        # page_file,
+        # flavor="lattice",
+        # table_regions=regions
+    # )
+    tables = None
+    line_scale = int(line_scale)
+    
+    if table_option == "areas":
+        parser = Lattice2(table_areas=regions, line_scale=line_scale)
+        
+    else:
+        parser = Lattice2(table_regions=regions, line_scale=line_scale)
+    tables = parser.extract_tables(page_file)
+    
+    return tables
 
-def task_split_process(file_name, split_extract_pages, total_pages, originalFilePath, PDFS_FOLDER, line_scale, pages, detected_areas, num_of_cpu):
+def task_split_process(
+        file_name,
+        split_extract_pages,
+        total_pages,
+        originalFilePath,
+        PDFS_FOLDER,
+        line_scale,
+        pages,
+        detected_areas,
+        num_of_cpu
+    ):
+
     for page in split_extract_pages:
         # progress = int( page / total_pages * 80/ num_of_cpu )
         # progress = int( page / total_pages *num_of_cpu * 80 )

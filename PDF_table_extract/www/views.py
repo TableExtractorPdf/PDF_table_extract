@@ -6,6 +6,15 @@
 # Last modified on 2022-01-05
 #
 
+import os
+import json
+import logging
+import logging.config
+from datetime import datetime
+import multiprocessing
+# import pickle
+
+import cv2
 from flask import (
     request,
     render_template,
@@ -18,6 +27,8 @@ from flask import (
     g
 )
 from werkzeug.utils import secure_filename
+from PyPDF2 import PdfFileReader
+from numpyencoder import NumpyEncoder
 
 from PDF_table_extract.utils.file_path import file_path_select
 from PDF_table_extract.utils.location import(
@@ -27,29 +38,13 @@ from PDF_table_extract.utils.location import(
     bbox_to_areas
 )
 # from utils.tasks import split as task_split
-from PDF_table_extract.tasks.task import task_split
-from PDF_table_extract.utils.cell_control import *
-
+from PDF_table_extract.tasks.task import task_split, extract
 from PDF_table_extract.tasks.check_lattice.Lattice_2 import Lattice2
 from PDF_table_extract.tasks.check_lattice.check_line_scale import GetLineScale
-
 from PDF_table_extract.data_rendering.makeGoogleSheet import make_google_sheets
-
-from PyPDF2 import PdfFileReader
-
-import cv2
-import os
-import json
-import logging
-import logging.config
-from datetime import datetime
-import multiprocessing
-
 from PDF_table_extract.utils.cell_control import *
 
-from numpyencoder import NumpyEncoder
 
-# import pickle
 
 
 views = Blueprint("views", __name__)
@@ -57,9 +52,9 @@ views = Blueprint("views", __name__)
 manager = multiprocessing.Manager()
 
 # split_progress = {} # split 작업 진행도
-split_progress = manager.dict() # split 작업 진행도
-detected_areas = {}
-is_working = False # 현재 작업중인지 확인
+g.split_progress = manager.dict() # split 작업 진행도
+g.detected_areas = {}
+g.is_working = False # 현재 작업중인지 확인
 
 
 # 인덱스 페이지
@@ -158,18 +153,18 @@ def uploadPDF():
 # jquery ajax로 
 @views.route("/autoExtract", methods = ['POST'])
 def autoExtract():
-    global split_progress
-    global detected_areas
-    global is_working
+    # global split_progress
+    # global detected_areas
+    # global is_working
 
-    is_working = True
+    g.is_working = True
 
     file_names = request.form.getlist('file_names')
     
 
     # original pdf -> split 1, 2 .... n page pdf
     for file_name in file_names:
-        split_progress[file_name] = 0
+        g.split_progress[file_name] = 0
 
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], file_name)
         file_page_path = os.path.splitext(filepath)[0]
@@ -184,11 +179,8 @@ def autoExtract():
         result = task_split(
             file_name,
             filepath,
-            file_page_path,
-            split_progress
+            file_page_path
         )
-
-        print("이거 끝")
 
         if result is not None and len(result) > 0:
             # with open(
@@ -200,7 +192,7 @@ def autoExtract():
             for page, tables in sorted(result.items()):
 
                 progress = int( page / len(result) * 20 )
-                split_progress[file_name] = 80 + progress
+                g.split_progress[file_name] = 80 + progress
 
                 page_file = file_page_path + f"\\page-{page}.pdf"
                 image_file = file_page_path + f"\\page-{page}.png"
@@ -258,15 +250,15 @@ def autoExtract():
         else:
             bboxs = 0
 
-        detected_areas[
+        g.detected_areas[
             file_name.replace('.pdf', '').replace('.PDF', '')
         ] = result
 
     resp = jsonify( json.dumps(
         {
             'message': 'Files successfully uploaded',
-            'detected_areas': detected_areas,
-            'split_progress': dict(split_progress)
+            'detected_areas': g.detected_areas,
+            'split_progress': dict(g.split_progress)
         },
         cls = NumpyEncoder)
     )
@@ -280,22 +272,22 @@ def autoExtract():
 # progress 진행도를 반환하는 라우트
 @views.route('/getProgress', methods = ['POST'])
 def getProgress():
-    global split_progress
-    global is_working
-    print(f'split_progress_ajax : {split_progress}\t{id(split_progress)}')
+    # global split_progress
+    # global is_working
+    print(f'split_progress_ajax : {g.split_progress}\t{id(g.split_progress)}')
 
     return jsonify({
-        'split_progress': dict(split_progress),
-        'is_working': is_working}
+        'split_progress': dict(g.split_progress),
+        'is_working': g.is_working}
     )
 
 # detected_areas를 반환하는 라우트
 @views.route('/getDetectedAreas', methods = ['POST'])
 def getDetectedAreas():
-    global detected_areas
+    # global detected_areas
 
     return jsonify(json.dumps(
-        {'detected_areas': detected_areas},
+        {'detected_areas': g.detected_areas},
         cls=NumpyEncoder,
         ensure_ascii=False
     ))
@@ -303,19 +295,19 @@ def getDetectedAreas():
 # 작업중인지 반환하는 라우트
 @views.route('/isWorking', methods = ['POST'])
 def isWorking():
-    global is_working
+    # global is_working
 
-    return jsonify(is_working)
+    return jsonify(g.is_working)
 
 
 # 추출할 pdf파일이 정해졌을때 추출을 진행하는 라우트 (Get 요청으로 pdf파일 명시)
 @views.route("/workspace", methods=['GET'])
 def workspace():
-    global detected_areas
-    global split_progress
+    # global detected_areas
+    # global split_progress
 
     fileName = request.args.get("fileName")
-    print(f'split_progress:{split_progress}')
+    print(f'split_progress:{g.split_progress}')
 
     if fileName is not None:
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], fileName)
@@ -327,8 +319,8 @@ def workspace():
         total_page = infile.getNumPages()
         inputstream.close()
 
-        if detected_areas.get(fileName) is not None:
-            print(detected_areas.get(fileName))
+        if g.detected_areas.get(fileName) is not None:
+            print(g.detected_areas.get(fileName))
             # for k, v in detected_areas[fileName].items():
             #     for i in v:
 
@@ -337,7 +329,7 @@ def workspace():
                 fileName=fileName,
                 totalPage=total_page,
                 detected_areas=json.dumps(
-                    detected_areas[fileName],
+                    g.detected_areas[fileName],
                     cls=NumpyEncoder,
                     ensure_ascii=False
                 ),
@@ -360,7 +352,7 @@ def workspace():
 
 @views.route("/pre_extract", methods=['POST'])
 def pre_extract():
-    global detected_areas
+    # global detected_areas
 
     file_name = request.form['fileName']+".pdf"
     filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], file_name)
@@ -421,15 +413,11 @@ def pre_extract():
     else:
         bboxs = 0
 
-    detected_areas[file_name.replace('.pdf', '')] = result
+    g.detected_areas[file_name.replace('.pdf', '')] = result
 
     resp = jsonify({'message' : 'success'})
     resp.status_code = 201
     return resp
-
-
-
-
 
 
 
@@ -618,23 +606,3 @@ def download_sheets():
         csv_to_xlsx(exportObjs)
         return "success"
     return "failed"
-
-
-# 지정 pdf파일 지정 영역의 테이블을 추출하는 함수
-def extract(regions, page_file, table_option, line_scale=40):
-    # output_camelot = read_pdf(
-        # page_file,
-        # flavor="lattice",
-        # table_regions=regions
-    # )
-    tables = None
-    line_scale = int(line_scale)
-    
-    if table_option == "areas":
-        parser = Lattice2(table_areas=regions, line_scale=line_scale)
-        
-    else:
-        parser = Lattice2(table_regions=regions, line_scale=line_scale)
-    tables = parser.extract_tables(page_file)
-    
-    return tables
