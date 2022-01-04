@@ -3,7 +3,7 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-08
-# Last modified on 2022-01-03
+# Last modified on 2022-01-05
 #
 
 from flask import (
@@ -14,7 +14,8 @@ from flask import (
     redirect,
     url_for,
     current_app,
-    session
+    session,
+    g
 )
 from werkzeug.utils import secure_filename
 
@@ -97,7 +98,7 @@ def example():
 def uploadPDF():
     if 'file' not in request.files:
         resp = jsonify({'message' : 'No file part in the request'})
-        logger.error('No file part in the request')
+        g.logger.error('No file part in the request')
         resp.status_code = 400
         return resp
 	
@@ -132,11 +133,11 @@ def uploadPDF():
 
         else:
             errors[file.filename] = 'File type is not allowed'
-            logger.error('File type is not allowed')
+            g.logger.error('File type is not allowed')
     
     if success and errors:
         errors['message'] = 'File(s) successfully uploaded'
-        logger.error('File(s) successfully uploaded')
+        g.logger.error('File(s) successfully uploaded')
         resp = jsonify(errors)
         resp.status_code = 206
         return resp
@@ -149,7 +150,7 @@ def uploadPDF():
 
     else:
         resp = jsonify(errors)
-        logger.error(errors)
+        g.logger.error(errors)
         resp.status_code = 400
         return resp
 
