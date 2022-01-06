@@ -20,14 +20,14 @@ from camelot.ext.ghostscript import Ghostscript
 from camelot.utils import get_page_layout, get_text_objects, get_rotation
 
 from PDF_table_extract.tasks.check_lattice.Lattice_2 import Lattice2
+from PDF_table_extract.utils.cell_control import *
+from PDF_table_extract.utils import logger
 from PDF_table_extract.utils.location import(
     get_file_dim,
     get_regions,
     get_regions_img,
     bbox_to_areas
 )
-from PDF_table_extract.utils.cell_control import *
-from PDF_table_extract.utils import logger
 
 
 # 지정 pdf파일 지정 영역의 테이블을 추출하는 함수
@@ -65,7 +65,9 @@ def task_split_process(
     for page in split_extract_pages:
         # progress = int( page / total_pages * 80/ num_of_cpu )
         # progress = int( page / total_pages *num_of_cpu * 80 )
-        progress = g.split_progress[file_name] if g.split_progress[file_name] else 0.0
+        progress = split_progress[file_name]\
+                   if split_progress[file_name] else 0.0
+        
         progress += float( 1 / total_pages * 80 )
         split_progress[file_name] = round(progress, 2)
         print(f'split_progress_task : {split_progress}\t{id(split_progress)}')
@@ -77,7 +79,9 @@ def task_split_process(
         filepath = os.path.join(PDFS_FOLDER, filename)
 
         imagename = "".join( [filename.replace(".pdf", ""), ".png"] )
-        thumb_imagename = "".join( [filename.replace(".pdf", ""), "-thumb.png"] )
+        thumb_imagename = "".join(
+            [filename.replace(".pdf", ""), "-thumb.png"]
+        )
         imagepath = os.path.join(PDFS_FOLDER, imagename)
         thumb_imagepath = os.path.join(PDFS_FOLDER, thumb_imagename)
 
@@ -85,7 +89,7 @@ def task_split_process(
 
         # convert single-page PDF to PNG
 
-        gs_call = "-q -sDEVICE=png16m -o {} -r300 {}".format(imagepath, filepath)
+        gs_call = f"-q -sDEVICE=png16m -o {imagepath} -r300 {filepath}"
         gs_call = gs_call.encode().split()
         null = open(os.devnull, "wb")
         with Ghostscript(*gs_call, stdout=null) as gs:
@@ -93,7 +97,7 @@ def task_split_process(
         null.close()
 
         # creating thumbnail image
-        gs_call = "-q -sDEVICE=png16m -o {} -r50 {}".format(thumb_imagepath, filepath)
+        gs_call = f"-q -sDEVICE=png16m -o {thumb_imagepath} -r50 {filepath}"
         gs_call = gs_call.encode().split()
         null = open(os.devnull, "wb")
         with Ghostscript(*gs_call, stdout=null) as gs:
@@ -124,14 +128,18 @@ def task_split_process(
             if "(" in bbox:
                 bbox = bbox[1:-1].split(", ")
 
-            table.df.to_csv(f'{PDFS_FOLDER}\\page-{page}-table-{idx}.csv', index=False)
-            cells = json_text_to_list([
-                            [
-                                {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
-                                for j in i
-                            ]
-                            for i in table.cells
-                        ])
+            table.df.to_csv(
+                f'{PDFS_FOLDER}\\page-{page}-table-{idx}.csv', index=False
+            )
+            cells = json_text_to_list(
+                [
+                    [
+                        {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
+                        for j in i
+                    ]
+                    for i in table.cells
+                ]
+            )
 
             table_list[str(table.order)] = {
                 "page": str(page),
@@ -139,21 +147,20 @@ def task_split_process(
                 "line_scale": line_scale,
                 # "csv": table.df.to_csv(index=False),
                 #"dataframe": None,#table.df,
-                "merge_data": find_merge_cell([
-                            [
-                                {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
-                                for j in i
-                            ]
-                            for i in table.cells
-                        ]),
+                "merge_data": find_merge_cell(
+                    [
+                        [
+                            {
+                                "text":str(j.text),
+                                "vspan":j.vspan,
+                                "hspan":j.hspan
+                            }
+                            for j in i
+                        ]
+                        for i in table.cells
+                    ]
+                ),
                 "cells": cells,
-                # "cells": [
-                #             [
-                #                 {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
-                #                 for j in i
-                #             ]
-                #             for i in table.cells
-                #         ]
                 "csv_path": f'{PDFS_FOLDER}\\page-{page}-table-{idx}.csv'
             }
         
@@ -161,7 +168,15 @@ def task_split_process(
 
     return detected_areas
 
-def task_split(file_name, originalFilePath, PDFS_FOLDER, split_progress, line_scale=40, pages='all'):
+def task_split(
+        file_name,
+        originalFilePath,
+        PDFS_FOLDER,
+        split_progress,
+        line_scale=40,
+        pages='all'
+    ):
+
     try:
         extract_pages, total_pages = get_pages(originalFilePath, pages)
         
@@ -186,7 +201,6 @@ def task_split(file_name, originalFilePath, PDFS_FOLDER, split_progress, line_sc
                     originalFilePath,
                     PDFS_FOLDER,
                     split_progress,
-                    # logger,
                     line_scale,
                     pages,
                     detected_areas,
@@ -209,7 +223,15 @@ def task_split(file_name, originalFilePath, PDFS_FOLDER, split_progress, line_sc
         logging.exception(e)
         
 
-def split(file_name, originalFilePath, PDFS_FOLDER, split_progress, line_scale=40, pages='all'):
+def split(
+        file_name,
+        originalFilePath,
+        PDFS_FOLDER,
+        split_progress,
+        line_scale=40,
+        pages='all'
+    ):
+
     try:
         extract_pages, total_pages = get_pages(originalFilePath, pages)
 
@@ -233,13 +255,15 @@ def split(file_name, originalFilePath, PDFS_FOLDER, split_progress, line_scale=4
             filepath = os.path.join(PDFS_FOLDER, filename)
 
             imagename = "".join( [filename.replace(".pdf", ""), ".png"] )
-            thumb_imagename = "".join( [filename.replace(".pdf", ""), "-thumb.png"] )
+            thumb_imagename = "".join(
+                [filename.replace(".pdf", ""), "-thumb.png"]
+            )
             imagepath = os.path.join(PDFS_FOLDER, imagename)
             thumb_imagepath = os.path.join(PDFS_FOLDER, thumb_imagename)
 
             # convert single-page PDF to PNG
 
-            gs_call = "-q -sDEVICE=png16m -o {} -r300 {}".format(imagepath, filepath)
+            gs_call = f"-q -sDEVICE=png16m -o {imagepath} -r300 {filepath}"
             gs_call = gs_call.encode().split()
             null = open(os.devnull, "wb")
             with Ghostscript(*gs_call, stdout=null) as gs:
@@ -247,7 +271,7 @@ def split(file_name, originalFilePath, PDFS_FOLDER, split_progress, line_scale=4
             null.close()
 
             # creating thumbnail image
-            gs_call = "-q -sDEVICE=png16m -o {} -r50 {}".format(thumb_imagepath, filepath)
+            gs_call = f"-q -sDEVICE=png16m -o {thumb_imagepath} -r50 {filepath}"
             gs_call = gs_call.encode().split()
             null = open(os.devnull, "wb")
             with Ghostscript(*gs_call, stdout=null) as gs:
@@ -324,7 +348,10 @@ def save_page(filepath, page_number):
     page = infile.getPage(page_number - 1)
     outfile = PdfFileWriter()
     outfile.addPage(page)
-    outpath = os.path.join(os.path.dirname(filepath), "page-{}.pdf".format(page_number))
+    outpath = os.path.join(
+        os.path.dirname(filepath),
+        f"page-{page_number}.pdf"
+    )
     with open(outpath, "wb") as f:
         outfile.write(f)
     froot, fext = os.path.splitext(outpath)
