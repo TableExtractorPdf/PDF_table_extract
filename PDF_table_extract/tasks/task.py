@@ -199,28 +199,28 @@ def task_split(
         split_extract_pages = np.array_split(extract_pages, num_of_cpu)
         print(f'split_progress_split : {split_progress}\t{id(split_progress)}')
 
-        # for idx in range(num_of_cpu):
-        #     process = Process(target=task_split_process,
-        #         args=(
-        #             file_name,
-        #             split_extract_pages[idx],
-        #             total_pages,
-        #             originalFilePath,
-        #             PDFS_FOLDER,
-        #             line_scale,
-        #             pages,
-        #             detected_areas,
-        #             num_of_cpu
-        #         )
-        #     )
+        for idx in range(num_of_cpu):
+            process = Process(target=task_split_process,
+                args=(
+                    file_name,
+                    split_extract_pages[idx],
+                    total_pages,
+                    originalFilePath,
+                    PDFS_FOLDER,
+                    line_scale,
+                    pages,
+                    detected_areas,
+                    num_of_cpu
+                )
+            )
             
-        #     processes.append(process)
-        #     process.start()
+            processes.append(process)
+            process.start()
             
         
-        # for process in processes:
-        #     process.join()
-        #     process.terminate()
+        for process in processes:
+            process.join()
+            process.terminate()
             
 
         return detected_areas.copy()
@@ -233,7 +233,6 @@ def split(
         file_name,
         originalFilePath,
         PDFS_FOLDER,
-        # split_progress,
         line_scale=40,
         pages='all'
     ):
@@ -295,8 +294,60 @@ def split(
                 print(f"Error! {e}")
                 logger.error(e)
                 tables = ''
+
             
-            detected_areas[page] = tables
+            table_list = {}
+            for idx, table in enumerate(tables, 1):
+                # table_list.append(table.df)
+                # table_list.append(table._bbox)
+                
+                bbox = table._bbox
+                if "(" in bbox:
+                    bbox = bbox[1:-1].split(", ")
+
+                table.df.to_csv(
+                    f'{PDFS_FOLDER}\\page-{page}-table-{idx}.csv', index=False
+                )
+                cells = json_text_to_list(
+                    [
+                        [
+                            {
+                                "text": str(j.text),
+                                "vspan": j.vspan,
+                                "hspan": j.hspan
+                            }
+                            for j in i
+                        ]
+                        for i in table.cells
+                    ]
+                )
+
+                table_list[str(table.order)] = {
+                    "page": str(page),
+                    "bbox": bbox,
+                    "line_scale": line_scale,
+                    # "csv": table.df.to_csv(index=False),
+                    #"dataframe": None,#table.df,
+                    "merge_data": find_merge_cell(
+                        [
+                            [
+                                {
+                                    "text": str(j.text),
+                                    "vspan": j.vspan,
+                                    "hspan": j.hspan
+                                }
+                                for j in i
+                            ]
+                            for i in table.cells
+                        ]
+                    ),
+                    "cells": cells,
+                    "csv_path": f'{PDFS_FOLDER}\\page-{page}-table-{idx}.csv'
+                }
+            
+            detected_areas[int(page)] = table_list
+            
+            # detected_areas[page] = tables
 
         return detected_areas
     except Exception as e:

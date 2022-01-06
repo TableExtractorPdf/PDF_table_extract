@@ -186,7 +186,7 @@ def autoExtract():
                 # for table in tables:
                     # bbox = table.bbox
 
-                if tables != -1:
+                if tables != -1 and tables != []:
                     for table_key in tables.keys():
                         table = tables[table_key]
                         

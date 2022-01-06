@@ -18,5 +18,6 @@ def create_app():
 
     UPLOAD_FOLDER = os.getcwd() + r'\PDF_TABLE_extract\www\static\job_pdf'
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    app.debug = False
 
     return app
