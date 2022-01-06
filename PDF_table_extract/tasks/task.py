@@ -53,7 +53,7 @@ def extract(regions, page_file, table_option, line_scale=40):
     return tables
 
 def task_split_process(
-        idx,
+        process_idx,
         file_name,
         split_extract_pages,
         total_pages,
@@ -65,18 +65,18 @@ def task_split_process(
         num_of_cpu,
         split_progress_process,
     ):
-    split_progress_process[idx] = 0.0
-    # print(f'split_progress_process-{idx} : {split_progress_process}\t{id(split_progress_process)}')
+    split_progress_process[process_idx] = 0.0
+    # print(f'split_progress_process-{process_idx} : {split_progress_process}\t{id(split_progress_process)}')
 
     for page in split_extract_pages:
         # progress = int( page / total_pages * 80/ num_of_cpu )
         # progress = int( page / total_pages *num_of_cpu * 80 )
         # progress = split_progress_process[file_name]\
         #            if split_progress_process.get(file_name) else 0.0
-        progress = split_progress_process[idx]
+        progress = split_progress_process[process_idx]
         
         progress += float( 1 / total_pages * 80 )
-        split_progress_process[idx] = progress
+        split_progress_process[process_idx] = progress
 
         # extract into single-page PDF
         save_page(originalFilePath, page)

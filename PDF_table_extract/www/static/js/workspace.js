@@ -1,3 +1,5 @@
+let this_page = 1;
+
 // 테이블 선택 영역 표시 함수
 function set_select_areas(bboxs){
     if(bboxs != 0 || bboxs != {}){
@@ -262,9 +264,9 @@ function showAreaPreviewImg(){
                 showAreaImg(this);
             });
         }
-        else{
-            showAreaImg(this);
-        }
+        // else{
+        //     showAreaImg(this);
+        // }
     });
 }
 
@@ -306,10 +308,10 @@ function showAreaImg(target){
     page = String(page);
     if( dtd_pg.hasOwnProperty(String(page)) ){
         let areas = dtd_pg[page];
-        console.log(`hihi areas : ${areas}`);
 
         if(Object.prototype.toString.call(areas) === "[object String]"){
             let arr = areas.split(";");
+            console.log(`arr : ${arr}`);
 
             for(j=0 ; j<arr.length ; j++){
                 let arr2 = arr[j].split(",");
@@ -324,21 +326,33 @@ function showAreaImg(target){
             }
         }
         else{
-            console.log(`areas.length : ${areas.length}`);
-            for(idx=0 ; idx<areas.length ; idx++){
-                for (const [key, value] of Object.entries(areas[idx])) {
-                    console.log(`hihi key : ${key} value : ${value}`);
-                    let arr2 = value.bbox.split(",");
-                    if(arr2.length>=4){
-                        ctx.strokeRect(
-                            arr2[0]/scalingFactorX,
-                            arr2[1]/scalingFactorY,
-                            arr2[2]/scalingFactorX,
-                            arr2[3]/scalingFactorY
-                        );
-                    }
+            // console.log(`areas : ${areas}`);
+            for (const [idx, info] of Object.entries(areas)) {
+                let arr2 = info.bbox.split(",");
+                if(arr2.length>=4){
+                    ctx.strokeRect(
+                        arr2[0]/scalingFactorX,
+                        arr2[1]/scalingFactorY,
+                        arr2[2]/scalingFactorX,
+                        arr2[3]/scalingFactorY
+                    );
                 }
             }
+            // for(idx=0 ; idx<areas.length ; idx++){
+            // areas.forEach(function(el){
+            //     for (const [key, value] of Object.entries(el)) {
+            //         console.log(`hihi key : ${key} value : ${value}`);
+            //         let arr2 = value.bbox.split(",");
+            //         if(arr2.length>=4){
+            //             ctx.strokeRect(
+            //                 arr2[0]/scalingFactorX,
+            //                 arr2[1]/scalingFactorY,
+            //                 arr2[2]/scalingFactorX,
+            //                 arr2[3]/scalingFactorY
+            //             );
+            //         }
+            //     }
+            // });
         }
     }
 }
@@ -374,7 +388,7 @@ if(detected_areas != "-1"){
         );
     }
 
-    let this_page = 1;
+    this_page = 1;
     let table_data;
 
     $( document ).tooltip();
@@ -382,7 +396,7 @@ if(detected_areas != "-1"){
     let selectionExists;
 }
 else if(!(localStorage.getItem(`PDF__${file_name}`) === "null")){
-    let this_page = 1;
+    this_page = 1;
     let table_data;
 
     $( document ).tooltip();
