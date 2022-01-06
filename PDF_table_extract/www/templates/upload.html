@@ -25,47 +25,6 @@
             }
 
 			$(document).ready(function () {
-                function progress(){
-                    $(".background-grey").css("display", "block");
-                    $(".loading").css("display", "block");
-
-                    var percent = document.querySelector('.percent');
-                    var progress = document.querySelector('.progress2');
-                    var text = document.querySelector('.text');
-                    var count = 4;
-                    var per = 16;
-                    var loading = setInterval(getProgress, 500);
-
-                    function getProgress(){
-                        $.ajax({
-                            type: 'POST',
-                            url: '/getProgress',
-                            xhrFields: {
-                                withCredentials: true
-                            },
-                            success: function (data) {
-                                animate(data);
-                            }
-                        });
-                    }
-
-                    function animate(per){
-                        // console.log("count : ", count);
-                        // console.log("per : ", per);
-                        // console.log("\n\n");
-                        if(count == 100 && per == 400){
-                            percent.classList.add("text-blink");
-                            text.style.display = "block";
-                            clearInterval(loading);
-                            // console.log("clear interval");
-                        }
-                        else{
-                            progress.style.width = per*4 + 'px';
-                            percent.textContent = per + '%';
-                        }
-                    }
-                }
-
                 $('.zone').on("dragover", dragOver).on("drop", uploadFiles);
                 
                 $("#file").change(function(e){
@@ -78,7 +37,7 @@
                         e.preventDefault();
                     }
 
-                    var dropZone = $('.zone'),
+                    let dropZone = $('.zone'),
                         timeout = window.dropZoneTimeout;
                     if (!timeout) {
                         dropZone.addClass('in');
@@ -86,7 +45,7 @@
                     else {
                         clearTimeout(timeout);
                     }
-                    var found = false,
+                    let found = false,
                         node = e.target;
 
                     do {
@@ -110,7 +69,7 @@
                 }
 
                 
-                var formData = new FormData();
+                let formData = new FormData();
 
                 function uploadFiles(e) {
                     if($(e.target).get(0) != $('#file').get(0)){
@@ -120,13 +79,13 @@
                     }
                     
                     e.dataTransfer = e.originalEvent.dataTransfer;
-                    var files = e.target.files || e.dataTransfer.files;
+                    let files = e.target.files || e.dataTransfer.files;
 
                     selectFile(files);
                 }
                 
                 function selectFile(fileObject){
-                    var files = null;
+                    let files = null;
 
                     if(fileObject == undefined){
 
@@ -149,10 +108,10 @@
                             if (files[i].type==='application/pdf') {
                                 $(".zone").css({"outline": "none"});
 
-                                var tag = '';
-                                var f = files[i];
-                                var fileName = f.name;
-                                var fileSize = f.size / 1024 / 1024;
+                                let tag = '';
+                                let f = files[i];
+                                let fileName = f.name;
+                                let fileSize = f.size / 1024 / 1024;
                                 fileSize = fileSize < 1 ? fileSize.toFixed(3) : fileSize.toFixed(1);
                                 tag += 
                                     "<div class='fileBox'>" +

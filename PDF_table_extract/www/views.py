@@ -28,7 +28,7 @@ from flask import (
 
 from PDF_table_extract.utils.file_path import file_path_select
 # from utils.tasks import split as task_split
-from PDF_table_extract.tasks.task import split as task_split, extract, split_progress
+from PDF_table_extract.tasks.task import task_split, extract, split_progress
 from PDF_table_extract.tasks.check_lattice.Lattice_2 import Lattice2
 from PDF_table_extract.tasks.check_lattice.check_line_scale import GetLineScale
 from PDF_table_extract.data_rendering.makeGoogleSheet import make_google_sheets
@@ -234,10 +234,25 @@ def autoExtract():
 def getProgress():
     global split_progress
     global is_working
-    print(f'split_progress_ajax : {split_progress}\t{id(split_progress)}')
+
+    result_progress = dict(split_progress)
+    for dic in result_progress.keys():
+        progresses = 0
+
+        if isinstance(result_progress[dic], int):
+            progresses = result_progress[dic]
+
+        else:
+            for progress in dict(result_progress[dic]).values():
+                progresses += progress
+            progresses = round(progresses, 2)
+
+        result_progress[dic] = progresses
+        
+    # print(f'split_progress_ajax : {result_progress}\t{id(result_progress)}')
 
     return jsonify({
-        'split_progress': dict(split_progress),
+        'split_progress': result_progress,
         'is_working': is_working}
     )
 
@@ -268,7 +283,7 @@ def workspace():
 
     fileName = request.args.get("fileName")
     # print(f'split_progress:{split_progress}')
-    print(f'split_progress_workspace : {split_progress}\t{id(split_progress)}')
+    # print(f'split_progress_workspace : {split_progress}\t{id(split_progress)}')
 
     if fileName is not None:
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], fileName)

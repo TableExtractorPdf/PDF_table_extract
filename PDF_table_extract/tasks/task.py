@@ -53,6 +53,7 @@ def extract(regions, page_file, table_option, line_scale=40):
     return tables
 
 def task_split_process(
+        idx,
         file_name,
         split_extract_pages,
         total_pages,
@@ -61,19 +62,21 @@ def task_split_process(
         line_scale,
         pages,
         detected_areas,
-        num_of_cpu
+        num_of_cpu,
+        split_progress_process,
     ):
-    global split_progress
+    split_progress_process[idx] = 0.0
+    # print(f'split_progress_process-{idx} : {split_progress_process}\t{id(split_progress_process)}')
 
     for page in split_extract_pages:
         # progress = int( page / total_pages * 80/ num_of_cpu )
         # progress = int( page / total_pages *num_of_cpu * 80 )
-        progress = split_progress[file_name]\
-                   if split_progress.get(file_name) else 0.0
+        # progress = split_progress_process[file_name]\
+        #            if split_progress_process.get(file_name) else 0.0
+        progress = split_progress_process[idx]
         
         progress += float( 1 / total_pages * 80 )
-        split_progress[file_name] = round(progress, 2)
-        print(f'split_progress_task{num_of_cpu} : {split_progress}\t{id(split_progress)}')
+        split_progress_process[idx] = progress
 
         # extract into single-page PDF
         save_page(originalFilePath, page)
@@ -193,15 +196,18 @@ def task_split(
 
         # detected_areas = dict()
         detected_areas = manager.dict()
+        split_progress_process = manager.dict()
+        split_progress[file_name] = split_progress_process
 
         processes = []
         
         split_extract_pages = np.array_split(extract_pages, num_of_cpu)
-        print(f'split_progress_split : {split_progress}\t{id(split_progress)}')
+        # print(f'split_progress_split : {split_progress}\t{id(split_progress)}')
 
         for idx in range(num_of_cpu):
             process = Process(target=task_split_process,
                 args=(
+                    idx,
                     file_name,
                     split_extract_pages[idx],
                     total_pages,
@@ -210,7 +216,8 @@ def task_split(
                     line_scale,
                     pages,
                     detected_areas,
-                    num_of_cpu
+                    num_of_cpu,
+                    split_progress_process,
                 )
             )
             
@@ -249,6 +256,7 @@ def split(
             imagedims,
             detected_areas,
         ) = ({} for i in range(6))
+        print(f'split_progress_split : {split_progress}\t{id(split_progress)}')
 
         for page in extract_pages:
             progress = int( page / total_pages * 80 )

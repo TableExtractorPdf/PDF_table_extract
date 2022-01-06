@@ -5,7 +5,7 @@
     var popup_window;
 
     function popup_upload(){
-        var popup = window.open(
+        let popup = window.open(
             '/upload',
             'PDF file upload',
             'width=700px,height=400px,scrollbars=yes, menubar=no, location=no,toolbar=no,status=no');
@@ -37,12 +37,12 @@
             $(".background-grey").css("display", "block");
             $(".loading").css("display", "block");
 
-            var percent = document.querySelector('.percent');
-            var progress = document.querySelector('.progress2');
-            var text = document.querySelector('.text');
-            var count = 4;
-            var per = 16;
-            var loading = setInterval(getProgress, 500);
+            let percent = document.querySelector('.percent');
+            let progress = document.querySelector('.progress2');
+            let text = document.querySelector('.text');
+            let count = 4;
+            let per = 16;
+            let loading = setInterval(getProgress, 500);
 
             function getProgress(){
                 $.ajax({
@@ -72,11 +72,15 @@
                                 //     is_finish = false;
                                 // }
 
-                                var window_body = popup_window.document.getElementById("body");
+                                let window_body = popup_window.document.getElementById("body");
 
                                 $(window_body).css("padding", "100px");
-                                $(window_body).find(`#${filename.split(".")[0]}_progress + > div`).css("width", `${data.split_progress[ filename ]}%`);
-                                $(window_body).find(`#${filename.split(".")[0]}_progress + > div`).text(`${data.split_progress[ filename ]}%`);
+                                
+                                $(window_body).find(`#${filename.split(".")[0]}_progress + > div`)
+                                .css("width", `${data.split_progress[ filename ]}%`);
+
+                                $(window_body).find(`#${filename.split(".")[0]}_progress + > div`)
+                                .text(`${data.split_progress[ filename ]}%`);
                             }
                         }
                     }
@@ -85,8 +89,8 @@
         }
 
     function auto_extract(files, popup_window){
-        var html = "";
-        var file_names = [];
+        let html = "";
+        let file_names = [];
 
         for(i=0 ; i<files.length ; i++){
             html += `<span id='${files[i].name.split('.')[0]}_progress'>${files[i].name}</span>`;
