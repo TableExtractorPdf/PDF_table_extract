@@ -29,6 +29,9 @@ from PDF_table_extract.utils.location import(
     bbox_to_areas
 )
 
+# manager = Manager()
+# split_progress = manager.dict() # split 작업 진행도
+split_progress = {}
 
 # 지정 pdf파일 지정 영역의 테이블을 추출하는 함수
 def extract(regions, page_file, table_option, line_scale=40):
@@ -55,22 +58,22 @@ def task_split_process(
         total_pages,
         originalFilePath,
         PDFS_FOLDER,
-        split_progress,
         line_scale,
         pages,
         detected_areas,
         num_of_cpu
     ):
+    global split_progress
 
     for page in split_extract_pages:
         # progress = int( page / total_pages * 80/ num_of_cpu )
         # progress = int( page / total_pages *num_of_cpu * 80 )
         progress = split_progress[file_name]\
-                   if split_progress[file_name] else 0.0
+                   if split_progress.get(file_name) else 0.0
         
         progress += float( 1 / total_pages * 80 )
         split_progress[file_name] = round(progress, 2)
-        print(f'split_progress_task : {split_progress}\t{id(split_progress)}')
+        print(f'split_progress_task{num_of_cpu} : {split_progress}\t{id(split_progress)}')
 
         # extract into single-page PDF
         save_page(originalFilePath, page)
@@ -134,7 +137,11 @@ def task_split_process(
             cells = json_text_to_list(
                 [
                     [
-                        {"text":str(j.text), "vspan":j.vspan, "hspan":j.hspan}
+                        {
+                            "text": str(j.text),
+                            "vspan": j.vspan,
+                            "hspan": j.hspan
+                        }
                         for j in i
                     ]
                     for i in table.cells
@@ -151,9 +158,9 @@ def task_split_process(
                     [
                         [
                             {
-                                "text":str(j.text),
-                                "vspan":j.vspan,
-                                "hspan":j.hspan
+                                "text": str(j.text),
+                                "vspan": j.vspan,
+                                "hspan": j.hspan
                             }
                             for j in i
                         ]
@@ -172,10 +179,10 @@ def task_split(
         file_name,
         originalFilePath,
         PDFS_FOLDER,
-        split_progress,
         line_scale=40,
         pages='all'
     ):
+    global split_progress
 
     try:
         extract_pages, total_pages = get_pages(originalFilePath, pages)
@@ -192,29 +199,28 @@ def task_split(
         split_extract_pages = np.array_split(extract_pages, num_of_cpu)
         print(f'split_progress_split : {split_progress}\t{id(split_progress)}')
 
-        for idx in range(num_of_cpu):
-            process = Process(target=task_split_process,
-                args=(
-                    file_name,
-                    split_extract_pages[idx],
-                    total_pages,
-                    originalFilePath,
-                    PDFS_FOLDER,
-                    split_progress,
-                    line_scale,
-                    pages,
-                    detected_areas,
-                    num_of_cpu
-                )
-            )
+        # for idx in range(num_of_cpu):
+        #     process = Process(target=task_split_process,
+        #         args=(
+        #             file_name,
+        #             split_extract_pages[idx],
+        #             total_pages,
+        #             originalFilePath,
+        #             PDFS_FOLDER,
+        #             line_scale,
+        #             pages,
+        #             detected_areas,
+        #             num_of_cpu
+        #         )
+        #     )
             
-            processes.append(process)
-            process.start()
+        #     processes.append(process)
+        #     process.start()
             
         
-        for process in processes:
-            process.join()
-            process.terminate()
+        # for process in processes:
+        #     process.join()
+        #     process.terminate()
             
 
         return detected_areas.copy()
@@ -227,10 +233,11 @@ def split(
         file_name,
         originalFilePath,
         PDFS_FOLDER,
-        split_progress,
+        # split_progress,
         line_scale=40,
         pages='all'
     ):
+    global split_progress
 
     try:
         extract_pages, total_pages = get_pages(originalFilePath, pages)

@@ -8,7 +8,6 @@
 
 import os
 import json
-import multiprocessing
 from posixpath import split
 # import pickle
 
@@ -24,12 +23,12 @@ from flask import (
     redirect,
     url_for,
     current_app,
-    session,
+    session,g
 )
 
 from PDF_table_extract.utils.file_path import file_path_select
 # from utils.tasks import split as task_split
-from PDF_table_extract.tasks.task import task_split, extract
+from PDF_table_extract.tasks.task import split as task_split, extract, split_progress
 from PDF_table_extract.tasks.check_lattice.Lattice_2 import Lattice2
 from PDF_table_extract.tasks.check_lattice.check_line_scale import GetLineScale
 from PDF_table_extract.data_rendering.makeGoogleSheet import make_google_sheets
@@ -42,13 +41,8 @@ from PDF_table_extract.utils.location import(
 )
 from PDF_table_extract.utils import logger
 
-
 views = Blueprint("views", __name__)
 
-manager = multiprocessing.Manager()
-
-# split_progress = {} # split 작업 진행도
-split_progress = manager.dict() # split 작업 진행도
 detected_areas = {}
 is_working = False # 현재 작업중인지 확인
 
@@ -165,7 +159,7 @@ def autoExtract():
             file_name,
             filepath,
             file_page_path,
-            split_progress
+            # split_progress
         )
 
         if result is not None and len(result) > 0:
@@ -273,7 +267,8 @@ def workspace():
     global split_progress
 
     fileName = request.args.get("fileName")
-    print(f'split_progress:{split_progress}')
+    # print(f'split_progress:{split_progress}')
+    print(f'split_progress_workspace : {split_progress}\t{id(split_progress)}')
 
     if fileName is not None:
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], fileName)
