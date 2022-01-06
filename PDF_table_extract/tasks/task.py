@@ -4,7 +4,7 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-16
-# Last modified on 2022-01-05
+# Last modified on 2022-01-06
 #
 
 import os
@@ -27,6 +27,7 @@ from PDF_table_extract.utils.location import(
     bbox_to_areas
 )
 from PDF_table_extract.utils.cell_control import *
+from PDF_table_extract.utils import logger
 
 
 # 지정 pdf파일 지정 영역의 테이블을 추출하는 함수
@@ -109,7 +110,7 @@ def task_split_process(
             tables = parser.extract_tables(filepath) # 여기서 에러
         except Exception as e:
             print(f"Error! {e}")
-            g.logger.error(e)
+            logger.error(e)
             tables = ''
 
         # detected_areas[int(page)] = tables
@@ -208,7 +209,7 @@ def task_split(file_name, originalFilePath, PDFS_FOLDER, split_progress, line_sc
         logging.exception(e)
         
 
-def split(file_name, originalFilePath, PDFS_FOLDER, split_progress, logger, line_scale=40, pages='all'):
+def split(file_name, originalFilePath, PDFS_FOLDER, split_progress, line_scale=40, pages='all'):
     try:
         extract_pages, total_pages = get_pages(originalFilePath, pages)
 

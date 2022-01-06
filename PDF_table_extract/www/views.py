@@ -3,7 +3,7 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-08
-# Last modified on 2022-01-05
+# Last modified on 2022-01-06
 #
 
 import os
@@ -47,8 +47,8 @@ views = Blueprint("views", __name__)
 
 manager = multiprocessing.Manager()
 
-split_progress = {} # split 작업 진행도
-# g.split_progress = manager.dict() # split 작업 진행도
+# split_progress = {} # split 작업 진행도
+split_progress = manager.dict() # split 작업 진행도
 detected_areas = {}
 is_working = False # 현재 작업중인지 확인
 
@@ -75,7 +75,7 @@ def uploadPDF():
 
     if 'file' not in request.files:
         resp = jsonify({'message' : 'No file part in the request'})
-        current_app.logger.error('No file part in the request')
+        logger.error('No file part in the request')
         resp.status_code = 400
         return resp
 	
@@ -110,11 +110,11 @@ def uploadPDF():
 
         else:
             errors[file.filename] = 'File type is not allowed'
-            views.logger.error('File type is not allowed')
+            logger.error('File type is not allowed')
     
     if success and errors:
         errors['message'] = 'File(s) successfully uploaded'
-        views.logger.error('File(s) successfully uploaded')
+        logger.error('File(s) successfully uploaded')
         resp = jsonify(errors)
         resp.status_code = 206
         return resp
@@ -127,7 +127,7 @@ def uploadPDF():
 
     else:
         resp = jsonify(errors)
-        views.logger.error(errors)
+        logger.error(errors)
         resp.status_code = 400
         return resp
 
