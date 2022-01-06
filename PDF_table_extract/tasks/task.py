@@ -54,6 +54,7 @@ def task_split_process(
         total_pages,
         originalFilePath,
         PDFS_FOLDER,
+        split_progress,
         line_scale,
         pages,
         detected_areas,

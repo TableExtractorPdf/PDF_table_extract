@@ -3,12 +3,13 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-08
-# Last modified on 2022-01-03
+# Last modified on 2022-01-06
 #
 
 from flask import Flask
-from .views import views
 import os
+
+from PDF_table_extract.www.views import views
 
 def create_app():
     app = Flask(__name__)

@@ -8,13 +8,14 @@
 
 import os
 import json
-import logging
-import logging.config
 import multiprocessing
 from posixpath import split
 # import pickle
 
 import cv2
+from werkzeug.utils import secure_filename
+from PyPDF2 import PdfFileReader
+from numpyencoder import NumpyEncoder
 from flask import (
     request,
     render_template,
@@ -23,25 +24,23 @@ from flask import (
     redirect,
     url_for,
     current_app,
-    session
+    session,
 )
-from werkzeug.utils import secure_filename
-from PyPDF2 import PdfFileReader
-from numpyencoder import NumpyEncoder
 
 from PDF_table_extract.utils.file_path import file_path_select
-from PDF_table_extract.utils.location import(
-    get_file_dim,
-    get_regions,
-    get_regions_img,
-    bbox_to_areas
-)
 # from utils.tasks import split as task_split
 from PDF_table_extract.tasks.task import task_split, extract
 from PDF_table_extract.tasks.check_lattice.Lattice_2 import Lattice2
 from PDF_table_extract.tasks.check_lattice.check_line_scale import GetLineScale
 from PDF_table_extract.data_rendering.makeGoogleSheet import make_google_sheets
 from PDF_table_extract.utils.cell_control import *
+from PDF_table_extract.utils.location import(
+    get_file_dim,
+    get_regions,
+    get_regions_img,
+    bbox_to_areas
+)
+from PDF_table_extract.utils import logger
 
 
 views = Blueprint("views", __name__)
@@ -76,7 +75,7 @@ def uploadPDF():
 
     if 'file' not in request.files:
         resp = jsonify({'message' : 'No file part in the request'})
-        logger.error('No file part in the request')
+        current_app.logger.error('No file part in the request')
         resp.status_code = 400
         return resp
 	
@@ -111,11 +110,11 @@ def uploadPDF():
 
         else:
             errors[file.filename] = 'File type is not allowed'
-            logger.error('File type is not allowed')
+            views.logger.error('File type is not allowed')
     
     if success and errors:
         errors['message'] = 'File(s) successfully uploaded'
-        logger.error('File(s) successfully uploaded')
+        views.logger.error('File(s) successfully uploaded')
         resp = jsonify(errors)
         resp.status_code = 206
         return resp
@@ -128,7 +127,7 @@ def uploadPDF():
 
     else:
         resp = jsonify(errors)
-        logger.error(errors)
+        views.logger.error(errors)
         resp.status_code = 400
         return resp
 
