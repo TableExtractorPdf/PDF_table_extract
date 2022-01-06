@@ -6,7 +6,7 @@ function set_select_areas(bboxs){
             for(key in bboxs){
                 value = bboxs[key];
 
-                var arr = value.bbox.split(',');
+                let arr = value.bbox.split(',');
 
                 fileDimsX = Number(arr[4])
                 fileDimsY = Number(arr[5])
@@ -30,7 +30,7 @@ function set_select_areas(bboxs){
             
             arrs = [];
             for(i=0 ; i<bboxs.length ; i++){
-                var arr = bboxs[i].split(',');
+                let arr = bboxs[i].split(',');
 
                 fileDimsX = Number(arr[4])
                 fileDimsY = Number(arr[5])
@@ -103,7 +103,7 @@ function move_page(pre_page, page){
         $('.nowImg').removeAttr('style');
         $('.nowImg').attr("class", "previewImg");
 
-        var target = $('#centerImg');
+        let target = $('#centerImg');
         $(target).unwrap();
 
         $(target).selectAreas({
@@ -126,9 +126,9 @@ function move_page(pre_page, page){
     $('#thumb_page_'+page).addClass('thumb_img_select');
 
 
-    var target_thumb = $('.thumb_img_select').parent().parent();
-    var prv_page = -1;
-    var nxt_page = -1;
+    let target_thumb = $('.thumb_img_select').parent().parent();
+    let prv_page = -1;
+    let nxt_page = -1;
 
     if($(target_thumb).prevAll('.thumb_page:visible:first').length > 0)
         prv_page = target_thumb.prevAll('.thumb_page:visible:first')
@@ -169,17 +169,17 @@ function move_page(pre_page, page){
 
 
     $("<img>").attr("src", $("img.nowImg").attr("src")).load(function(){
-        var imageWidth = this.width;
-        var imageHeight = this.height;
+        let imageWidth = this.width;
+        let imageHeight = this.height;
 
-        var fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
+        let fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
 
         $('.image-decorator div, .image-decorator img').css({
             'height':'70vh',
             'width':fit_width
         });
         
-        var dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
+        let dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
 
         page = Number(this_page);
         if($('.nowImg').attr('id') === 'prvImg') page=prv_page;
@@ -221,7 +221,7 @@ function show_gs(data){
 function debugQtyAreas (event, id, areas) {
     // console.log(areas.length + " areas", arguments);
     // alert(areas.length + " areas", arguments);
-    var target = this;
+    let target = this;
 
     $("<img>").attr("src", $("img.nowImg").attr("src")).load(function(){
         if ($(target).attr("id") == $('.nowImg').attr('id')){
@@ -229,9 +229,9 @@ function debugQtyAreas (event, id, areas) {
             page = Number(this_page);
             if($(".nowImg").attr('id') === 'prvImg') page -= 1;
             if($(".nowImg").attr('id') === 'nxtImg') page += 1;
-            var this_page_thumb = $(`.thumb_page_${page}`);1
+            let this_page_thumb = $(`.thumb_page_${page}`);1
 
-            var dtd_pg = JSON.parse( localStorage.getItem(`PDF__${file_name}`) );
+            let dtd_pg = JSON.parse( localStorage.getItem(`PDF__${file_name}`) );
 
             dtd_pg[page] = areas_to_bbox(areas, this.width, this.height);
 
@@ -273,11 +273,11 @@ function showAreaImg(target){
         $(target).unwrap();
     }
     
-    var img_width = target.width;
-    var img_height = target.height;
+    let img_width = target.width;
+    let img_height = target.height;
 
-    var img_width_n = target.naturalWidth;
-    var img_height_n = target.naturalHeight;
+    let img_width_n = target.naturalWidth;
+    let img_height_n = target.naturalHeight;
 
     $(target).wrap(`<canvas class='preview_canvas'
         width='${img_width}' height='${img_height}'></canvas>`);
@@ -286,8 +286,8 @@ function showAreaImg(target){
     $("canvas.preview_canvas:has(#centerImg)").css("left", "250px");
     $("canvas.preview_canvas:has(#nxtImg)").css("left", "600px");
     
-    var canvas = $(target).parent();
-    var ctx = canvas[0].getContext("2d");
+    let canvas = $(target).parent();
+    let ctx = canvas[0].getContext("2d");
     ctx.drawImage(target, 0, 0, img_width, img_height);
     
     ctx.strokeStyle = "red";
@@ -297,7 +297,7 @@ function showAreaImg(target){
     scalingFactorX = img_width_n / img_width;
     scalingFactorY = img_height_n / img_height;
     
-    var dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
+    let dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
 
     page = Number(this_page);
     if($(target).attr('id') === 'prvImg') page-=1;
@@ -305,13 +305,14 @@ function showAreaImg(target){
 
     page = String(page);
     if( dtd_pg.hasOwnProperty(String(page)) ){
-        var areas = dtd_pg[page];
+        let areas = dtd_pg[page];
+        console.log(`hihi areas : ${areas}`);
 
         if(Object.prototype.toString.call(areas) === "[object String]"){
-            var arr = areas.split(";");
+            let arr = areas.split(";");
 
             for(j=0 ; j<arr.length ; j++){
-                var arr2 = arr[j].split(",");
+                let arr2 = arr[j].split(",");
                 if(arr2.length>=4){
                     ctx.strokeRect(
                         arr2[0]/scalingFactorX,
@@ -323,9 +324,11 @@ function showAreaImg(target){
             }
         }
         else{
+            console.log(`areas.length : ${areas.length}`);
             for(idx=0 ; idx<areas.length ; idx++){
                 for (const [key, value] of Object.entries(areas[idx])) {
-                    var arr2 = value.bbox.split(",");
+                    console.log(`hihi key : ${key} value : ${value}`);
+                    let arr2 = value.bbox.split(",");
                     if(arr2.length>=4){
                         ctx.strokeRect(
                             arr2[0]/scalingFactorX,
@@ -350,7 +353,7 @@ function output (text) {
 
 // Display areas coordinates in a div
 function displayAreas (areas) {
-    var text = "";
+    let text = "";
     $.each(areas, function (id, area) {
         text += areaToString(area);
     });
@@ -359,7 +362,7 @@ function displayAreas (areas) {
 
 // 빨간 줄 그어져도 에러 안남
 if(detected_areas != "-1"){
-    var detected_areas_origin = JSON.parse( detected_areas );
+    let detected_areas_origin = JSON.parse( detected_areas );
     localStorage.setItem(
         `PDF__${file_name}_origin`, JSON.stringify(detected_areas_origin)
     );
@@ -371,20 +374,20 @@ if(detected_areas != "-1"){
         );
     }
 
-    var this_page = 1;
-    var table_data;
+    let this_page = 1;
+    let table_data;
 
     $( document ).tooltip();
         
-    var selectionExists;
+    let selectionExists;
 }
 else if(!(localStorage.getItem(`PDF__${file_name}`) === "null")){
-    var this_page = 1;
-    var table_data;
+    let this_page = 1;
+    let table_data;
 
     $( document ).tooltip();
         
-    var selectionExists;
+    let selectionExists;
 }
 
 
@@ -395,12 +398,12 @@ $(window).load(function() {
 $(document).ready(function () {
     if (!(localStorage.getItem(`PDF__${file_name}`) === "null"
         || localStorage.getItem(`PDF__${file_name}`) === null )) {
-        var dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
+        let dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
 
-        var htmls = "";
+        let htmls = "";
 
         for(idx=1 ; idx<Object.keys(dtd_pg).length+1 ; idx++){
-            var tables_len = 0;
+            let tables_len = 0;
 
             if(dtd_pg[idx] != -1){
                 tables_len = Object.keys(dtd_pg[idx]).length;
@@ -408,9 +411,9 @@ $(document).ready(function () {
 
             if (tables_len > 0){
                 // 최초 로딩
-                var cnt = 1;
+                let cnt = 1;
                 for(const[key, value] of Object.entries(dtd_pg[idx])){
-                    var isTextExist = false
+                    let isTextExist = false
                     if(value.cells == undefined) {
                         continue;
                     }
@@ -483,12 +486,12 @@ $(document).ready(function () {
 
         $("#page_list_box").append(htmls);
 
-        var select_items = new Set();
+        let select_items = new Set();
         select_items.add(".thumb_page");
 
         $('#page_multiple_selected').multiselect({
             onChange: function(option, checked, select) {
-                var opselected = $(option).val();
+                let opselected = $(option).val();
                 if(checked == true) {
                     if (opselected == 'all') { select_items.add(".thumb_page"); } 
                     if (opselected == 'table') { select_items.add(".thumb_table"); } 
@@ -508,7 +511,7 @@ $(document).ready(function () {
                 $( Array.from(select_items).join('') ).show("slow");
             }
         });
-        var is_page_list_expand = false;
+        let is_page_list_expand = false;
         
 
         // 추출할 메인 이미지 교체
@@ -521,10 +524,10 @@ $(document).ready(function () {
             width: window.innerWidth / 3.84,
             onChanged: debugQtyAreas
         }).one("load", function(){
-            var imageWidth = $('#centerImg').width();
-            var imageHeight = $('#centerImg').height();
+            let imageWidth = $('#centerImg').width();
+            let imageHeight = $('#centerImg').height();
 
-            var fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
+            let fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
 
             $('.image-decorator div, .image-decorator img').css(
                 {'height':'70vh', 'width':fit_width}
@@ -539,7 +542,7 @@ $(document).ready(function () {
         showAreaPreviewImg();
     }
     else{
-        var values = [],
+        let values = [],
         keys = Object.keys(split_progress),
         i = keys.length;
         count = 0;
@@ -548,7 +551,7 @@ $(document).ready(function () {
             auto_detect_progress();
         }
 
-        var html = "<h4>Previous Jobs</h4>";
+        let html = "<h4>Previous Jobs</h4>";
 
         
         
@@ -661,7 +664,7 @@ $(document).ready(function () {
                 break;
 
             case " ":
-                var this_page_thumb = $(".thumb_page_"+this_page);
+                let this_page_thumb = $(".thumb_page_"+this_page);
                 if(this_page_thumb.hasClass("thumb_check")){
                     this_page_thumb.removeClass("thumb_check")
                     this_page_thumb.addClass("thumb_check_none");
@@ -679,14 +682,14 @@ $(document).ready(function () {
     
     $('#get_line_size').click(function () { 
         $('.loader').addClass("is-active");
-        var selectedAreas = $('img#centerImg').selectAreas('areas');
+        let selectedAreas = $('img#centerImg').selectAreas('areas');
         
         if (selectedAreas.length > 0) {
             const imageWidth = $('#centerImg').width();
             const imageHeight = $('#centerImg').height();
         
-            var table_option = $("input[name='optradio']:checked").val();
-            var jsons = {};
+            let table_option = $("input[name='optradio']:checked").val();
+            let jsons = {};
             
             for(i=0 ; i<selectedAreas.length ; i++){
                 selectedAreas[i]['imageWidth'] = imageWidth;
@@ -720,14 +723,14 @@ $(document).ready(function () {
     $('#extract').click(function () {
         $('.loader').addClass('is-active');
 
-        var selectedAreas = $('img#centerImg').selectAreas('areas');
+        let selectedAreas = $('img#centerImg').selectAreas('areas');
         
         if (selectedAreas.length > 0) {
             const imageWidth = $('#centerImg').width();
             const imageHeight = $('#centerImg').height();
         
-            var table_option = $("input[name='optradio']:checked").val();
-            var jsons = {};
+            let table_option = $("input[name='optradio']:checked").val();
+            let jsons = {};
             
             for(i=0 ; i<selectedAreas.length ; i++){
                 selectedAreas[i]['imageWidth'] = imageWidth;
@@ -750,17 +753,17 @@ $(document).ready(function () {
                 success: function (data) {
                     table_data = data;
 
-                    var bboxs = table_data.bboxs;
+                    let bboxs = table_data.bboxs;
 
                     // --- Google Sheet Code ---
                     
-                    // var jsons = table_data.jsons;
-                    // var csvs = table_data.csvs;
+                    // let jsons = table_data.jsons;
+                    // let csvs = table_data.csvs;
                     
-                    // var gs_url = table_data.gs_url;
-                    // var iframe = null;
+                    // let gs_url = table_data.gs_url;
+                    // let iframe = null;
 
-                    // var htmls = "";
+                    // let htmls = "";
                     // --- ----------------- ---
                     
                     if(bboxs != 0){
@@ -781,7 +784,7 @@ $(document).ready(function () {
                             
                             arrs = [];
 
-                            var arr = bboxs[idx].split(',');
+                            let arr = bboxs[idx].split(',');
                             
                             arrs.push({
                                 x: Number(arr[0]),
@@ -810,8 +813,8 @@ $(document).ready(function () {
     });
 
     $('#auto_detect').click(function(){
-        var dtd_pg_origin = JSON.parse( localStorage.getItem(`PDF__${file_name}_origin`) );
-        var dtd_pg = JSON.parse( localStorage.getItem(`PDF__${file_name}`) );
+        let dtd_pg_origin = JSON.parse( localStorage.getItem(`PDF__${file_name}_origin`) );
+        let dtd_pg = JSON.parse( localStorage.getItem(`PDF__${file_name}`) );
 
         page = Number(this_page);
         if($('.nowImg').attr('id') === 'prvImg') page-=1;
@@ -836,7 +839,7 @@ $(document).ready(function () {
         if ($(this).find("img").attr('src') == `${img_path}/page_out_of_range.png`) return;
         destroy_select_areas();
         
-        var target = $(this).find("img");
+        let target = $(this).find("img");
         $(target).unwrap();
 
         $(target).wrap('<div class="image-decorator"></div>')
@@ -876,17 +879,17 @@ $(document).ready(function () {
         showAreaPreviewImg();
 
         $("<img>").attr("src", $("img.nowImg").attr("src")).load(function(){
-            var imageWidth = this.width;
-            var imageHeight = this.height;
+            let imageWidth = this.width;
+            let imageHeight = this.height;
 
-            var fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
+            let fit_width = (imageWidth/imageHeight*100)*0.7+'vh';
 
             $('.image-decorator div, .image-decorator img').css({
                 'height':'70vh',
                 'width':fit_width
             });
             
-            var dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
+            let dtd_pg = JSON.parse(localStorage.getItem(`PDF__${file_name}`));
 
             page = Number(this_page);
             if($('.nowImg').attr('id') === 'prvImg') page-=1;
@@ -923,7 +926,7 @@ $(document).ready(function () {
     });
     
     $("#check_page_btn").click(function(){
-        var this_page_thumb = $(".thumb_page_"+this_page);
+        let this_page_thumb = $(".thumb_page_"+this_page);
         if(this_page_thumb.hasClass("thumb_check")){
             this_page_thumb.removeClass("thumb_check")
             this_page_thumb.addClass("thumb_check_none");
@@ -946,7 +949,7 @@ $(document).ready(function () {
     
     // 테마 선택
     $('#select-theme').on('click', 'li', function() {
-        var style= $(this).text();
+        let style= $(this).text();
 
         if(style == "Leaf") {
             applyPreset(leaf.header, leaf.headerTxt, leaf.body, leaf.bodyAlt, leaf.bodyTxt, leaf.border);
@@ -961,7 +964,7 @@ $(document).ready(function () {
 
     // 테마 선택
     $('#select-align').on('click', 'li', function() {
-        var align = $(this).text().trim();
+        let align = $(this).text().trim();
         
         if (align == 'format_align_left') {
             $('.jexcel_overflow').find('td[data-x][data-y]').css('text-align', 'left');

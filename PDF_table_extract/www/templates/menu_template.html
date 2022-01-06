@@ -2,7 +2,7 @@
 <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/menu_template.css')}}">
 
 <script>
-    var popup_window;
+    let popup_window;
 
     function popup_upload(){
         let popup = window.open(
@@ -64,7 +64,7 @@
                             // console.log(data);
                             let keys = Object.keys(data.split_progress);
 
-                            // var is_finish = true;
+                            // let is_finish = true;
 
                             for(i=0 ; i<keys.length ; i++){
                                 filename = keys[i];
@@ -75,7 +75,7 @@
                                 let window_body = popup_window.document.getElementById("body");
 
                                 $(window_body).css("padding", "100px");
-                                
+
                                 $(window_body).find(`#${filename.split(".")[0]}_progress + > div`)
                                 .css("width", `${data.split_progress[ filename ]}%`);
 

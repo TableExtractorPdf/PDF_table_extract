@@ -72,11 +72,11 @@
 
 
         <script>
-            var detected_areas = {{detected_areas | tojson | safe}};
-            var file_name = `{{fileName}}`;
-            var job_path = `{{url_for('static', filename='job_pdf')}}/${file_name}`;
-            var img_path = `{{url_for('static', filename='img')}}/`;
-            var split_progress = JSON.parse( '{{split_progress | tojson | safe}}' );
+            let detected_areas = {{detected_areas | tojson | safe}};
+            let file_name = `{{fileName}}`;
+            let job_path = `{{url_for('static', filename='job_pdf')}}/${file_name}`;
+            let img_path = `{{url_for('static', filename='img')}}/`;
+            let split_progress = JSON.parse( '{{split_progress | tojson | safe}}' );
         </script>
 
         <script src="/static/js/workspace.js"></script>
