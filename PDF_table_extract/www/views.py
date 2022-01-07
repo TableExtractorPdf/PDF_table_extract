@@ -249,8 +249,6 @@ def getProgress():
 
         result_progress[dic] = progresses
         
-    # print(f'split_progress_ajax : {result_progress}\t{id(result_progress)}')
-
     return jsonify({
         'split_progress': result_progress,
         'is_working': is_working}
@@ -282,8 +280,6 @@ def workspace():
     global split_progress
 
     fileName = request.args.get("fileName")
-    # print(f'split_progress:{split_progress}')
-    # print(f'split_progress_workspace : {split_progress}\t{id(split_progress)}')
 
     if fileName is not None:
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], fileName)

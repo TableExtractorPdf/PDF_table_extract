@@ -66,7 +66,6 @@ def task_split_process(
         split_progress_process,
     ):
     split_progress_process[process_idx] = 0.0
-    # print(f'split_progress_process-{process_idx} : {split_progress_process}\t{id(split_progress_process)}')
 
     for page in split_extract_pages:
         progress = split_progress_process[process_idx]
