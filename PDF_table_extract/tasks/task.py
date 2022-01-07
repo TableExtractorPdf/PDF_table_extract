@@ -69,10 +69,6 @@ def task_split_process(
     # print(f'split_progress_process-{process_idx} : {split_progress_process}\t{id(split_progress_process)}')
 
     for page in split_extract_pages:
-        # progress = int( page / total_pages * 80/ num_of_cpu )
-        # progress = int( page / total_pages *num_of_cpu * 80 )
-        # progress = split_progress_process[file_name]\
-        #            if split_progress_process.get(file_name) else 0.0
         progress = split_progress_process[process_idx]
         
         progress += float( 1 / total_pages * 80 )
