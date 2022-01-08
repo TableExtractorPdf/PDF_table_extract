@@ -1,4 +1,5 @@
 let this_page = 1;
+let is_page_list_expand = false;
 
 // 테이블 선택 영역 표시 함수
 function set_select_areas(bboxs){
@@ -525,7 +526,7 @@ $(document).ready(function () {
                 $( Array.from(select_items).join('') ).show("slow");
             }
         });
-        let is_page_list_expand = false;
+        is_page_list_expand = false;
         
 
         // 추출할 메인 이미지 교체

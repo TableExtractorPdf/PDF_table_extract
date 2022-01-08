@@ -398,7 +398,7 @@ def pre_extract_page():
     fileName = request.args.get("fileName")
 
     # if fileName is not None and page is not None:
-    if fileName is not None:
+    if fileName:
         empty_pages = session['empty_pages']
 
         return render_template(
@@ -577,7 +577,7 @@ def download_sheets():
         return "success"
     return "failed"
 
-    
+
 # 각종 테스트 페이지. 현재 사용안함
 # @views.route("/test", methods=['GET'])
 # def test():
