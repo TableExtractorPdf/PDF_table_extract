@@ -120,8 +120,10 @@ class GetLineScale:
         threshold = np.unique(threshold) # 중복 제거
         
         # 중복 제거하고 모두 0이면 false / 0 이외 값이 있으면 (line 존재하는 것이므로) true
-        if len(threshold)==1: return False
-        else: return True
+        if len(threshold)==1: 
+            return False
+        else: 
+            return True
         
     def calc_line_size(self, threshold): # case horizontal
         if self.direction == "h":
@@ -151,8 +153,10 @@ class GetLineScale:
         pick_x, pick_y = self.pick_line[0] ,self.pick_line[1] 
         for line in cont:
             # 모든 line중에서 pick_line 범위를 포함하는 line 구하기
-            if pick_x < line[0] or pick_x > line[0]+line[2] : continue
-            if pick_y >= line[1] and pick_y <= line[1]+line[3] : return line
+            if pick_x < line[0] or pick_x > line[0]+line[2]:
+                continue
+            if pick_y >= line[1] and pick_y <= line[1]+line[3]:
+                return line
         
         # pick line 포함하는 line이 없는 경우
         return [-1]

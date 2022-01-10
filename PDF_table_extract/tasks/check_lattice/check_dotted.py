@@ -124,7 +124,7 @@ def detect_dotted_line(threshold, direction="v", line_scale=15, rep = 5):
     '''
     Parameters
         threshold <nd.array> : Readed Image to Threshold
-        direction <String> : Direction to check
+        direction <str> : Direction to check
         line_scale <int> : Camelot read_pdf Parameter line_scale
         rep <int> : Number of times the dotted line repeats
     returns
