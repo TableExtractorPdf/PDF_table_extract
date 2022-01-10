@@ -1,7 +1,7 @@
 ﻿"""
 # check line scale
 # start : 20200225
-# update : 20210310
+# update : 20220111
 # minku Koo
 """
 
@@ -50,9 +50,11 @@ class GetLineScale:
         threshold = self.getThreshold(self.image_gray)
         
         # find direction, first horizontal 
-        if self.find_direction(threshold, "h"): self.direction = "h"
+        if self.find_direction(threshold, "h"): 
+            self.direction = "h"
         # second vertical
-        elif self.find_direction(threshold, "v"): pass # vertical is default, pass
+        elif self.find_direction(threshold, "v"): 
+            pass # vertical is default, pass
         else: # no line detected
             self.line_size = [-1]
             self.line_scale = -1
@@ -97,6 +99,7 @@ class GetLineScale:
             # horizontal calculation
             size = threshold.shape[1] // self.div_line_scale
             el = cv2.getStructuringElement(cv2.MORPH_RECT, ( size, 1 ))
+            
         elif direction == "v":
             # vertical calculation
             size = threshold.shape[0] // self.div_line_scale
@@ -166,7 +169,7 @@ class GetLineScale:
         return -1 # anyway error
 
 if __name__ ==  "__main__":
-    print("I AM CHECK_LINE_SCALE MAIN")
+    # print("I AM CHECK_LINE_SCALE MAIN")
     '''
     # How to use?
     dirpath = "./test-photo/"
@@ -181,5 +184,6 @@ if __name__ ==  "__main__":
     print("line size >", getlinescale.line_size)
     print("adapted line scale >", getlinescale.line_scale)
     '''
+    pass
     
     

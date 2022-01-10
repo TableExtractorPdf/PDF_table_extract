@@ -1,15 +1,13 @@
 ﻿'''
 # get line size
 # start : 20200220
-# update : 20210226
+# update : 20220111
 # minku Koo
 
-Line Conditions
+Table Line Conditions
 1. 영역 벽에 선이 붙어있음
 2. 영역 내에서 가장 긴 선
 
-horizontal, vertical 구분
-vertical 경우 -> horizontal 구조로 전환 후 계산
 '''
 
 import cv2
@@ -171,7 +169,7 @@ class GetLineSize:
     
 
 if __name__ ==  "__main__":
-    print("I AM GET_LINE_SIZE MAIN")
+    # print("I AM GET_LINE_SIZE MAIN")
     '''
     # How to use?
     dirpath = "./test-photo/"
@@ -186,5 +184,6 @@ if __name__ ==  "__main__":
     print(getlinesize.line_size)
     print(getlinesize.line_sizes)
     '''
+    pass
 
 

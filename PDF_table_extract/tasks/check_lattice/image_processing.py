@@ -95,12 +95,7 @@ def find_lines(
         size = threshold.shape[0] // line_scale
         el = cv2.getStructuringElement(cv2.MORPH_RECT, (1, size)) # 구조체 정의
         el_temp = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 2))
-        '''
-        모폴로지 연산
-        morph cross 십자가형
-        morph rect 직사각형
-        morph ellipse 타원형
-        '''
+        
     elif direction == "horizontal":
         size = threshold.shape[1] // line_scale
         el = cv2.getStructuringElement(cv2.MORPH_RECT, (size, 1))
@@ -114,8 +109,6 @@ def find_lines(
             x, y, w, h = region
             region_mask[y : y + h, x : x + w] = 1
         threshold = np.multiply(threshold, region_mask)
-    
-    print("image processing 1")
     
     # threshold = cv2.dilate(threshold, el_temp, iterations=2)
     threshold = cv2.erode(threshold, el, iterations=1)
@@ -141,7 +134,7 @@ def find_lines(
             lines.append(((x1 + x2) // 2, y2, (x1 + x2) // 2, y1))
         elif direction == "horizontal":
             lines.append((x1, (y1 + y2) // 2, x2, (y1 + y2) // 2))
-    # print(direction+" lines",lines)
+    
     return dmask, lines
 
 
@@ -175,10 +168,7 @@ def find_contours(vertical, horizontal):
             mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
         )
     # sort in reverse based on contour area and use first 10 contours
-    # contourarea : 테두리로 둘러쌓인 곳의 면적
     contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
-    
-    
     
     cont = []
     for c in contours:

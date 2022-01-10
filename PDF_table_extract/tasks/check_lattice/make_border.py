@@ -1,7 +1,7 @@
 ﻿'''
 # add outside border -> detect more table (less 4 joint table)
 # start : 20200301
-# update : 20200301
+# update : 20220111
 # minku Koo
 '''
 

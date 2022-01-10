@@ -3,7 +3,7 @@
 # one table but camelot cannot detected. 
 # it can detected tables as one, and merging
 # start : 20210319
-# update : 20210410
+# update : 20220111
 # minku Koo
 """
 
@@ -13,12 +13,14 @@ import pandas as pd
 def __calc_row_value(horizontal_seg, before_table, now_table, table=True):
     """
     Parameters
+    ----------
         horizontal_seg <tuple in list> : horizontal line position
         before_table <list> : [ before table coordinate <tuple>, table or line <boolean> ]
         now_table <list> : [ now table coordinate <tuple>, table or line <boolean> ]
         table <boolean> : is table or line, table is true (default = True)
     
     returns
+    ----------
        boolean : True - merge / False - not merge
     """
     
@@ -61,7 +63,9 @@ def __calc_row_value(horizontal_seg, before_table, now_table, table=True):
     bottom_value = now_table[0][1]
     table_by_table = bottom_value - top_value
     
-    if table_by_table > row_value: return False # not merge
+    if table_by_table > row_value: 
+        return False # not merge
+        
     return True # merge
     
     
@@ -69,6 +73,7 @@ def __calc_row_value(horizontal_seg, before_table, now_table, table=True):
 def tableMerge(contours, vertical_segments, horizontal_segments, scale = 15):
     """
     Parameters
+    ----------
         contours <tuple in list> : detedted table
         vertical_segments <tuple in list> : vertical line position
         horizontal_segments <tuple in list> : horizontal line position
@@ -76,9 +81,11 @@ def tableMerge(contours, vertical_segments, horizontal_segments, scale = 15):
                       If smaller than scale value, jedge by line (default = 15)
     
     returns
+    ----------
         result <tuple in list> : Tables that require merging
     """
-    if contours == [] : return []
+    if contours == []: 
+        return []
     
     result = []
     #  y 좌표로 오름차순 정렬
@@ -98,9 +105,11 @@ def tableMerge(contours, vertical_segments, horizontal_segments, scale = 15):
         if not isTable: # if not table, line
             
             #  condition 1 : is same width?
-            if abs( contours[index-1][2] - table[2]) > 2: continue
+            if abs( contours[index-1][2] - table[2]) > 2: 
+                continue
             #  condition 2 : is same x coordinate?
-            if abs(contours[index-1][0] - table[0]) > 2: continue
+            if abs(contours[index-1][0] - table[0]) > 2: 
+                continue
             
             
         tables[index] = [table , isTable]
@@ -114,7 +123,9 @@ def tableMerge(contours, vertical_segments, horizontal_segments, scale = 15):
         if index not in tables.keys(): 
             sameTable = []
             continue
-        if index-1 not in tables.keys(): continue
+            
+        if index-1 not in tables.keys(): 
+            continue
         
         before_table, now_table = tables[index-1], tables[index]
         
@@ -188,11 +199,13 @@ def tableMerge(contours, vertical_segments, horizontal_segments, scale = 15):
 def addVerticalLine(vertical_mask, merge_table, lineSize=1):
     """
     Parameters
+    ----------
         vertical_mask <nd.array> : vertical line threshold
         merge_table <tuple in list> : Tables that require merging
         lineSize <int> : line size <default = 1>
     
     returns
+    ----------
         vertical_mask <nd.array> : added vertical line on threshold
     """
     for table in merge_table:

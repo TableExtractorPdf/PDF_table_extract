@@ -1,6 +1,6 @@
 ﻿'''
 # Start : 21.07.20
-# Updated : 21.08.31
+# Updated : 21.01.11
 # Minku Koo
 # Purpose : 점선 감지 후, 실선으로 변경
 
@@ -37,7 +37,7 @@ def __check_dotted_line(line, repetition = 5, erosion_size=10):
     line_meta_data, count_pixel = [], 0
     # temp_pixel : 이전 픽셀이 0인지 1인지 확인하기 위한 변수
     # start_point : 라인 또는 공백의 시작점 인덱스 저장 변수
-    temp_pixel, start_point = int( line[0] ), 0
+    temp_pixel, start_point = int(line[0]), 0
     for index, pixel in enumerate(line):
         # 현재 픽셀과 이전 픽셀의 값이 동일한 경우
         if temp_pixel == pixel : 
@@ -45,27 +45,21 @@ def __check_dotted_line(line, repetition = 5, erosion_size=10):
             
         else: # 다른 경우
             # 기존 라인 또는 공백 정보를 메타 데이터에 추가
-            line_meta_data.append( {
+            line_meta_data.append({
                                     "start": start_point,
                                     "pixel": temp_pixel,
                                     "size": count_pixel
-                                    } )
+                                    })
             # 변수 초기화
             count_pixel = 1
             temp_pixel = pixel
             start_point = index
     
-    line_meta_data.append( {
+    line_meta_data.append({
                             "start": start_point,
                             "pixel": temp_pixel,
                             "size": count_pixel
-                            } )
-    
-    '''
-    # Example
-    >> print( line_meta_data )
-    [{'start': 0, 'pixel': 0, 'size': 1}, {'start': 1, 'pixel': 1, 'size': 4}, ...]
-    '''
+                            })
     
     
     dotted_line_section, dotted_line_stack = [], []
@@ -122,6 +116,7 @@ def __dotted2solid(threshold, sections, direction, index):
         for sec in sections:
             start, end = sec[0], sec[-1]
             threshold[ start:end+1 , index:index+1 ] = 255
+            
     return threshold
 
 
