@@ -129,3 +129,6 @@
 2022-01-07 00:56:00,597 | ERROR    | 0123 | list index out of range
 2022-01-07 00:56:04,203 | ERROR    | 0123 | list index out of range
 2022-01-07 00:56:29,738 | ERROR    | 0123 | list index out of range
+2022-01-28 01:15:44,490 | ERROR    | 0072 | No file part in the request
+2022-01-28 01:15:46,725 | ERROR    | 0072 | No file part in the request
+2022-01-28 01:15:48,546 | ERROR    | 0072 | No file part in the request
