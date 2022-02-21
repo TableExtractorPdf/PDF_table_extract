@@ -3,7 +3,7 @@
 # PDF_table_extract
 #
 # Created by Ji-yong219 on 2021-03-08
-# Last modified on 2022-01-06
+# Last modified on 2022-02-21
 #
 
 import os
@@ -27,7 +27,6 @@ from flask import (
 )
 
 from PDF_table_extract.utils.file_path import file_path_select
-# from utils.tasks import split as task_split
 from PDF_table_extract.tasks.task import task_split, extract, split_progress
 from PDF_table_extract.tasks.check_lattice.Lattice_2 import Lattice2
 from PDF_table_extract.tasks.check_lattice.check_line_scale import GetLineScale
@@ -163,10 +162,12 @@ def autoExtract():
         )
 
         if result is not None and len(result) > 0:
+            ### save data with pickle
             # with open(
             #   f"table_data/{file_name}-table-data.pickle", "wb"
             # ) as fw:
             #     pickle.dump(result, fw)
+            ### save data with pickle
 
             v = {}
             for page, tables in sorted(result.items()):
@@ -182,9 +183,6 @@ def autoExtract():
                     v['imageWidth'],
                     _
                 ) = cv2.cv2.imread(image_file).shape
-
-                # for table in tables:
-                    # bbox = table.bbox
 
                 if tables != -1 and tables != []:
                     for table_key in tables.keys():
@@ -292,9 +290,6 @@ def workspace():
         inputstream.close()
 
         if detected_areas.get(fileName) is not None:
-            print(detected_areas.get(fileName))
-            # for k, v in detected_areas[fileName].items():
-            #     for i in v:
 
             return render_template(
                 'workspace.html',
@@ -306,7 +301,6 @@ def workspace():
                     ensure_ascii=False
                 ),
                 split_progress=dict(split_progress)
-                # page=page
             )
 
     return render_template(
