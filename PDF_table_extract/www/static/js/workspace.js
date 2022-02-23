@@ -202,10 +202,6 @@ function move_page(pre_page, page){
     showAreaPreviewImg();
 }
 
-function sum(total, num) {
-    return total + num;
-}
-
 function show_gs(data){
     $("#table_printer").html('');
 
@@ -327,7 +323,6 @@ function showAreaImg(target){
             }
         }
         else{
-            // console.log(`areas : ${areas}`);
             for (const [idx, info] of Object.entries(areas)) {
                 let arr2 = info.bbox.split(",");
                 if(arr2.length>=4){
@@ -339,21 +334,6 @@ function showAreaImg(target){
                     );
                 }
             }
-            // for(idx=0 ; idx<areas.length ; idx++){
-            // areas.forEach(function(el){
-            //     for (const [key, value] of Object.entries(el)) {
-            //         console.log(`hihi key : ${key} value : ${value}`);
-            //         let arr2 = value.bbox.split(",");
-            //         if(arr2.length>=4){
-            //             ctx.strokeRect(
-            //                 arr2[0]/scalingFactorX,
-            //                 arr2[1]/scalingFactorY,
-            //                 arr2[2]/scalingFactorX,
-            //                 arr2[3]/scalingFactorY
-            //             );
-            //         }
-            //     }
-            // });
         }
     }
 }
