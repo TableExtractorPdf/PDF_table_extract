@@ -765,7 +765,6 @@ $(document).ready(function () {
                         bboxs = bboxs.split(";");
                         
                         for(idx=0 ; idx<bboxs.length ; idx++){
-                            // console.log(`table_data.cells[idx] : ${table_data.cells[idx]}`);
 
                             modifySheet(
                                 table_data.page,
