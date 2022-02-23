@@ -303,17 +303,17 @@ def workspace():
                 split_progress=dict(split_progress)
             )
 
-    return render_template(
-        'workspace.html',
-        fileName=fileName,
-        detected_areas=-1,
-        split_progress=dict(split_progress)
-    )
-    # else:
-    #     return render_template(
-            # 'error.html',
-            # error='해당 페이지를 찾을 수 없습니다.'
-        # )
+        return render_template(
+            'workspace.html',
+            fileName=fileName,
+            detected_areas=-1,
+            split_progress=dict(split_progress)
+        )
+    else:
+        return render_template(
+            'error.html',
+            error='해당 페이지를 찾을 수 없습니다.'
+        )
 
 
 @views.route("/pre_extract", methods=['POST'])
@@ -570,19 +570,3 @@ def download_sheets():
         csv_to_xlsx(exportObjs)
         return "success"
     return "failed"
-
-
-# 각종 테스트 페이지. 현재 사용안함
-# @views.route("/test", methods=['GET'])
-# def test():
-#     return render_template('test.html')
-
-
-# table_shape.pdf파일로 테스트하던 예시 페이지
-# @views.route("/example", methods=['GET'])
-# def example():
-#     page = request.args.get("page")
-#     if page is None:
-#         page = "166"
-    
-#     return render_template('example.html', page=page)
