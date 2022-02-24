@@ -92,8 +92,8 @@ def read_task(path, file_hash):
     return
     ===========================================
     task_info <dictionary> : task information{
-        'last_page' : temp, 일단 신경 ㄴ
-        'checked' : temp, 일단 신경 ㄴ
+        'last_page' : temp,
+        'checked' : temp,
         'table_index'<int> : {
             'bbox' : (bbox), (bbox) <tuple>,
             'line_scale' : line_scale <int>
