@@ -23,7 +23,7 @@ from flask import (
     redirect,
     url_for,
     current_app,
-    session,g
+    session,
 )
 
 from PDF_table_extract.utils.file_path import file_path_select
