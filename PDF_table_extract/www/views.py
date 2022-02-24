@@ -271,7 +271,9 @@ def isWorking():
     return jsonify(is_working)
 
 
-# 추출할 pdf파일이 정해졌을때 추출을 진행하는 라우트 (Get 요청으로 pdf파일 명시)
+# 추출할 pdf파일명을 받아와서
+# 해당 pdf파일의 workspace 페이지를 반환하는 라우트
+# (Get 요청으로 pdf파일 명시)
 @views.route("/workspace", methods=['GET'])
 def workspace():
     global detected_areas
